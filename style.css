@@ -27,35 +27,32 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--tex
 .green { background: var(--success); }
 .orange { background: var(--warning); }
 .gray { background: #94a3b8; }
+.red { background: #ef4444; }
 
+/* Övningsväljare */
 .category-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
-.cat-btn { padding: 15px; border-radius: 15px; border: 2px solid #e2e8f0; background: white; font-weight: 700; color: var(--text); cursor: pointer; }
-.cat-btn:active { background: var(--primary); color: white; }
+.cat-btn { padding: 15px; border-radius: 15px; border: 2px solid #e2e8f0; background: white; font-weight: 700; color: var(--text); cursor: pointer; transition: 0.2s; }
+.cat-btn.active { background: var(--primary); color: white; border-color: var(--primary); transform: scale(1.05); }
 
-.calendar-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-.nav-arrow { background: none; border: none; font-size: 20px; color: var(--primary); font-weight: bold; cursor: pointer; }
+/* Kalender */
 .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
-.calendar-cell { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; background: white; border-radius: 10px; font-size: 12px; font-weight: 700; border: 1px solid #f1f5f9; cursor: pointer; }
-
+.calendar-cell { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; background: white; border-radius: 10px; font-size: 12px; font-weight: 700; border: 1px solid #f1f5f9; cursor: pointer; position: relative; }
 .cell-planned { background-color: #dbeafe !important; color: #1d4ed8; }
 .cell-completed { background-color: var(--success) !important; color: white; border: none !important; }
 
-.legend { margin-top: 20px; display: flex; justify-content: center; gap: 20px; }
-.legend-item { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; }
-.legend-color { width: 14px; height: 14px; border-radius: 4px; }
+/* Statistik-staplar */
+.chart-wrapper { display: flex; align-items: flex-end; height: 150px; gap: 10px; padding: 20px 10px; border-bottom: 2px solid #eee; margin-bottom: 10px; }
+.chart-bar { flex: 1; background: var(--primary); border-radius: 6px 6px 0 0; position: relative; cursor: pointer; transition: 0.3s; }
+.chart-bar:hover { filter: brightness(1.1); }
+.chart-bar::after { content: attr(data-value); position: absolute; top: -20px; left: 50%; transform: translateX(-50%); font-size: 10px; font-weight: 800; }
+.chart-label { font-size: 9px; text-align: center; margin-top: 5px; color: var(--text-light); }
 
-.exercise-card-container { perspective: 1000px; margin-bottom: 15px; }
-.exercise-card-inner { position: relative; width: 100%; transition: transform 0.6s; transform-style: preserve-3d; min-height: 160px; }
-.exercise-card-container.flipped .exercise-card-inner { transform: rotateY(180deg); }
-.card-front, .card-back { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; border-radius: 20px; padding: 20px; background: white; border: 1px solid #f1f5f9; }
-.card-back { transform: rotateY(180deg); background: var(--primary); color: white; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
-.exercise-image { width: 100%; height: 90px; object-fit: cover; border-radius: 12px; margin-top: 8px; background: #eee; }
+/* Redigering */
+.edit-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #eee; }
+.remove-btn { color: #ef4444; font-weight: 800; cursor: pointer; padding: 5px; }
 
-.input-group { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 10px; }
-.log-input { width: 100%; padding: 10px; border-radius: 10px; border: 2px solid #e2e8f0; text-align: center; font-weight: 800; }
-
+/* Övrigt */
 .global-header { position: fixed; top: 0; left: 0; right: 0; padding: 15px; display: flex; justify-content: space-between; z-index: 1000; }
 .circle-ctrl { background: white; width: 45px; height: 45px; border-radius: 15px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.08); cursor: pointer; }
-
 .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; z-index: 2000; }
 .modal-content { background: white; padding: 30px; border-radius: 28px; width: 90%; max-height: 80vh; overflow-y: auto; }
