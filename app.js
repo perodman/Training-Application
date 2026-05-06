@@ -33,6 +33,8 @@ function renderHome() {
     const draftAlert = document.getElementById("draft-alert");
     const startBtn = document.getElementById("start-new-btn");
     
+    activeDraft = JSON.parse(localStorage.getItem("activeWorkoutDraft") || "null");
+    
     if (activeDraft) {
         draftAlert.classList.remove("hidden");
         startBtn.classList.add("hidden");
@@ -71,6 +73,7 @@ function renderCalendar() {
         cell.className = "calendar-cell";
 
         const hasWorkouts = workoutHistory.filter(w => w.date === dateStr);
+        const isOngoing = activeDraft && activeDraft.date === dateStr;
         const dayOfWeek = dateObj.getDay();
         const isAutoDay = [2, 4, 6].includes(dayOfWeek);
         const override = calendarOverrides[dateStr];
@@ -87,20 +90,23 @@ function renderCalendar() {
         let passLabel = "";
         if (hasWorkouts.length > 0) {
             cell.classList.add("cell-completed");
-            passLabel = "✓"; // Vit bock under siffran
+            passLabel = "✓";
+        } else if (isOngoing) {
+            cell.classList.add("cell-ongoing");
+            passLabel = "⏱️";
         } else if (displayPass) {
             cell.classList.add("cell-planned");
             passLabel = displayPass.name.split(" ").pop();
         }
 
         cell.innerHTML = `<span>${d}</span><span class="cell-info">${passLabel}</span>`;
-        cell.onclick = () => openDayManager(dateStr, displayPass, hasWorkouts);
+        cell.onclick = () => openDayManager(dateStr, displayPass, hasWorkouts, isOngoing);
         grid.appendChild(cell);
     }
     showView("calendar-view");
 }
 
-function openDayManager(dateStr, currentPass, completedWorkouts) {
+function openDayManager(dateStr, currentPass, completedWorkouts, isOngoing) {
     const body = document.getElementById("modal-body");
     let html = `<h3>${dateStr}</h3>`;
 
@@ -122,7 +128,14 @@ function openDayManager(dateStr, currentPass, completedWorkouts) {
                 </div>
             `;
         });
-        // Om passet är genomfört visar vi inga alternativ för att planera/starta nya pass här
+    } else if (isOngoing) {
+        html += `
+            <div class="card" style="border-left: 5px solid var(--warning); padding: 15px; text-align:center;">
+                <p><strong>Ett pass pågår redan! ⏱️</strong></p>
+                <p style="font-size:13px; color:var(--text-light);">Du har ett sparat utkast för den här dagen. Gå till startsidan för att fortsätta träningen.</p>
+                <button class="mode-btn orange" onclick="location.reload()">Gå till Startsida</button>
+            </div>
+        `;
     } else {
         html += `
             <p>Planerat: <strong>${currentPass ? currentPass.name : 'Vila'}</strong></p>
@@ -141,7 +154,6 @@ function openDayManager(dateStr, currentPass, completedWorkouts) {
 }
 
 function editLoggedWorkout(dateStr, index) {
-    // Hitta passet i historiken
     const globalIdx = workoutHistory.findIndex((w, i) => {
         const matchesDate = w.date === dateStr;
         return matchesDate && workoutHistory.filter((v, j) => v.date === dateStr && j < i).length === index;
@@ -149,26 +161,15 @@ function editLoggedWorkout(dateStr, index) {
 
     if (globalIdx !== -1) {
         const workoutToEdit = workoutHistory[globalIdx];
-        
-        // Hitta motsvarande program i programData för att få grundstrukturen
         let basePass = programData.routine.find(p => p.name === workoutToEdit.programName);
-        
-        // Om vi inte hittar programmet (t.ex. raderat), skapa ett temporärt
-        if (!basePass) {
-            basePass = { name: workoutToEdit.programName, exercises: workoutToEdit.exercises };
-        }
+        if (!basePass) basePass = { name: workoutToEdit.programName, exercises: workoutToEdit.exercises };
 
-        // Förbered data för träningsvyn
         const prefilledData = workoutToEdit.exercises.map(e => ({
-            weight: e.weight,
-            reps: e.reps,
-            sets: e.sets
+            weight: e.weight, reps: e.reps, sets: e.sets
         }));
 
-        // Radera det gamla passet ur historiken så att vi inte får dubletter när vi sparar om
         workoutHistory.splice(globalIdx, 1);
         localStorage.setItem("workoutHistory", JSON.stringify(workoutHistory));
-
         closeModal();
         startWorkout(basePass, prefilledData, dateStr);
     }
