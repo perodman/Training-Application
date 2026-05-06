@@ -10,7 +10,6 @@
 <body>
   <div class="global-header">
     <div id="global-home" class="circle-ctrl">🏠</div>
-    <!-- SYSTEM ACTIVE BORTTAGEN HÄR -->
   </div>
 
   <div class="app-container">
@@ -29,19 +28,18 @@
 
     <div id="calendar-view" class="view hidden">
       <div class="calendar-nav">
-        <button onclick="changeMonth(-1)">❮</button>
+        <button onclick="changeMonth(-1)" class="nav-arrow">❮</button>
         <h2 id="month-label"></h2>
-        <button onclick="changeMonth(1)">❯</button>
+        <button onclick="changeMonth(1)" class="nav-arrow">❯</button>
       </div>
       <div class="card">
         <div class="calendar-grid" id="calendar-grid"></div>
         
-        <!-- FÄRGFÖRKLARING -->
         <div class="legend">
-          <div class="legend-item"><div class="legend-color" style="background:var(--pass-a)"></div> Pass A</div>
-          <div class="legend-item"><div class="legend-color" style="background:var(--pass-b)"></div> Pass B</div>
-          <div class="legend-item"><div class="legend-color" style="background:var(--pass-c)"></div> Pass C</div>
-          <div class="legend-item"><div class="legend-color" style="background:var(--pass-d)"></div> Pass D</div>
+          <div class="legend-item"><div class="legend-color" style="background:#ef4444"></div> Pass A</div>
+          <div class="legend-item"><div class="legend-color" style="background:#3b82f6"></div> Pass B</div>
+          <div class="legend-item"><div class="legend-color" style="background:#10b981"></div> Pass C</div>
+          <div class="legend-item"><div class="legend-color" style="background:#f59e0b"></div> Pass D</div>
         </div>
       </div>
     </div>
