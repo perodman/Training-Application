@@ -24,7 +24,7 @@
 
       <button id="start-new-btn" class="mode-btn blue">Starta Nytt Pass 🔥</button>
       <button id="view-exercises-btn" class="mode-btn indigo">🏋️ Övningar</button>
-      <button id="view-programs-btn" class="mode-btn indigo">📋 Program & Redigera</button>
+      <button id="view-programs-btn" class="mode-btn indigo">📋 Träningsprogram</button>
       <button id="calendar-mode" class="mode-btn gray">📅 Månadsschema</button>
       <button id="stats-mode" class="mode-btn gray">📊 Statistik</button>
     </div>
@@ -39,8 +39,8 @@
       <div class="card">
         <div class="calendar-grid" id="calendar-grid"></div>
         <div class="legend">
-          <div class="legend-item"><div class="legend-color" style="background:#3b82f6"></div> Planerat</div>
-          <div class="legend-item"><div class="legend-color" style="background:#10b981"></div> Genomfört</div>
+          <div class="legend-item"><div class="legend-color cell-planned"></div> Planerat</div>
+          <div class="legend-item"><div class="legend-color cell-completed"></div> Genomfört</div>
         </div>
       </div>
     </div>
@@ -59,14 +59,11 @@
       <div id="exercise-results" class="exercise-bank-list"></div>
     </div>
 
-    <!-- PROGRAMÖVERSIKT & REDIGERING -->
+    <!-- TRÄNINGSPROGRAM -->
     <div id="programs-view" class="view hidden">
-      <h2 class="section-title">Program & Redigera</h2>
-      <div class="pass-selector">
-        <button class="mode-btn blue" onclick="showProgramPass(0)">Pass A</button>
-        <button class="mode-btn blue" onclick="showProgramPass(1)">Pass B</button>
-        <button class="mode-btn blue" onclick="showProgramPass(2)">Pass C</button>
-        <button class="mode-btn blue" onclick="showProgramPass(3)">Pass D</button>
+      <h2 class="section-title">Träningsprogram</h2>
+      <div id="pass-selector-list" class="pass-selector">
+        <!-- Knappar genereras dynamiskt -->
       </div>
       <div id="program-exercise-list" class="card hidden"></div>
       <button id="add-custom-pass-btn" class="mode-btn gray" style="margin-top:20px;">+ Skapa Nytt Pass</button>
@@ -74,15 +71,15 @@
 
     <!-- STATISTIK -->
     <div id="stats-view" class="view hidden">
-      <h2 class="section-title">Din Progress</h2>
+      <h2 class="section-title">Statistik</h2>
       <div class="card">
         <h3>Pass per månad</h3>
         <div id="chart-container" class="chart-wrapper"></div>
       </div>
       <div class="card">
-        <h3>Filtrera per muskelgrupp</h3>
+        <h3>Muskelgrupp</h3>
         <select id="stats-muscle-filter" class="log-input" onchange="renderMuscleStats()">
-          <option value="Alla">Alla muskelgrupper</option>
+          <option value="Alla">Alla</option>
           <option value="Ben">Ben</option>
           <option value="Bröst">Bröst</option>
           <option value="Rygg">Rygg</option>
