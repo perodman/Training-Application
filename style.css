@@ -42,6 +42,10 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--tex
 .cell-planned { background-color: #dbeafe !important; color: #1d4ed8; border: 1px solid #3b82f6 !important; }
 .cell-completed { background-color: var(--success) !important; color: white; border: none !important; }
 
+.legend { display: flex; gap: 15px; justify-content: center; margin-top: 15px; font-size: 12px; font-weight: 700; }
+.legend-item { display: flex; align-items: center; gap: 5px; }
+.legend-color { width: 12px; height: 12px; border-radius: 3px; }
+
 .exercise-card-container { margin-bottom: 15px; }
 .card-front { background: white; border-radius: 20px; padding: 20px; border: 1px solid #f1f5f9; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
 .input-group { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 15px; }
