@@ -25,17 +25,28 @@ function startWorkout(workout) {
     document.getElementById("active-workout-title").textContent = workout.name;
     const list = document.getElementById("exercise-list");
     list.innerHTML = "";
+    
     workout.exercises.forEach((ex, i) => {
         const item = document.createElement("div");
-        item.className = "exercise-item card";
-        item.style.textAlign = "left";
+        item.className = "card";
         item.innerHTML = `
-            <div style="color:#3b82f6; font-size:11px; font-weight:900; text-transform:uppercase; letter-spacing:1px; margin-bottom:5px;">${ex.target}</div>
-            <strong style="font-size:18px;">${ex.name}</strong>
-            <div class="input-row">
-                <input type="number" placeholder="Kg" id="w-${i}" class="log-input">
-                <input type="number" placeholder="Reps" id="r-${i}" class="log-input">
-                <input type="number" placeholder="Set" value="${ex.defaultSets}" id="s-${i}" class="log-input">
+            <div class="exercise-header">
+                <span class="target-label">${ex.target}</span>
+                <span class="exercise-name">${ex.name}</span>
+            </div>
+            <div class="input-group">
+                <div class="input-field">
+                    <label>Kg</label>
+                    <input type="number" id="w-${i}" class="log-input" placeholder="0">
+                </div>
+                <div class="input-field">
+                    <label>Reps</label>
+                    <input type="number" id="r-${i}" class="log-input" placeholder="0">
+                </div>
+                <div class="input-field">
+                    <label>Set</label>
+                    <input type="number" id="s-${i}" class="log-input" value="${ex.defaultSets}">
+                </div>
             </div>
         `;
         list.appendChild(item);
@@ -44,10 +55,39 @@ function startWorkout(workout) {
     showView("workout-view");
 }
 
+function renderWeeklySchedule() {
+    const list = document.getElementById("schedule-list");
+    // Definiera ditt schema baserat på din text
+    const schedule = [
+      { day: "Måndag v.1", pass: "Pass A: Bas & Kraft" },
+      { day: "Onsdag v.1", pass: "Pass B: Stretch & Vinklar" },
+      { day: "Fredag v.1", pass: "Pass C: Unilateralt & Kontakt" },
+      { day: "Måndag v.2", pass: "Pass D: Skulptering" }
+    ];
+
+    list.innerHTML = schedule.map(s => `
+        <div class="schedule-item">
+            <span class="day-name">${s.day}</span>
+            <span class="workout-name">${s.pass}</span>
+        </div>
+    `).join("");
+
+    // Rendera även historik under
+    const histList = document.getElementById("history-list");
+    histList.innerHTML = workoutHistory.slice().reverse().map(w => `
+        <div class="card" style="padding:15px; display:flex; justify-content:space-between; align-items:center;">
+            <div><small>${w.displayDate}</small><br><strong>${w.programName}</strong></div>
+            <span style="color:var(--success)">✓</span>
+        </div>
+    `).join("");
+    
+    showView("calendar-view");
+}
+
 function saveWorkout(workout) {
     const log = {
-        date: new Date().toISOString(), // Spara fullt datum för kalendern
-        displayDate: new Date().toLocaleDateString(),
+        date: new Date().toISOString(),
+        displayDate: new Date().toLocaleDateString('sv-SE'),
         programId: workout.id,
         programName: workout.name,
         exercises: workout.exercises.map((ex, i) => ({
@@ -62,65 +102,17 @@ function saveWorkout(workout) {
     renderHome();
 }
 
-function renderCalendar() {
-    const grid = document.getElementById("calendar-grid");
-    const historyList = document.getElementById("history-list");
-    grid.innerHTML = "";
-    historyList.innerHTML = "";
-
-    // Skapa en enkel 28-dagars vy (4 veckor)
-    const now = new Date();
-    const datesWithWorkout = workoutHistory.map(w => new Date(w.date).toDateString());
-
-    for (let i = -20; i <= 7; i++) {
-        const d = new Date();
-        d.setDate(now.getDate() + i);
-        const dayEl = document.createElement("div");
-        dayEl.className = "calendar-day";
-        dayEl.textContent = d.getDate();
-        
-        if (datesWithWorkout.includes(d.toDateString())) dayEl.classList.add("active");
-        if (d.toDateString() === now.toDateString()) dayEl.classList.add("today");
-        
-        grid.appendChild(dayEl);
-    }
-
-    // Visa historiklista
-    workoutHistory.slice().reverse().forEach(w => {
-        const div = document.createElement("div");
-        div.className = "history-item";
-        div.innerHTML = `
-            <div>
-                <small>${w.displayDate}</small><br>
-                <strong>${w.programName}</strong>
-            </div>
-            <span style="color:#10b981; font-weight:800;">✓</span>
-        `;
-        historyList.appendChild(div);
-    });
-    showView("calendar-view");
-}
-
-function renderStats() {
-    const container = document.getElementById("stats-content");
-    let totalReps = 0;
-    workoutHistory.forEach(w => {
-        w.exercises.forEach(e => totalReps += (parseInt(e.reps) * parseInt(e.sets)));
-    });
-    container.innerHTML = `
-        <div style="font-size:14px; color:#64748b;">Totalt lyfta reps</div>
-        <div style="font-size:42px; font-weight:900; color:#3b82f6;">${totalReps}</div>
-        <hr style="margin:20px 0; border:0; border-top:1px solid #eee;">
-        <p>Antal pass slutförda: <strong>${workoutHistory.length}</strong></p>
-    `;
-    showView("stats-view");
-}
-
 function showView(id) {
     document.querySelectorAll(".view").forEach(v => v.classList.add("hidden"));
     document.getElementById(id).classList.remove("hidden");
+    window.scrollTo(0,0);
 }
 
 document.getElementById("global-home").onclick = () => renderHome();
-document.getElementById("calendar-mode").onclick = () => renderCalendar();
-document.getElementById("stats-mode").onclick = () => renderStats();
+document.getElementById("calendar-mode").onclick = () => renderWeeklySchedule();
+document.getElementById("stats-mode").onclick = () => {
+    // Enkel statistik-vy
+    const content = document.getElementById("stats-content");
+    content.innerHTML = `<h3>Totalt antal pass: ${workoutHistory.length}</h3>`;
+    showView("stats-view");
+};
