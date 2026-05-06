@@ -70,7 +70,7 @@ function renderCalendar() {
         const cell = document.createElement("div");
         cell.className = "calendar-cell";
 
-        const isDone = workoutHistory.some(w => w.date.startsWith(dateStr));
+        const hasWorkouts = workoutHistory.filter(w => w.date === dateStr);
         const dayOfWeek = dateObj.getDay();
         const isAutoDay = [2, 4, 6].includes(dayOfWeek);
         const override = calendarOverrides[dateStr];
@@ -85,40 +85,76 @@ function renderCalendar() {
         }
 
         let passLabel = "";
-        if (isDone) {
+        if (hasWorkouts.length > 0) {
             cell.classList.add("cell-completed");
-            passLabel = "GENOMFÖRT";
+            // Ingen text i rutan för genomförda pass, bara färg
+            passLabel = "";
         } else if (displayPass) {
             cell.classList.add("cell-planned");
             passLabel = displayPass.name.split(" ").pop();
         }
 
         cell.innerHTML = `<span>${d}</span><span class="cell-info">${passLabel}</span>`;
-        cell.onclick = () => openDayManager(dateStr, displayPass, isDone);
+        cell.onclick = () => openDayManager(dateStr, displayPass, hasWorkouts);
         grid.appendChild(cell);
     }
     showView("calendar-view");
 }
 
-function openDayManager(dateStr, currentPass, isDone) {
+function openDayManager(dateStr, currentPass, completedWorkouts) {
     const body = document.getElementById("modal-body");
     
-    if (isDone) {
-        body.innerHTML = `<h3>${dateStr}</h3><p>Passet är genomfört!</p>`;
-    } else {
-        body.innerHTML = `
-            <h3>${dateStr}</h3>
-            <p>Planerat: <strong>${currentPass ? currentPass.name : 'Vila'}</strong></p>
-            ${currentPass ? `<button class="mode-btn green" onclick="prepareStart('${dateStr}', '${currentPass.id}')">Starta passet 🔥</button>` : ''}
-            <hr>
-            <h4>Ändra planering (utan att starta):</h4>
-            ${programData.routine.map(p => `
-                <button class="mode-btn blue" onclick="setOverride('${dateStr}', '${p.id}')">Planera ${p.name}</button>
-            `).join("")}
-            <button class="mode-btn red" onclick="setOverride('${dateStr}', 'none')">Sätt som vilodag</button>
-        `;
+    let html = `<h3>${dateStr}</h3>`;
+
+    if (completedWorkouts.length > 0) {
+        html += `<h4>Genomförda pass:</h4>`;
+        completedWorkouts.forEach((w, idx) => {
+            html += `
+                <div class="card" style="border-left: 5px solid var(--success); padding: 12px; margin-bottom:10px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <strong>${w.programName}</strong>
+                        <button class="delete-x-btn" onclick="deleteLoggedWorkout('${dateStr}', ${idx})">✖</button>
+                    </div>
+                    <div style="font-size:11px; color:var(--text-light); margin-top:5px;">
+                        ${w.exercises.map(e => `${e.name}: ${e.weight}kg x ${e.reps}`).join("<br>")}
+                    </div>
+                </div>
+            `;
+        });
+        html += `<hr><p style="font-size:13px; color:var(--text-light);">Du kan fortfarande planera eller starta ett nytt pass nedan.</p>`;
     }
+
+    html += `
+        <p>Planerat: <strong>${currentPass ? currentPass.name : 'Vila'}</strong></p>
+        ${currentPass ? `<button class="mode-btn green" onclick="prepareStart('${dateStr}', '${currentPass.id}')">Starta passet 🔥</button>` : ''}
+        <hr>
+        <h4>Ändra planering:</h4>
+        ${programData.routine.map(p => `
+            <button class="mode-btn blue" onclick="setOverride('${dateStr}', '${p.id}')">Planera ${p.name}</button>
+        `).join("")}
+        <button class="mode-btn red" onclick="setOverride('${dateStr}', 'none')">Sätt som vilodag</button>
+    `;
+    
+    body.innerHTML = html;
     document.getElementById("workout-modal").classList.remove("hidden");
+}
+
+function deleteLoggedWorkout(dateStr, index) {
+    if(confirm("Vill du ta bort det här genomförda passet från historiken?")) {
+        // Hitta rätt index i den globala workoutHistory
+        const globalIdx = workoutHistory.findIndex((w, i) => {
+            const matchesDate = w.date === dateStr;
+            // Vi behöver matcha specifika passet om flera finns samma dag
+            return matchesDate && workoutHistory.filter((v, j) => v.date === dateStr && j < i).length === index;
+        });
+
+        if(globalIdx !== -1) {
+            workoutHistory.splice(globalIdx, 1);
+            localStorage.setItem("workoutHistory", JSON.stringify(workoutHistory));
+            closeModal();
+            renderCalendar();
+        }
+    }
 }
 
 function prepareStart(dateStr, passId) {
@@ -272,11 +308,11 @@ function openEditModal(pIdx) {
         item.innerHTML = `
             <div style="display:flex; flex-direction:column;">
                 <span style="font-weight:700;">${ex.name}</span>
-                <span class="red-text" style="font-size:11px; cursor:pointer; font-weight:800;" onclick="removeFromPass(${pIdx}, ${i})">TA BORT</span>
             </div>
             <div class="order-controls">
                 <button class="order-btn" onclick="moveExercise(${pIdx}, ${i}, -1)">↑</button>
                 <button class="order-btn" onclick="moveExercise(${pIdx}, ${i}, 1)">↓</button>
+                <button class="delete-x-btn" onclick="removeFromPass(${pIdx}, ${i})">✖</button>
             </div>
         `;
         list.appendChild(item);
