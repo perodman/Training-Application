@@ -41,8 +41,9 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--tex
 
 .cell-planned { background-color: #dbeafe !important; color: #1d4ed8; border: 1px solid #3b82f6 !important; }
 .cell-completed { background-color: var(--success) !important; color: white; border: none !important; }
+.cell-ongoing { background-color: #fef3c7 !important; color: #92400e; border: 1px solid var(--warning) !important; }
 
-.legend { display: flex; gap: 15px; justify-content: center; margin-top: 15px; font-size: 12px; font-weight: 700; }
+.legend { display: flex; gap: 10px; justify-content: center; margin-top: 15px; font-size: 10px; font-weight: 700; flex-wrap: wrap; }
 .legend-item { display: flex; align-items: center; gap: 5px; }
 .legend-color { width: 12px; height: 12px; border-radius: 3px; }
 
