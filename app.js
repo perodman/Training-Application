@@ -132,8 +132,8 @@ function openDayManager(dateStr, currentPass, completedWorkouts, isOngoing) {
         html += `
             <div class="card" style="border-left: 5px solid var(--warning); padding: 15px; text-align:center;">
                 <p><strong>Ett pass pågår redan! ⏱️</strong></p>
-                <p style="font-size:13px; color:var(--text-light);">Du har ett sparat utkast för den här dagen. Gå till startsidan för att fortsätta träningen.</p>
-                <button class="mode-btn orange" onclick="location.reload()">Gå till Startsida</button>
+                <p style="font-size:13px; color:var(--text-light);">Du har ett sparat utkast för den här dagen.</p>
+                <button class="mode-btn orange" onclick="resumeFromCalendar()">Öppna pågående pass</button>
             </div>
         `;
     } else {
@@ -151,6 +151,13 @@ function openDayManager(dateStr, currentPass, completedWorkouts, isOngoing) {
     
     body.innerHTML = html;
     document.getElementById("workout-modal").classList.remove("hidden");
+}
+
+function resumeFromCalendar() {
+    closeModal();
+    if (activeDraft) {
+        startWorkout(activeDraft.workout, activeDraft.data, activeDraft.date);
+    }
 }
 
 function editLoggedWorkout(dateStr, index) {
