@@ -13,6 +13,7 @@
   </div>
 
   <div class="app-container">
+    <!-- HEMSKÄRM -->
     <div id="home-view" class="view">
       <div class="hero-section">
         <h1 class="main-title">LIFT</h1>
@@ -30,6 +31,7 @@
       </div>
     </div>
 
+    <!-- TRÄNINGSSCHEMA -->
     <div id="calendar-view" class="view hidden">
       <h2 class="section-title">Träningsschema</h2>
       <div class="calendar-nav">
@@ -50,12 +52,10 @@
       </div>
     </div>
 
+    <!-- ÖVNINGAR -->
     <div id="exercises-view" class="view hidden">
-      <div class="header-with-action">
-        <h2 class="section-title" style="margin:0;">Övningar</h2>
-        <button class="add-mini-btn" onclick="openCreateExerciseModal()">+</button>
-      </div>
-      <div id="category-menu" class="category-grid" style="margin-top:20px;">
+      <h2 class="section-title">Muskelgrupper</h2>
+      <div id="category-menu" class="category-grid">
         <button class="cat-btn glass" data-cat="Ben" onclick="filterExercises('Ben')">Ben</button>
         <button class="cat-btn glass" data-cat="Bröst" onclick="filterExercises('Bröst')">Bröst</button>
         <button class="cat-btn glass" data-cat="Rygg" onclick="filterExercises('Rygg')">Rygg</button>
@@ -65,12 +65,7 @@
       <div id="exercise-results" class="exercise-bank-list" style="margin-top:20px;"></div>
     </div>
 
-    <div id="programs-view" class="view hidden">
-      <h2 class="section-title">Träningsprogram</h2>
-      <div id="pass-selector-list" class="pass-selector"></div>
-      <div id="program-exercise-list" class="card glass hidden"></div>
-    </div>
-
+    <!-- TRÄNINGS-VY -->
     <div id="workout-view" class="view hidden">
       <h2 id="active-title" style="text-align:center;"></h2>
       <div id="exercise-list"></div>
@@ -81,6 +76,7 @@
     </div>
   </div>
 
+  <!-- MODAL FÖR DETALJER -->
   <div id="workout-modal" class="modal hidden">
     <div class="modal-content glass-dark">
       <div id="modal-body"></div>
