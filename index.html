@@ -1,70 +1,19 @@
-<!DOCTYPE html>
-<html lang="sv">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>LIFT Tracker</title>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@800;900&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
-  <div class="global-header">
-    <div id="global-home" class="circle-ctrl">🏠</div>
-    <div id="status-tag" style="font-size: 10px; font-weight: 900; color: #64748b; padding-top: 12px;">SYSTEM READY</div>
+<!-- ... (resten av koden är samma) ... -->
+<div id="calendar-view" class="view hidden">
+  <div class="calendar-nav">
+    <button class="nav-btn" onclick="changeMonth(-1)">❮</button>
+    <h2 id="month-label" style="margin:0;">Maj 2026</h2>
+    <button class="nav-btn" onclick="changeMonth(1)">❯</button>
   </div>
-
-  <div class="app-container">
-    <!-- STARTSIDA -->
-    <div id="home-view" class="view">
-      <h1 style="font-family: 'Montserrat'; font-size: 40px; margin: 0; text-align: center;">LIFT</h1>
-      <p style="text-align: center; font-size: 12px; font-weight: 800; color: #64748b; letter-spacing: 2px; margin-bottom: 30px;">PROGRESS TRACKER</p>
-      
-      <div id="draft-alert" class="hidden" style="background: #fef3c7; padding: 15px; border-radius: 15px; margin-bottom: 20px; border: 1px solid #fcd34d; text-align: center;">
-        <p style="margin: 0 0 10px 0; font-weight: 700; font-size: 14px;">Du har ett pågående pass!</p>
-        <button id="resume-workout-btn" class="mode-btn orange">Återuppta pass ⏱️</button>
-      </div>
-
-      <button id="start-new-btn" class="mode-btn blue">Starta Träningspass 🔥</button>
-      <button id="view-programs-btn" class="mode-btn indigo">📋 Se Programöversikt</button>
-      <button id="calendar-mode" class="mode-btn gray">📅 Månadsschema</button>
-      <button id="stats-mode" class="mode-btn gray">📊 Statistik</button>
-    </div>
-
-    <!-- PROGRAMÖVERSIKT -->
-    <div id="programs-view" class="view hidden">
-      <h2 style="text-align: center;">Programöversikt</h2>
-      <div id="programs-list"></div>
-    </div>
-
-    <!-- KALENDERVY -->
-    <div id="calendar-view" class="view hidden">
-      <div class="calendar-header">
-        <span id="month-label">Maj 2026</span>
-      </div>
-      <div class="card">
-        <div class="calendar-grid" id="calendar-grid"></div>
-      </div>
-      <div id="day-details" style="margin-top: 20px;"></div>
-    </div>
-
-    <!-- TRÄNINGSVY -->
-    <div id="workout-view" class="view hidden">
-      <h2 id="active-title" style="text-align: center;"></h2>
-      <div id="exercise-list"></div>
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px;">
-        <button id="pause-workout-btn" class="mode-btn orange">Spara utkast</button>
-        <button id="save-workout-btn" class="mode-btn green">Avsluta pass</button>
-      </div>
-    </div>
-
-    <!-- STATISTIKVY -->
-    <div id="stats-view" class="view hidden">
-      <h2 style="text-align: center;">Statistik</h2>
-      <div id="stats-summary" class="card"></div>
-      <div id="stats-charts"></div>
-    </div>
+  <div class="card">
+    <div class="calendar-grid" id="calendar-grid"></div>
   </div>
+</div>
 
-  <script src="app.js"></script>
-</body>
-</html>
+<!-- Modal för att visa passinformation när man klickar i kalendern -->
+<div id="workout-modal" class="modal hidden">
+  <div class="modal-content">
+    <div id="modal-body"></div>
+    <button class="mode-btn gray" onclick="closeModal()" style="margin-top:20px;">Stäng</button>
+  </div>
+</div>
