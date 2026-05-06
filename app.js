@@ -5,12 +5,11 @@ let activeDraft = JSON.parse(localStorage.getItem("activeWorkoutDraft") || "null
 let calendarOverrides = JSON.parse(localStorage.getItem("calendarOverrides") || "{}");
 let currentViewDate = new Date();
 
-// --- INITIERING ---
-// Vi hämtar program och sparar ner övningarna permanent i master-listan en gång
+// --- INIT ---
 fetch("program.json").then(r => r.json()).then(json => {
     const saved = JSON.parse(localStorage.getItem("myCustomProgram"));
     
-    // Spara ner alla övningar från ursprungsfilen till masterExercises för att alltid ha en bank
+    // Säkerställ att masterlistan alltid är komplett från start
     json.routine.forEach(p => {
         p.exercises.forEach(ex => {
             if (!masterExercises.find(m => m.name === ex.name)) {
@@ -36,9 +35,13 @@ function renderHome() {
     showView("home-view");
     const draftAlert = document.getElementById("draft-alert");
     const startBtn = document.getElementById("start-new-btn");
+    
     if (activeDraft) {
         draftAlert.classList.remove("hidden");
         startBtn.classList.add("hidden");
+        document.getElementById("resume-workout-btn").onclick = () => {
+            startWorkout(activeDraft.workout, activeDraft.data);
+        };
     } else {
         draftAlert.classList.add("hidden");
         startBtn.classList.remove("hidden");
@@ -53,12 +56,11 @@ function renderCalendar() {
     const year = currentViewDate.getFullYear();
     const month = currentViewDate.getMonth();
     
-    // Stor bokstav på månaden
     const rawMonth = currentViewDate.toLocaleString('sv-SE', { month: 'long', year: 'numeric' });
     label.textContent = rawMonth.charAt(0).toUpperCase() + rawMonth.slice(1);
 
     const firstDay = new Date(year, month, 1).getDay();
-    const offset = firstDay === 0 ? 6 : firstDay - 1; // Anpassa för måndag som start
+    const offset = firstDay === 0 ? 6 : firstDay - 1;
     const daysInMonth = new Date(year, month + 1, 0).getDate();
 
     for (let i = 0; i < offset; i++) grid.innerHTML += `<div></div>`;
@@ -89,7 +91,6 @@ function renderCalendar() {
             passLabel = "KLART";
         } else if (displayPass) {
             cell.classList.add("cell-planned");
-            // Visa passets namn i kortform (t.ex. "Pass A" blir "A")
             passLabel = displayPass.name.split(" ").pop();
         }
 
@@ -127,7 +128,7 @@ function setOverride(dateStr, val) {
     renderCalendar();
 }
 
-// --- ÖVNINGAR ---
+// --- ÖVNINGAR VYN ---
 function filterExercises(category) {
     document.querySelectorAll(".cat-btn").forEach(b => b.classList.remove("active"));
     const btn = document.querySelector(`[data-cat="${category}"]`);
@@ -144,7 +145,7 @@ function filterExercises(category) {
     });
 }
 
-// --- TRÄNINGSPROGRAM ---
+// --- TRÄNINGSPROGRAM REDIGERING ---
 function renderProgramView() {
     const selector = document.getElementById("pass-selector-list");
     selector.innerHTML = "";
@@ -176,16 +177,12 @@ function openEditModal(pIdx) {
     const pass = programData.routine[pIdx];
     const body = document.getElementById("modal-body");
     body.innerHTML = `
-        <div class="modal-header-row">
-            <h3>Redigera ${pass.name}</h3>
-            <button class="mode-btn red" style="width:auto; padding:10px 20px; font-size:12px; margin:0;" onclick="deleteEntirePass(${pIdx})">RADERA HELA PASSET</button>
-        </div>
+        <h3>Redigera ${pass.name}</h3>
         <div id="edit-ex-list"></div>
         <hr>
         <h4 style="margin-bottom:10px;">Lägg till övning</h4>
-        <label style="font-size:11px; font-weight:800; color:var(--text-light);">VÄLJ MUSKELGRUPP</label>
-        <select id="muscle-group-select" class="log-input" onchange="updateExerciseDropdown()">
-            <option value="">Välj...</option>
+        <select id="muscle-group-select" class="log-input" onchange="updateExerciseDropdown()" style="margin-bottom:10px; font-size:14px;">
+            <option value="">Välj muskelgrupp...</option>
             <option value="Ben">Ben</option>
             <option value="Bröst">Bröst</option>
             <option value="Rygg">Rygg</option>
@@ -194,38 +191,54 @@ function openEditModal(pIdx) {
             <option value="Triceps">Triceps</option>
             <option value="Bål">Bål</option>
         </select>
-        <label style="font-size:11px; font-weight:800; color:var(--text-light);">VÄLJ ÖVNING</label>
-        <select id="bank-select" class="log-input" disabled></select>
-        <button id="add-btn-modal" class="mode-btn green" onclick="addFromBank(${pIdx})" disabled>+ Lägg till i passet</button>
+        <select id="bank-select" class="log-input" disabled style="margin-bottom:10px; font-size:14px;"></select>
+        <button id="add-btn-modal" class="mode-btn green" onclick="addFromBank(${pIdx})" disabled>+ Lägg till övning</button>
+        <hr>
+        <button class="mode-btn red" onclick="deleteEntirePass(${pIdx})" style="margin-top:20px;">RADERA HELA PASSET</button>
     `;
 
     const list = body.querySelector("#edit-ex-list");
     pass.exercises.forEach((ex, i) => {
-        list.innerHTML += `<div class="edit-item"><span>${ex.name}</span><span class="red-text" style="cursor:pointer; font-weight:800;" onclick="removeFromPass(${pIdx}, ${i})">TA BORT</span></div>`;
+        const item = document.createElement("div");
+        item.className = "edit-item";
+        item.innerHTML = `
+            <div style="display:flex; flex-direction:column;">
+                <span style="font-weight:700;">${ex.name}</span>
+                <span class="red-text" style="font-size:11px; cursor:pointer; font-weight:800;" onclick="removeFromPass(${pIdx}, ${i})">TA BORT</span>
+            </div>
+            <div class="order-controls">
+                <button class="order-btn" onclick="moveExercise(${pIdx}, ${i}, -1)">↑</button>
+                <button class="order-btn" onclick="moveExercise(${pIdx}, ${i}, 1)">↓</button>
+            </div>
+        `;
+        list.appendChild(item);
     });
 
     document.getElementById("workout-modal").classList.remove("hidden");
+}
+
+function moveExercise(pIdx, exIdx, direction) {
+    const exercises = programData.routine[pIdx].exercises;
+    const newIdx = exIdx + direction;
+    if (newIdx >= 0 && newIdx < exercises.length) {
+        const temp = exercises[exIdx];
+        exercises[exIdx] = exercises[newIdx];
+        exercises[newIdx] = temp;
+        saveAll();
+        openEditModal(pIdx);
+        showProgramDetails(pIdx);
+    }
 }
 
 function updateExerciseDropdown() {
     const muscle = document.getElementById("muscle-group-select").value;
     const bankSelect = document.getElementById("bank-select");
     const addBtn = document.getElementById("add-btn-modal");
-    
     bankSelect.innerHTML = "";
-    if (!muscle) {
-        bankSelect.disabled = true;
-        addBtn.disabled = true;
-        return;
-    }
-
+    if (!muscle) { bankSelect.disabled = true; addBtn.disabled = true; return; }
     const filtered = masterExercises.filter(ex => ex.target === muscle);
-    filtered.forEach(ex => {
-        bankSelect.innerHTML += `<option value="${ex.name}">${ex.name}</option>`;
-    });
-
-    bankSelect.disabled = false;
-    addBtn.disabled = false;
+    filtered.forEach(ex => { bankSelect.innerHTML += `<option value="${ex.name}">${ex.name}</option>`; });
+    bankSelect.disabled = false; addBtn.disabled = false;
 }
 
 function removeFromPass(pIdx, exIdx) {
@@ -256,27 +269,56 @@ function deleteEntirePass(pIdx) {
 
 document.getElementById("add-custom-pass-btn").onclick = () => {
     const newChar = String.fromCharCode(65 + programData.routine.length);
-    const newPass = { id: `pass-${newChar.toLowerCase()}`, name: `Pass ${newChar}`, exercises: [] };
-    programData.routine.push(newPass);
+    programData.routine.push({ id: `pass-${newChar.toLowerCase()}`, name: `Pass ${newChar}`, exercises: [] });
     saveAll();
     renderProgramView();
 };
 
-// --- STARTA OCH SPARA PASS ---
+// --- TRÄNINGS-REGISTRERING ---
 function startWorkout(workout, savedData = null) {
-    activeDraft = { workout: workout, startTime: new Date().toISOString() };
+    activeDraft = { workout: workout, data: savedData };
     document.getElementById("active-title").textContent = workout.name;
     const list = document.getElementById("exercise-list");
     list.innerHTML = "";
+    
     workout.exercises.forEach((ex, i) => {
-        const val = savedData ? savedData[i] : { weight: "", reps: "", sets: ex.defaultSets || 3 };
+        const val = (savedData && savedData[i]) ? savedData[i] : { weight: "", reps: "", sets: ex.defaultSets || 3 };
         const container = document.createElement("div");
         container.className = "exercise-card-container";
-        container.innerHTML = `<div class="card-front"><div style="font-size:10px; font-weight:900; color:var(--primary); text-transform:uppercase;">${ex.target}</div><strong style="font-size:18px; display:block; margin-bottom:10px;">${ex.name}</strong><div class="input-group"><div><label style="font-size:9px; font-weight:800;">KG</label><input type="number" id="w-${i}" class="log-input" value="${val.weight}"></div><div><label style="font-size:9px; font-weight:800;">REPS</label><input type="number" id="r-${i}" class="log-input" value="${val.reps}"></div><div><label style="font-size:9px; font-weight:800;">SET</label><input type="number" id="s-${i}" class="log-input" value="${val.sets}"></div></div></div>`;
+        container.innerHTML = `
+            <div class="card-front">
+                <div style="font-size:10px; font-weight:900; color:var(--primary); text-transform:uppercase; margin-bottom:5px;">${ex.target}</div>
+                <strong style="font-size:18px; display:block; margin-bottom:15px;">${ex.name}</strong>
+                <div class="input-group">
+                    <div>
+                        <label style="font-size:10px; font-weight:800; color:var(--text-light); display:block; text-align:center; margin-bottom:5px;">KG</label>
+                        <input type="number" id="w-${i}" class="log-input" value="${val.weight}" placeholder="0">
+                    </div>
+                    <div>
+                        <label style="font-size:10px; font-weight:800; color:var(--text-light); display:block; text-align:center; margin-bottom:5px;">REPS</label>
+                        <input type="number" id="r-${i}" class="log-input" value="${val.reps}" placeholder="0">
+                    </div>
+                    <div>
+                        <label style="font-size:10px; font-weight:800; color:var(--text-light); display:block; text-align:center; margin-bottom:5px;">SET</label>
+                        <input type="number" id="s-${i}" class="log-input" value="${val.sets}" placeholder="0">
+                    </div>
+                </div>
+            </div>`;
         list.appendChild(container);
     });
     showView("workout-view");
 }
+
+document.getElementById("pause-workout-btn").onclick = () => {
+    const draftData = activeDraft.workout.exercises.map((ex, i) => ({
+        weight: document.getElementById(`w-${i}`).value,
+        reps: document.getElementById(`r-${i}`).value,
+        sets: document.getElementById(`s-${i}`).value
+    }));
+    activeDraft.data = draftData;
+    localStorage.setItem("activeWorkoutDraft", JSON.stringify(activeDraft));
+    location.reload();
+};
 
 document.getElementById("save-workout-btn").onclick = () => {
     const log = {
@@ -296,7 +338,7 @@ document.getElementById("save-workout-btn").onclick = () => {
 };
 
 // --- NAVIGATION & UTILS ---
-document.getElementById("global-home").onclick = renderHome;
+document.getElementById("global-home").onclick = () => location.reload();
 document.getElementById("calendar-mode").onclick = renderCalendar;
 document.getElementById("view-exercises-btn").onclick = () => { showView("exercises-view"); filterExercises('Ben'); };
 document.getElementById("view-programs-btn").onclick = renderProgramView;
@@ -326,7 +368,7 @@ function renderStats() {
     Object.entries(months).forEach(([m, val]) => {
         const bar = document.createElement("div");
         bar.className = "chart-bar";
-        bar.style.height = (val * 20) + "px";
+        bar.style.height = Math.min(val * 15, 130) + "px";
         const w = document.createElement("div");
         w.style.flex = "1";
         w.appendChild(bar);
