@@ -2,6 +2,7 @@
   --primary: #3b82f6;
   --secondary: #6366f1;
   --success: #10b981;
+  --warning: #f59e0b;
   --bg: #f8fafc;
   --card: #ffffff;
   --text: #1e293b;
@@ -9,98 +10,37 @@
 }
 
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding-bottom: 40px; }
 
-body { 
-  font-family: 'Inter', sans-serif; 
-  background-color: var(--bg); 
-  color: var(--text); 
-  margin: 0; 
-  line-height: 1.5;
-}
-
-.app-container { max-width: 500px; margin: auto; padding: 80px 20px 40px; }
-
+.app-container { max-width: 500px; margin: auto; padding: 70px 15px 20px; }
 .hidden { display: none !important; }
 
-/* HEADER & TITLAR */
-.main-title { 
-  font-family: 'Montserrat', sans-serif; 
-  font-size: 48px; 
-  font-weight: 900; 
-  text-align: center; 
-  margin: 0; 
-  background: linear-gradient(135deg, var(--text), var(--primary)); 
-  -webkit-background-clip: text; 
-  -webkit-text-fill-color: transparent; 
-}
+/* KALENDER LAYOUT */
+.calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; font-weight: 800; }
+.calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; text-align: center; }
+.calendar-day-label { font-size: 10px; font-weight: 900; color: var(--text-light); padding-bottom: 5px; }
+.calendar-cell { aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; background: white; border-radius: 8px; font-size: 12px; font-weight: 600; position: relative; border: 1px solid #f1f5f9; }
+.calendar-cell.today { border: 2px solid var(--primary); }
+.workout-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--success); position: absolute; bottom: 4px; }
+.planned-label { font-size: 8px; color: var(--primary); font-weight: 900; margin-top: 2px; }
 
-.subtitle { text-align: center; color: var(--text-light); font-weight: 800; text-transform: uppercase; font-size: 11px; letter-spacing: 2px; margin-bottom: 20px; }
+/* FLIP CARD ANIMATION */
+.exercise-card-container { perspective: 1000px; margin-bottom: 15px; cursor: pointer; }
+.exercise-card-inner { position: relative; width: 100%; transition: transform 0.6s; transform-style: preserve-3d; min-height: 140px; }
+.exercise-card-container.flipped .exercise-card-inner { transform: rotateY(180deg); }
+.card-front, .card-back { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; border-radius: 20px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); background: white; border: 1px solid #f1f5f9; }
+.card-back { transform: rotateY(180deg); background: var(--primary); color: white; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
 
-.section-title { font-family: 'Montserrat', sans-serif; font-size: 24px; font-weight: 800; margin-bottom: 15px; text-align: center; }
-
-/* CARDS */
-.card { 
-  background: var(--card); 
-  padding: 20px; 
-  border-radius: 24px; 
-  box-shadow: 0 10px 25px rgba(0,0,0,0.05); 
-  margin-bottom: 20px; 
-  border: 1px solid rgba(255,255,255,0.1);
-}
-
-/* KNAPPAR */
-.mode-btn { 
-  width: 100%; 
-  padding: 18px; 
-  border-radius: 16px; 
-  border: none; 
-  color: white; 
-  font-weight: 800; 
-  font-size: 16px; 
-  cursor: pointer; 
-  display: flex; 
-  align-items: center; 
-  justify-content: center; 
-  gap: 10px;
-  transition: transform 0.1s;
-}
-
-.mode-btn:active { transform: scale(0.98); }
+/* KNAPPAR OCH INPUTS */
+.mode-btn { width: 100%; padding: 16px; border-radius: 14px; border: none; color: white; font-weight: 800; font-size: 15px; cursor: pointer; margin-bottom: 10px; display: flex; justify-content: center; align-items: center; gap: 8px; }
 .blue { background: var(--primary); }
 .indigo { background: var(--secondary); }
 .green { background: var(--success); }
-.purple { background: #8b5cf6; }
+.orange { background: var(--warning); }
+.gray { background: #94a3b8; }
 
-/* LOGGNINGS-INPUTS */
-.exercise-header { display: flex; flex-direction: column; margin-bottom: 15px; }
-.target-label { font-size: 10px; font-weight: 900; color: var(--primary); text-transform: uppercase; letter-spacing: 1px; }
-.exercise-name { font-size: 18px; font-weight: 700; }
+.input-group { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-top: 15px; }
+.log-input { width: 100%; padding: 10px; border-radius: 10px; border: 2px solid #e2e8f0; text-align: center; font-weight: 700; font-size: 16px; }
 
-.input-group { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
-.input-field { display: flex; flex-direction: column; gap: 5px; }
-.input-field label { font-size: 10px; font-weight: 800; color: var(--text-light); text-transform: uppercase; text-align: center; }
-.log-input { 
-  width: 100%; 
-  padding: 12px; 
-  border-radius: 12px; 
-  border: 2px solid #e2e8f0; 
-  text-align: center; 
-  font-weight: 700; 
-  font-family: inherit;
-  font-size: 16px;
-}
-
-/* SCHEMA-SIDA */
-.schedule-item { 
-  display: flex; 
-  justify-content: space-between; 
-  padding: 15px; 
-  border-bottom: 1px solid #f1f5f9; 
-}
-.schedule-item:last-child { border: 0; }
-.day-name { font-weight: 800; color: var(--primary); width: 100px; }
-.workout-name { font-weight: 600; color: var(--text); }
-
-/* NAVIGATION */
-.global-header { position: fixed; top: 0; left: 0; right: 0; padding: 15px; display: flex; justify-content: flex-end; background: rgba(248, 250, 252, 0.8); backdrop-filter: blur(10px); z-index: 100; }
-.circle-ctrl { background: white; width: 45px; height: 45px; border-radius: 14px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1); cursor: pointer; font-size: 20px; }
+.global-header { position: fixed; top: 0; left: 0; right: 0; padding: 12px; display: flex; justify-content: space-between; background: rgba(248, 250, 252, 0.9); backdrop-filter: blur(8px); z-index: 100; }
+.circle-ctrl { background: white; width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.05); cursor: pointer; }
