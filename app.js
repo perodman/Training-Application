@@ -87,8 +87,7 @@ function renderCalendar() {
         let passLabel = "";
         if (hasWorkouts.length > 0) {
             cell.classList.add("cell-completed");
-            // Ingen text i rutan för genomförda pass, bara färg
-            passLabel = "";
+            passLabel = "✓"; // Vit bock under siffran
         } else if (displayPass) {
             cell.classList.add("cell-planned");
             passLabel = displayPass.name.split(" ").pop();
@@ -103,7 +102,6 @@ function renderCalendar() {
 
 function openDayManager(dateStr, currentPass, completedWorkouts) {
     const body = document.getElementById("modal-body");
-    
     let html = `<h3>${dateStr}</h3>`;
 
     if (completedWorkouts.length > 0) {
@@ -113,38 +111,73 @@ function openDayManager(dateStr, currentPass, completedWorkouts) {
                 <div class="card" style="border-left: 5px solid var(--success); padding: 12px; margin-bottom:10px;">
                     <div style="display:flex; justify-content:space-between; align-items:center;">
                         <strong>${w.programName}</strong>
-                        <button class="delete-x-btn" onclick="deleteLoggedWorkout('${dateStr}', ${idx})">✖</button>
+                        <div style="display:flex; gap:5px;">
+                             <button class="order-btn" style="background:#dbeafe; color:var(--primary);" onclick="editLoggedWorkout('${dateStr}', ${idx})">Redigera</button>
+                             <button class="delete-x-btn" onclick="deleteLoggedWorkout('${dateStr}', ${idx})">✖</button>
+                        </div>
                     </div>
-                    <div style="font-size:11px; color:var(--text-light); margin-top:5px;">
-                        ${w.exercises.map(e => `${e.name}: ${e.weight}kg x ${e.reps}`).join("<br>")}
+                    <div style="font-size:11px; color:var(--text-light); margin-top:10px; line-height:1.6;">
+                        ${w.exercises.map(e => `• ${e.name}: <b>${e.weight}kg x ${e.reps} reps x ${e.sets} set</b>`).join("<br>")}
                     </div>
                 </div>
             `;
         });
-        html += `<hr><p style="font-size:13px; color:var(--text-light);">Du kan fortfarande planera eller starta ett nytt pass nedan.</p>`;
+        // Om passet är genomfört visar vi inga alternativ för att planera/starta nya pass här
+    } else {
+        html += `
+            <p>Planerat: <strong>${currentPass ? currentPass.name : 'Vila'}</strong></p>
+            ${currentPass ? `<button class="mode-btn green" onclick="prepareStart('${dateStr}', '${currentPass.id}')">Starta passet 🔥</button>` : ''}
+            <hr>
+            <h4>Ändra planering:</h4>
+            ${programData.routine.map(p => `
+                <button class="mode-btn blue" onclick="setOverride('${dateStr}', '${p.id}')">Planera ${p.name}</button>
+            `).join("")}
+            <button class="mode-btn red" onclick="setOverride('${dateStr}', 'none')">Sätt som vilodag</button>
+        `;
     }
-
-    html += `
-        <p>Planerat: <strong>${currentPass ? currentPass.name : 'Vila'}</strong></p>
-        ${currentPass ? `<button class="mode-btn green" onclick="prepareStart('${dateStr}', '${currentPass.id}')">Starta passet 🔥</button>` : ''}
-        <hr>
-        <h4>Ändra planering:</h4>
-        ${programData.routine.map(p => `
-            <button class="mode-btn blue" onclick="setOverride('${dateStr}', '${p.id}')">Planera ${p.name}</button>
-        `).join("")}
-        <button class="mode-btn red" onclick="setOverride('${dateStr}', 'none')">Sätt som vilodag</button>
-    `;
     
     body.innerHTML = html;
     document.getElementById("workout-modal").classList.remove("hidden");
 }
 
+function editLoggedWorkout(dateStr, index) {
+    // Hitta passet i historiken
+    const globalIdx = workoutHistory.findIndex((w, i) => {
+        const matchesDate = w.date === dateStr;
+        return matchesDate && workoutHistory.filter((v, j) => v.date === dateStr && j < i).length === index;
+    });
+
+    if (globalIdx !== -1) {
+        const workoutToEdit = workoutHistory[globalIdx];
+        
+        // Hitta motsvarande program i programData för att få grundstrukturen
+        let basePass = programData.routine.find(p => p.name === workoutToEdit.programName);
+        
+        // Om vi inte hittar programmet (t.ex. raderat), skapa ett temporärt
+        if (!basePass) {
+            basePass = { name: workoutToEdit.programName, exercises: workoutToEdit.exercises };
+        }
+
+        // Förbered data för träningsvyn
+        const prefilledData = workoutToEdit.exercises.map(e => ({
+            weight: e.weight,
+            reps: e.reps,
+            sets: e.sets
+        }));
+
+        // Radera det gamla passet ur historiken så att vi inte får dubletter när vi sparar om
+        workoutHistory.splice(globalIdx, 1);
+        localStorage.setItem("workoutHistory", JSON.stringify(workoutHistory));
+
+        closeModal();
+        startWorkout(basePass, prefilledData, dateStr);
+    }
+}
+
 function deleteLoggedWorkout(dateStr, index) {
     if(confirm("Vill du ta bort det här genomförda passet från historiken?")) {
-        // Hitta rätt index i den globala workoutHistory
         const globalIdx = workoutHistory.findIndex((w, i) => {
             const matchesDate = w.date === dateStr;
-            // Vi behöver matcha specifika passet om flera finns samma dag
             return matchesDate && workoutHistory.filter((v, j) => v.date === dateStr && j < i).length === index;
         });
 
