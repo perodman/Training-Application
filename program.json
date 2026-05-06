@@ -10,16 +10,16 @@
         { "name": "Seated DB Press", "target": "Axlar", "defaultSets": 3, "description": "Pressa hantlarna rakt upp över huvudet.", "image": "https://images.unsplash.com/photo-1541534741688-6078c64b52d3?q=80&w=300&h=150&auto=format&fit=crop" },
         { "name": "Back Extensions", "target": "Ländrygg", "defaultSets": 3, "description": "Kontrollerad fällning i höften.", "image": "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=300&h=150&auto=format&fit=crop" },
         { "name": "Front Delt Raises", "target": "Axlar", "defaultSets": 3, "description": "Lyft hantlarna framåt till axelhöjd.", "image": "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?q=80&w=300&h=150&auto=format&fit=crop" },
-        { "name": "Preacher Curls", "target": "Biceps", "defaultSets": 3, "description": "Isolera biceps mot dynan.", "image": "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?q=80&w=300&h=150&auto=format&fit=crop" },
-        { "name": "Tricep Pushdowns", "target": "Triceps", "defaultSets": 3, "description": "Pressa ner stången, håll armbågarna stilla.", "image": "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?q=80&w=300&h=150&auto=format&fit=crop" },
-        { "name": "Hanging Leg Raises", "target": "Bål", "defaultSets": 3, "description": "Lyft benen med magmusklerna.", "image": "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?q=80&w=300&h=150&auto=format&fit=crop" }
+        { "name": "Preacher Curls", "target": "Biceps", "defaultSets": 3, "description": "Isolera biceps mot dynan.", "image": "" },
+        { "name": "Tricep Pushdowns", "target": "Triceps", "defaultSets": 3, "description": "Pressa ner stången, håll armbågarna stilla.", "image": "" },
+        { "name": "Hanging Leg Raises", "target": "Bål", "defaultSets": 3, "description": "Lyft benen med magmusklerna.", "image": "" }
       ]
     },
     {
       "id": "pass-b",
       "name": "Pass B",
       "exercises": [
-        { "name": "Romanian DB Deadlifts", "target": "Ben", "defaultSets": 3, "description": "Fäll i höften, känn stretchen i baksidan.", "image": "https://images.unsplash.com/photo-1541534741688-6078c64b52d3?q=80&w=300&h=150&auto=format&fit=crop" },
+        { "name": "Romanian DB Deadlifts", "target": "Ben", "defaultSets": 3, "description": "Fäll i höften, känn stretchen i baksidan.", "image": "" },
         { "name": "Incline DB Bench Press", "target": "Bröst", "defaultSets": 3, "description": "Lutande bänk för övre bröst.", "image": "" },
         { "name": "Incline DB Rows", "target": "Rygg", "defaultSets": 3, "description": "Ligg på lutande bänk, dra vikterna uppåt.", "image": "" },
         { "name": "Cable Lateral Raises", "target": "Axlar", "defaultSets": 3, "description": "Dra åt sidan i kabelmaskin.", "image": "" },
@@ -34,7 +34,7 @@
       "id": "pass-c",
       "name": "Pass C",
       "exercises": [
-        { "name": "Walking Lunges", "target": "Ben", "defaultSets": 3, "description": "Ta stora steg framåt.", "image": "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=300&h=150&auto=format&fit=crop" },
+        { "name": "Walking Lunges", "target": "Ben", "defaultSets": 3, "description": "Ta stora steg framåt.", "image": "" },
         { "name": "Weighted Dips", "target": "Bröst", "defaultSets": 3, "description": "Sänk dig djupt, pressa upp.", "image": "" },
         { "name": "One-arm Lat Pulldowns", "target": "Rygg", "defaultSets": 3, "description": "Dra med en arm i taget.", "image": "" },
         { "name": "Single-arm Machine Fly", "target": "Axlar", "defaultSets": 3, "description": "Isolera baksida axel.", "image": "" },
@@ -49,7 +49,7 @@
       "id": "pass-d",
       "name": "Pass D",
       "exercises": [
-        { "name": "Lying Leg Curls", "target": "Ben", "defaultSets": 3, "description": "Dra hälarna mot sätet.", "image": "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?q=80&w=300&h=150&auto=format&fit=crop" },
+        { "name": "Lying Leg Curls", "target": "Ben", "defaultSets": 3, "description": "Dra hälarna mot sätet.", "image": "" },
         { "name": "Machine Chest Fly", "target": "Bröst", "defaultSets": 3, "description": "Krama ihop handtagen.", "image": "" },
         { "name": "Incline DB Rows", "target": "Rygg", "defaultSets": 3, "description": "Håll armbågarna brett.", "image": "" },
         { "name": "One-arm Crossovers", "target": "Bröst", "defaultSets": 3, "description": "Dra kabeln över kroppen.", "image": "" },
