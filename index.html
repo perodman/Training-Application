@@ -18,11 +18,9 @@
         <h1 class="main-title">LIFT</h1>
         <p class="subtitle">Elevate Your Strength</p>
       </div>
-      
       <div id="draft-alert" class="hidden" style="margin-bottom: 20px;">
         <button id="resume-workout-btn" class="mode-btn orange">Fortsätt träningen ⏱️</button>
       </div>
-
       <div class="menu-grid">
         <button id="start-new-btn" class="mode-btn blue main-action">Starta Nytt Pass 🔥</button>
         <button id="view-exercises-btn" class="mode-btn glass">🏋️ Övningar</button>
@@ -53,19 +51,16 @@
     </div>
 
     <div id="exercises-view" class="view hidden">
-      <h2 class="section-title">Muskelgrupper</h2>
-      <div id="category-menu" class="category-grid">
-        <button class="cat-btn glass" data-cat="Ben" onclick="filterExercises('Ben')">🦵 Ben</button>
-        <button class="cat-btn glass" data-cat="Bröst" onclick="filterExercises('Bröst')">👕 Bröst</button>
-        <button class="cat-btn glass" data-cat="Rygg" onclick="filterExercises('Rygg')">👐 Rygg</button>
-        <button class="cat-btn glass" data-cat="Axlar" onclick="filterExercises('Axlar')">🛡️ Axlar</button>
-        <button class="cat-btn glass" data-cat="Armar" onclick="filterExercises('Armar')">💪 Armar</button>
-        <button class="cat-btn glass" data-cat="Bål" onclick="filterExercises('Bål')">🧘 Bål</button>
-      </div>
-      
       <div class="header-with-action">
         <h2 class="section-title" style="margin:0;">Övningar</h2>
         <button class="add-mini-btn" onclick="openCreateExerciseModal()">+</button>
+      </div>
+      <div id="category-menu" class="category-grid" style="margin-top:20px;">
+        <button class="cat-btn glass" data-cat="Ben" onclick="filterExercises('Ben')">Ben</button>
+        <button class="cat-btn glass" data-cat="Bröst" onclick="filterExercises('Bröst')">Bröst</button>
+        <button class="cat-btn glass" data-cat="Rygg" onclick="filterExercises('Rygg')">Rygg</button>
+        <button class="cat-btn glass" data-cat="Axlar" onclick="filterExercises('Axlar')">Axlar</button>
+        <button class="cat-btn glass" data-cat="Armar" onclick="filterExercises('Armar')">Armar</button>
       </div>
       <div id="exercise-results" class="exercise-bank-list" style="margin-top:20px;"></div>
     </div>
@@ -74,15 +69,6 @@
       <h2 class="section-title">Träningsprogram</h2>
       <div id="pass-selector-list" class="pass-selector"></div>
       <div id="program-exercise-list" class="card glass hidden"></div>
-      <button id="add-custom-pass-btn" class="mode-btn glass-border" style="margin-top:20px;">+ Skapa Nytt Pass</button>
-    </div>
-
-    <div id="stats-view" class="view hidden">
-      <h2 class="section-title">Statistik</h2>
-      <div class="card glass">
-        <h3>Aktivitet</h3>
-        <div id="chart-container" class="chart-wrapper"></div>
-      </div>
     </div>
 
     <div id="workout-view" class="view hidden">
