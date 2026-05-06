@@ -65,6 +65,10 @@ function renderCalendar() {
 
     for (let i = 0; i < offset; i++) grid.innerHTML += `<div></div>`;
 
+    // Uppdatera historik från storage innan vi renderar
+    workoutHistory = JSON.parse(localStorage.getItem("workoutHistory") || "[]");
+    activeDraft = JSON.parse(localStorage.getItem("activeWorkoutDraft") || "null");
+
     for (let d = 1; d <= daysInMonth; d++) {
         const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
         const dateObj = new Date(year, month, d);
@@ -261,8 +265,13 @@ document.getElementById("save-workout-btn").onclick = () => {
     };
     workoutHistory.push(log);
     localStorage.setItem("workoutHistory", JSON.stringify(workoutHistory));
+    
+    // Rensa utkast
     localStorage.removeItem("activeWorkoutDraft");
-    location.reload();
+    activeDraft = null;
+
+    // Navigera till kalendern och rendera om den direkt
+    renderCalendar();
 };
 
 document.getElementById("pause-workout-btn").onclick = () => {
