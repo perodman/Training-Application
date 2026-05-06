@@ -3,51 +3,51 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>LIFT Tracker Pro</title>
+  <title>LIFT Tracker</title>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@800;900&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <div class="global-header">
-    <div class="top-right-controls">
-      <div id="global-home" class="circle-ctrl">🏠</div>
-    </div>
+    <div id="global-home" class="circle-ctrl">🏠</div>
   </div>
 
   <div class="app-container">
-    <!-- Vy 1: Startsida -->
+    <!-- STARTVY -->
     <div id="home-view" class="view">
       <h1 class="main-title">LIFT</h1>
-      <p class="subtitle">Nästa planerade pass</p>
-      <div id="next-workout-card" class="card">
-        <h2 id="next-workout-name">Laddar...</h2>
-        <button id="start-workout-btn" class="mode-btn blue">Starta Pass 🔥</button>
+      <p class="subtitle">Gym & Progress</p>
+      
+      <div class="card">
+        <div class="target-label" style="text-align: center;">Ditt nästa pass</div>
+        <h2 id="next-workout-name" style="text-align: center; margin: 10px 0 20px 0;">Laddar...</h2>
+        <button id="start-workout-btn" class="mode-btn blue">Starta Träning 🔥</button>
       </div>
-      <div class="mode-container" style="margin-top:20px;">
-        <button id="calendar-mode" class="mode-btn indigo">📅 Träningsschema</button>
-        <button id="stats-mode" class="mode-btn purple">📊 Statistik</button>
-      </div>
+
+      <button id="calendar-mode" class="mode-btn indigo">📅 Veckoschema</button>
+      <button id="stats-mode" class="mode-btn purple" style="margin-top:10px;">📊 Statistik & Historik</button>
     </div>
 
-    <!-- Vy 2: Kalender/Schema -->
+    <!-- SCHEMAVY -->
     <div id="calendar-view" class="view hidden">
-      <h1 class="section-title">Schema</h1>
-      <div class="calendar-container card">
-        <div id="calendar-grid" class="calendar-grid"></div>
+      <h1 class="section-title">Veckoschema</h1>
+      <div class="card" id="schedule-list">
+        <!-- Renderas via JS -->
       </div>
-      <div id="history-list" style="margin-top:20px;"></div>
+      <p class="subtitle">Historik</p>
+      <div id="history-list"></div>
     </div>
 
-    <!-- Vy 3: Träningsläge -->
+    <!-- TRÄNINGSVY -->
     <div id="workout-view" class="view hidden">
       <h1 id="active-workout-title" class="section-title">Tränar</h1>
       <div id="exercise-list"></div>
-      <button id="save-workout-btn" class="mode-btn green">Spara & Avsluta ✅</button>
+      <button id="save-workout-btn" class="mode-btn green">Slutför & Spara ✅</button>
     </div>
 
-    <!-- Vy 4: Statistik -->
+    <!-- STATISTIKVY -->
     <div id="stats-view" class="view hidden">
-      <h1 class="section-title">Framsteg</h1>
+      <h1 class="section-title">Statistik</h1>
       <div id="stats-content" class="card"></div>
     </div>
   </div>
