@@ -3,12 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>GymTracker Pro</title>
+  <title>LIFT Tracker Pro</title>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@800;900&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <!-- Header -->
   <div class="global-header">
     <div class="top-right-controls">
       <div id="global-home" class="circle-ctrl">🏠</div>
@@ -19,24 +18,34 @@
     <!-- Vy 1: Startsida -->
     <div id="home-view" class="view">
       <h1 class="main-title">LIFT</h1>
-      <p class="subtitle">Ditt nästa pass</p>
+      <p class="subtitle">Nästa planerade pass</p>
       <div id="next-workout-card" class="card">
         <h2 id="next-workout-name">Laddar...</h2>
         <button id="start-workout-btn" class="mode-btn blue">Starta Pass 🔥</button>
       </div>
-      <div class="mode-container">
+      <div class="mode-container" style="margin-top:20px;">
+        <button id="calendar-mode" class="mode-btn indigo">📅 Träningsschema</button>
         <button id="stats-mode" class="mode-btn purple">📊 Statistik</button>
       </div>
     </div>
 
-    <!-- Vy 2: Träningsläge -->
+    <!-- Vy 2: Kalender/Schema -->
+    <div id="calendar-view" class="view hidden">
+      <h1 class="section-title">Schema</h1>
+      <div class="calendar-container card">
+        <div id="calendar-grid" class="calendar-grid"></div>
+      </div>
+      <div id="history-list" style="margin-top:20px;"></div>
+    </div>
+
+    <!-- Vy 3: Träningsläge -->
     <div id="workout-view" class="view hidden">
       <h1 id="active-workout-title" class="section-title">Tränar</h1>
       <div id="exercise-list"></div>
       <button id="save-workout-btn" class="mode-btn green">Spara & Avsluta ✅</button>
     </div>
 
-    <!-- Vy 3: Statistik -->
+    <!-- Vy 4: Statistik -->
     <div id="stats-view" class="view hidden">
       <h1 class="section-title">Framsteg</h1>
       <div id="stats-content" class="card"></div>
