@@ -51,7 +51,10 @@
 
     <!-- ÖVNINGAR -->
     <div id="exercises-view" class="view hidden">
-      <h2 class="section-title">Muskelgrupper</h2>
+      <h2 class="section-title">Hantera Övningar</h2>
+      <button class="mode-btn green" onclick="openCreateExerciseModal()" style="margin-bottom: 20px;">+ Skapa Ny Övning</button>
+      
+      <h3 class="section-title" style="font-size: 16px;">Muskelgrupper</h3>
       <div id="category-menu" class="category-grid">
         <button class="cat-btn" data-cat="Ben" onclick="filterExercises('Ben')">🦵 Ben</button>
         <button class="cat-btn" data-cat="Bröst" onclick="filterExercises('Bröst')">💪 Bröst</button>
@@ -60,7 +63,6 @@
         <button class="cat-btn" data-cat="Armar" onclick="filterExercises('Armar')">🦾 Armar</button>
         <button class="cat-btn" data-cat="Bål" onclick="filterExercises('Bål')">🧘 Bål</button>
       </div>
-      <h2 class="section-title">Övningar</h2>
       <div id="exercise-results" class="exercise-bank-list"></div>
     </div>
 
