@@ -7,10 +7,6 @@
   --card: #ffffff;
   --text: #1e293b;
   --text-light: #64748b;
-  --pass-a: #ef4444;
-  --pass-b: #3b82f6;
-  --pass-c: #10b981;
-  --pass-d: #f59e0b;
 }
 
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -21,6 +17,7 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--tex
 
 .main-title { font-family: 'Montserrat', sans-serif; font-size: 48px; font-weight: 900; text-align: center; margin: 0; }
 .subtitle { text-align: center; color: var(--text-light); font-weight: 800; text-transform: uppercase; font-size: 11px; letter-spacing: 2px; margin-bottom: 20px; }
+.section-title { text-align: center; font-weight: 900; margin-bottom: 20px; }
 
 .card { background: var(--card); padding: 20px; border-radius: 24px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); margin-bottom: 20px; }
 
@@ -31,18 +28,19 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--tex
 .orange { background: var(--warning); }
 .gray { background: #94a3b8; }
 
+.category-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+.cat-btn { padding: 15px; border-radius: 15px; border: 2px solid #e2e8f0; background: white; font-weight: 700; color: var(--text); cursor: pointer; }
+.cat-btn:active { background: var(--primary); color: white; }
+
 .calendar-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
 .nav-arrow { background: none; border: none; font-size: 20px; color: var(--primary); font-weight: bold; cursor: pointer; }
 .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
 .calendar-cell { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; background: white; border-radius: 10px; font-size: 12px; font-weight: 700; border: 1px solid #f1f5f9; cursor: pointer; }
 
-.cell-pass-a { background-color: var(--pass-a) !important; color: white; }
-.cell-pass-b { background-color: var(--pass-b) !important; color: white; }
-.cell-pass-c { background-color: var(--pass-c) !important; color: white; }
-.cell-pass-d { background-color: var(--pass-d) !important; color: white; }
-.cell-completed { border: 3px solid var(--success) !important; }
+.cell-planned { background-color: #dbeafe !important; color: #1d4ed8; }
+.cell-completed { background-color: var(--success) !important; color: white; border: none !important; }
 
-.legend { margin-top: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.legend { margin-top: 20px; display: flex; justify-content: center; gap: 20px; }
 .legend-item { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; }
 .legend-color { width: 14px; height: 14px; border-radius: 4px; }
 
