@@ -27,12 +27,13 @@
         <button id="start-new-btn" class="mode-btn blue main-action">Starta Nytt Pass 🔥</button>
         <button id="view-exercises-btn" class="mode-btn glass">🏋️ Övningar</button>
         <button id="view-programs-btn" class="mode-btn glass">📋 Program</button>
-        <button id="calendar-mode" class="mode-btn glass">📅 Schema</button>
+        <button id="calendar-mode" class="mode-btn glass">📅 Träningsschema</button>
         <button id="stats-mode" class="mode-btn glass">📊 Statistik</button>
       </div>
     </div>
 
     <div id="calendar-view" class="view hidden">
+      <h2 class="section-title">Träningsschema</h2>
       <div class="calendar-nav">
         <button onclick="changeMonth(-1)" class="nav-arrow">❮</button>
         <h2 id="month-label"></h2>
@@ -40,13 +41,13 @@
       </div>
       <div class="card calendar-card glass">
         <div class="calendar-weekdays">
-          <span>Mån</span><span>Tis</span><span>Ons</span><span>Tor</span><span>Fre</span><span>Lör</span><span>Sön</span>
+          <div>Mån</div><div>Tis</div><div>Ons</div><div>Tor</div><div>Fre</div><div>Lör</div><div>Sön</div>
         </div>
         <div class="calendar-grid" id="calendar-grid"></div>
         <div class="legend">
-          <div class="legend-item"><div class="legend-color cell-planned"></div> Planerat</div>
-          <div class="legend-item"><div class="legend-color cell-ongoing"></div> Pågående</div>
-          <div class="legend-item"><div class="legend-color cell-completed"></div> Klart</div>
+          <div class="legend-item"><div class="legend-color planned"></div> Planerat</div>
+          <div class="legend-item"><div class="legend-color ongoing"></div> Pågående</div>
+          <div class="legend-item"><div class="legend-color completed"></div> Klart</div>
         </div>
       </div>
     </div>
@@ -63,11 +64,10 @@
       </div>
       
       <div class="header-with-action">
-        <h2 class="section-title">Övningar</h2>
+        <h2 class="section-title" style="margin:0;">Övningar</h2>
         <button class="add-mini-btn" onclick="openCreateExerciseModal()">+</button>
       </div>
-      
-      <div id="exercise-results" class="exercise-bank-list"></div>
+      <div id="exercise-results" class="exercise-bank-list" style="margin-top:20px;"></div>
     </div>
 
     <div id="programs-view" class="view hidden">
@@ -86,9 +86,7 @@
     </div>
 
     <div id="workout-view" class="view hidden">
-      <div class="workout-header">
-        <h2 id="active-title"></h2>
-      </div>
+      <h2 id="active-title" style="text-align:center;"></h2>
       <div id="exercise-list"></div>
       <div class="workout-footer">
         <button id="pause-workout-btn" class="mode-btn glass-border">Spara utkast</button>
