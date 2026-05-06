@@ -1,35 +1,106 @@
-.calendar-grid {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 5px;
-  margin-top: 10px;
+:root {
+  --primary: #3b82f6;
+  --secondary: #6366f1;
+  --success: #10b981;
+  --bg: #f8fafc;
+  --card: #ffffff;
+  --text: #1e293b;
+  --text-light: #64748b;
 }
-.calendar-day {
-  aspect-ratio: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #f8fafc;
-  border-radius: 8px;
-  font-size: 12px;
-  font-weight: 700;
-  color: #94a3b8;
+
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+body { 
+  font-family: 'Inter', sans-serif; 
+  background-color: var(--bg); 
+  color: var(--text); 
+  margin: 0; 
+  line-height: 1.5;
 }
-.calendar-day.active {
-  background: #10b981;
-  color: white;
+
+.app-container { max-width: 500px; margin: auto; padding: 80px 20px 40px; }
+
+.hidden { display: none !important; }
+
+/* HEADER & TITLAR */
+.main-title { 
+  font-family: 'Montserrat', sans-serif; 
+  font-size: 48px; 
+  font-weight: 900; 
+  text-align: center; 
+  margin: 0; 
+  background: linear-gradient(135deg, var(--text), var(--primary)); 
+  -webkit-background-clip: text; 
+  -webkit-text-fill-color: transparent; 
 }
-.calendar-day.today {
-  border: 2px solid #3b82f6;
+
+.subtitle { text-align: center; color: var(--text-light); font-weight: 800; text-transform: uppercase; font-size: 11px; letter-spacing: 2px; margin-bottom: 20px; }
+
+.section-title { font-family: 'Montserrat', sans-serif; font-size: 24px; font-weight: 800; margin-bottom: 15px; text-align: center; }
+
+/* CARDS */
+.card { 
+  background: var(--card); 
+  padding: 20px; 
+  border-radius: 24px; 
+  box-shadow: 0 10px 25px rgba(0,0,0,0.05); 
+  margin-bottom: 20px; 
+  border: 1px solid rgba(255,255,255,0.1);
 }
-.indigo { background: #6366f1; }
-.history-item {
-  background: white;
-  padding: 15px;
-  border-radius: 15px;
-  margin-bottom: 10px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+
+/* KNAPPAR */
+.mode-btn { 
+  width: 100%; 
+  padding: 18px; 
+  border-radius: 16px; 
+  border: none; 
+  color: white; 
+  font-weight: 800; 
+  font-size: 16px; 
+  cursor: pointer; 
+  display: flex; 
+  align-items: center; 
+  justify-content: center; 
+  gap: 10px;
+  transition: transform 0.1s;
 }
+
+.mode-btn:active { transform: scale(0.98); }
+.blue { background: var(--primary); }
+.indigo { background: var(--secondary); }
+.green { background: var(--success); }
+.purple { background: #8b5cf6; }
+
+/* LOGGNINGS-INPUTS */
+.exercise-header { display: flex; flex-direction: column; margin-bottom: 15px; }
+.target-label { font-size: 10px; font-weight: 900; color: var(--primary); text-transform: uppercase; letter-spacing: 1px; }
+.exercise-name { font-size: 18px; font-weight: 700; }
+
+.input-group { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+.input-field { display: flex; flex-direction: column; gap: 5px; }
+.input-field label { font-size: 10px; font-weight: 800; color: var(--text-light); text-transform: uppercase; text-align: center; }
+.log-input { 
+  width: 100%; 
+  padding: 12px; 
+  border-radius: 12px; 
+  border: 2px solid #e2e8f0; 
+  text-align: center; 
+  font-weight: 700; 
+  font-family: inherit;
+  font-size: 16px;
+}
+
+/* SCHEMA-SIDA */
+.schedule-item { 
+  display: flex; 
+  justify-content: space-between; 
+  padding: 15px; 
+  border-bottom: 1px solid #f1f5f9; 
+}
+.schedule-item:last-child { border: 0; }
+.day-name { font-weight: 800; color: var(--primary); width: 100px; }
+.workout-name { font-weight: 600; color: var(--text); }
+
+/* NAVIGATION */
+.global-header { position: fixed; top: 0; left: 0; right: 0; padding: 15px; display: flex; justify-content: flex-end; background: rgba(248, 250, 252, 0.8); backdrop-filter: blur(10px); z-index: 100; }
+.circle-ctrl { background: white; width: 45px; height: 45px; border-radius: 14px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1); cursor: pointer; font-size: 20px; }
