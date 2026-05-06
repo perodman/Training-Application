@@ -8,6 +8,11 @@ fetch("program.json").then(r => r.json()).then(json => {
     renderHome();
 });
 
+function showView(id) {
+    document.querySelectorAll(".view").forEach(v => v.classList.add("hidden"));
+    document.getElementById(id).classList.remove("hidden");
+}
+
 function renderHome() {
     showView("home-view");
     const draftAlert = document.getElementById("draft-alert");
@@ -21,6 +26,7 @@ function renderHome() {
     }
 }
 
+// 1. STARTA & FORTSÄTT TRÄNING
 function startWorkout(workout, savedData = null) {
     activeDraft = { workout: workout, startTime: new Date().toISOString() };
     document.getElementById("active-title").textContent = workout.name;
@@ -46,7 +52,7 @@ function startWorkout(workout, savedData = null) {
                 </div>
                 <div class="card-back">
                     <strong>TIPS & FORM</strong>
-                    <p style="font-size:11px; margin:5px 0;">${ex.description || "Isolera muskeln och håll tempot."}</p>
+                    <p style="font-size:11px; margin:5px 0;">${ex.description || "Håll fokus på kontakten."}</p>
                     <img src="${imgPath}" class="exercise-image">
                 </div>
             </div>
@@ -57,6 +63,32 @@ function startWorkout(workout, savedData = null) {
     showView("workout-view");
 }
 
+// 2. STATISTIK
+function renderStats() {
+    const content = document.getElementById("stats-content");
+    content.innerHTML = "";
+    if (workoutHistory.length === 0) {
+        content.innerHTML = "<p style='text-align:center'>Inga pass sparade än.</p>";
+    } else {
+        const statsCard = document.createElement("div");
+        statsCard.className = "card";
+        statsCard.innerHTML = `
+            <h3>Summering</h3>
+            <p>Totalt antal pass: <strong>${workoutHistory.length}</strong></p>
+            <hr>
+            <h4>Senaste passen:</h4>
+            ${workoutHistory.slice(-5).reverse().map(w => `
+                <div style="font-size:13px; margin-bottom:8px;">
+                    <strong>${w.programName}</strong> - ${new Date(w.date).toLocaleDateString('sv-SE')}
+                </div>
+            `).join("")}
+        `;
+        content.appendChild(statsCard);
+    }
+    showView("stats-view");
+}
+
+// 3. KALENDER (Grön för färdigt, Blå för kommande)
 function renderCalendar() {
     const grid = document.getElementById("calendar-grid");
     const label = document.getElementById("month-label");
@@ -77,34 +109,79 @@ function renderCalendar() {
         cell.className = "calendar-cell";
         cell.innerHTML = d;
 
+        // Planerade dagar (mån, ons, fre)
         if ([1, 3, 5].includes(date.getDay())) {
             const dayCounter = Math.floor(date.getTime() / 86400000);
             const passIdx = dayCounter % 4;
-            const classes = ["cell-pass-a", "cell-pass-b", "cell-pass-c", "cell-pass-d"];
-            cell.classList.add(classes[passIdx]);
+            cell.classList.add("cell-planned");
             cell.onclick = () => showDayInfo(date, programData.routine[passIdx]);
         }
 
+        // Färdiga dagar
         const hasCompleted = workoutHistory.some(w => new Date(w.date).toDateString() === date.toDateString());
-        if (hasCompleted) cell.classList.add("cell-completed");
+        if (hasCompleted) {
+            cell.classList.remove("cell-planned");
+            cell.classList.add("cell-completed");
+        }
 
         grid.appendChild(cell);
     }
     showView("calendar-view");
 }
 
+// 4. ÖVNINGS-VY (Kategoriserad)
+function filterExercises(category) {
+    const results = document.getElementById("exercise-results");
+    results.innerHTML = "";
+    
+    // Samla alla unika övningar från alla pass
+    let allEx = [];
+    programData.routine.forEach(p => {
+        p.exercises.forEach(ex => {
+            if (!allEx.find(a => a.name === ex.name)) allEx.push(ex);
+        });
+    });
+
+    // Gruppera Armar (Biceps + Triceps)
+    const filtered = allEx.filter(ex => {
+        if (category === "Armar") return ex.target === "Biceps" || ex.target === "Triceps";
+        return ex.target === category;
+    });
+
+    filtered.forEach(ex => {
+        results.innerHTML += `
+            <div class="card" style="margin-bottom:10px; padding:15px;">
+                <strong>${ex.name}</strong>
+                <div style="font-size:12px; color:var(--text-light)">${ex.description}</div>
+            </div>
+        `;
+    });
+}
+
+// 5. PROGRAMÖVERSIKT (Renodlad)
+function showProgramPass(idx) {
+    const pass = programData.routine[idx];
+    const list = document.getElementById("program-exercise-list");
+    list.classList.remove("hidden");
+    list.innerHTML = `<h3>${pass.name}</h3><hr>`;
+    pass.exercises.forEach(e => {
+        list.innerHTML += `<div style="padding:8px 0; border-bottom:1px solid #eee;"><strong>${e.name}</strong> <span style="font-size:11px; color:#666;">(${e.target})</span></div>`;
+    });
+}
+
+// NAVIGATION & MODAL
 function showDayInfo(date, pass) {
-    const modal = document.getElementById("workout-modal");
     const body = document.getElementById("modal-body");
     body.innerHTML = `<h3>${date.toLocaleDateString('sv-SE')}</h3><h2>${pass.name}</h2><hr>`;
-    pass.exercises.forEach(e => body.innerHTML += `<div style="padding:4px 0">• ${e.name} (${e.target})</div>`);
-    modal.classList.remove("hidden");
+    pass.exercises.forEach(e => body.innerHTML += `<div style="padding:4px 0">• ${e.name}</div>`);
+    document.getElementById("workout-modal").classList.remove("hidden");
 }
 
 function closeModal() { document.getElementById("workout-modal").classList.add("hidden"); }
 function changeMonth(offset) { currentViewDate.setMonth(currentViewDate.getMonth() + offset); renderCalendar(); }
-function showView(id) { document.querySelectorAll(".view").forEach(v => v.classList.add("hidden")); document.getElementById(id).classList.remove("hidden"); }
 
+// EVENT LISTENERS
+document.getElementById("global-home").onclick = renderHome;
 document.getElementById("start-new-btn").onclick = () => {
     const lastWorkout = workoutHistory[workoutHistory.length - 1];
     let nextIdx = 0;
@@ -114,10 +191,12 @@ document.getElementById("start-new-btn").onclick = () => {
     }
     startWorkout(programData.routine[nextIdx]);
 };
-
-document.getElementById("calendar-mode").onclick = renderCalendar;
-document.getElementById("global-home").onclick = renderHome;
 document.getElementById("resume-workout-btn").onclick = () => startWorkout(activeDraft.workout, activeDraft.exercises);
+document.getElementById("view-exercises-btn").onclick = () => { showView("exercises-view"); document.getElementById("exercise-results").innerHTML = ""; };
+document.getElementById("view-programs-btn").onclick = () => { showView("programs-view"); document.getElementById("program-exercise-list").classList.add("hidden"); };
+document.getElementById("calendar-mode").onclick = renderCalendar;
+document.getElementById("stats-mode").onclick = renderStats;
+
 document.getElementById("pause-workout-btn").onclick = () => {
     activeDraft.exercises = activeDraft.workout.exercises.map((ex, i) => ({
         weight: document.getElementById(`w-${i}`).value,
@@ -144,13 +223,4 @@ document.getElementById("save-workout-btn").onclick = () => {
     localStorage.removeItem("activeWorkoutDraft");
     activeDraft = null;
     location.reload();
-};
-
-document.getElementById("view-programs-btn").onclick = () => {
-    const list = document.getElementById("modal-body");
-    list.innerHTML = "<h2>Programöversikt</h2>";
-    programData.routine.forEach(p => {
-        list.innerHTML += `<div class="card"><h3>${p.name}</h3>${p.exercises.map(e => `<div>• ${e.name}</div>`).join("")}</div>`;
-    });
-    document.getElementById("workout-modal").classList.remove("hidden");
 };
