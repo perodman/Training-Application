@@ -5,19 +5,21 @@ let activeDraft = JSON.parse(localStorage.getItem("activeWorkoutDraft") || "null
 let calendarOverrides = JSON.parse(localStorage.getItem("calendarOverrides") || "{}");
 let currentViewDate = new Date();
 
-// - Laddar programdata och masterlistan
+// --- INITIERING ---
+// Vi hämtar program och sparar ner övningarna permanent i master-listan en gång
 fetch("program.json").then(r => r.json()).then(json => {
     const saved = JSON.parse(localStorage.getItem("myCustomProgram"));
-    programData = saved || json;
     
-    programData.routine.forEach(p => {
+    // Spara ner alla övningar från ursprungsfilen till masterExercises för att alltid ha en bank
+    json.routine.forEach(p => {
         p.exercises.forEach(ex => {
             if (!masterExercises.find(m => m.name === ex.name)) {
                 masterExercises.push({...ex});
             }
         });
     });
-    
+
+    programData = saved || json;
     renderHome();
 });
 
@@ -50,10 +52,13 @@ function renderCalendar() {
     grid.innerHTML = "";
     const year = currentViewDate.getFullYear();
     const month = currentViewDate.getMonth();
-    label.textContent = currentViewDate.toLocaleString('sv-SE', { month: 'long', year: 'numeric' });
+    
+    // Stor bokstav på månaden
+    const rawMonth = currentViewDate.toLocaleString('sv-SE', { month: 'long', year: 'numeric' });
+    label.textContent = rawMonth.charAt(0).toUpperCase() + rawMonth.slice(1);
 
     const firstDay = new Date(year, month, 1).getDay();
-    const offset = firstDay === 0 ? 6 : firstDay - 1;
+    const offset = firstDay === 0 ? 6 : firstDay - 1; // Anpassa för måndag som start
     const daysInMonth = new Date(year, month + 1, 0).getDate();
 
     for (let i = 0; i < offset; i++) grid.innerHTML += `<div></div>`;
@@ -63,26 +68,33 @@ function renderCalendar() {
         const dateStr = dateObj.toISOString().split('T')[0];
         const cell = document.createElement("div");
         cell.className = "calendar-cell";
-        cell.innerHTML = d;
 
         const isDone = workoutHistory.some(w => w.date.startsWith(dateStr));
         const dayOfWeek = dateObj.getDay();
         const isAutoDay = [2, 4, 6].includes(dayOfWeek);
         const override = calendarOverrides[dateStr];
 
-        let displayPassId = null;
+        let displayPass = null;
         if (override && override !== "none") {
-            displayPassId = override;
+            displayPass = programData.routine.find(p => p.id === override);
         } else if (isAutoDay && override !== "none") {
             const dayCounter = Math.floor(dateObj.getTime() / (1000 * 60 * 60 * 24 * 2)); 
             const idx = dayCounter % programData.routine.length;
-            displayPassId = programData.routine[idx].id;
+            displayPass = programData.routine[idx];
         }
 
-        if (isDone) cell.classList.add("cell-completed");
-        else if (displayPassId) cell.classList.add("cell-planned");
+        let passLabel = "";
+        if (isDone) {
+            cell.classList.add("cell-completed");
+            passLabel = "KLART";
+        } else if (displayPass) {
+            cell.classList.add("cell-planned");
+            // Visa passets namn i kortform (t.ex. "Pass A" blir "A")
+            passLabel = displayPass.name.split(" ").pop();
+        }
 
-        cell.onclick = () => openDayManager(dateStr, displayPassId, isDone);
+        cell.innerHTML = `<span>${d}</span><span class="cell-info">${passLabel}</span>`;
+        cell.onclick = () => openDayManager(dateStr, displayPass?.id, isDone);
         grid.appendChild(cell);
     }
     showView("calendar-view");
@@ -95,8 +107,8 @@ function openDayManager(dateStr, passId, isDone) {
     } else {
         const currentPass = programData.routine.find(p => p.id === passId);
         body.innerHTML = `
-            <h3>Hantera ${dateStr}</h3>
-            <p>Nuvarande: <strong>${currentPass ? currentPass.name : 'Vila'}</strong></p>
+            <h3>${dateStr}</h3>
+            <p>Planerat: <strong>${currentPass ? currentPass.name : 'Vila'}</strong></p>
             <hr>
             <h4>Ändra till:</h4>
             ${programData.routine.map(p => `
@@ -152,7 +164,7 @@ function showProgramDetails(idx) {
     list.classList.remove("hidden");
     list.innerHTML = `
         <div style="display:flex; justify-content:space-between; align-items:center;">
-            <h3>${pass.name}</h3>
+            <h3 style="margin:0;">${pass.name}</h3>
             <button class="mode-btn indigo" style="width:auto; padding:8px 15px;" onclick="openEditModal(${idx})">Redigera</button>
         </div>
         <hr>
@@ -160,19 +172,18 @@ function showProgramDetails(idx) {
     `;
 }
 
-// --- REDIGERING MED MUSKELGRUPPS-FILTER ---
 function openEditModal(pIdx) {
     const pass = programData.routine[pIdx];
     const body = document.getElementById("modal-body");
     body.innerHTML = `
-        <div style="display:flex; justify-content:space-between; align-items:center;">
+        <div class="modal-header-row">
             <h3>Redigera ${pass.name}</h3>
-            <button class="mode-btn red" style="width:auto; padding:8px 15px; font-size:12px;" onclick="deleteEntirePass(${pIdx})">RADERA HELA PASSET</button>
+            <button class="mode-btn red" style="width:auto; padding:10px 20px; font-size:12px; margin:0;" onclick="deleteEntirePass(${pIdx})">RADERA HELA PASSET</button>
         </div>
         <div id="edit-ex-list"></div>
         <hr>
-        <h4>Lägg till övning:</h4>
-        <label style="font-size:11px; font-weight:800;">1. VÄLJ MUSKELGRUPP</label>
+        <h4 style="margin-bottom:10px;">Lägg till övning</h4>
+        <label style="font-size:11px; font-weight:800; color:var(--text-light);">VÄLJ MUSKELGRUPP</label>
         <select id="muscle-group-select" class="log-input" onchange="updateExerciseDropdown()">
             <option value="">Välj...</option>
             <option value="Ben">Ben</option>
@@ -183,9 +194,9 @@ function openEditModal(pIdx) {
             <option value="Triceps">Triceps</option>
             <option value="Bål">Bål</option>
         </select>
-        <label style="font-size:11px; font-weight:800;">2. VÄLJ ÖVNING</label>
+        <label style="font-size:11px; font-weight:800; color:var(--text-light);">VÄLJ ÖVNING</label>
         <select id="bank-select" class="log-input" disabled></select>
-        <button id="add-btn-modal" class="mode-btn green" onclick="addFromBank(${pIdx})" disabled>Lägg till</button>
+        <button id="add-btn-modal" class="mode-btn green" onclick="addFromBank(${pIdx})" disabled>+ Lägg till i passet</button>
     `;
 
     const list = body.querySelector("#edit-ex-list");
@@ -217,16 +228,6 @@ function updateExerciseDropdown() {
     addBtn.disabled = false;
 }
 
-function deleteEntirePass(pIdx) {
-    if(confirm("Är du säker på att du vill radera hela detta pass?")) {
-        programData.routine.splice(pIdx, 1);
-        saveAll();
-        closeModal();
-        renderProgramView();
-        document.getElementById("program-exercise-list").classList.add("hidden");
-    }
-}
-
 function removeFromPass(pIdx, exIdx) {
     programData.routine[pIdx].exercises.splice(exIdx, 1);
     saveAll();
@@ -243,6 +244,16 @@ function addFromBank(pIdx) {
     showProgramDetails(pIdx);
 }
 
+function deleteEntirePass(pIdx) {
+    if(confirm("Är du säker på att du vill radera hela detta pass?")) {
+        programData.routine.splice(pIdx, 1);
+        saveAll();
+        closeModal();
+        renderProgramView();
+        document.getElementById("program-exercise-list").classList.add("hidden");
+    }
+}
+
 document.getElementById("add-custom-pass-btn").onclick = () => {
     const newChar = String.fromCharCode(65 + programData.routine.length);
     const newPass = { id: `pass-${newChar.toLowerCase()}`, name: `Pass ${newChar}`, exercises: [] };
@@ -251,7 +262,7 @@ document.getElementById("add-custom-pass-btn").onclick = () => {
     renderProgramView();
 };
 
-// --- STARTA PASS ---
+// --- STARTA OCH SPARA PASS ---
 function startWorkout(workout, savedData = null) {
     activeDraft = { workout: workout, startTime: new Date().toISOString() };
     document.getElementById("active-title").textContent = workout.name;
@@ -266,24 +277,6 @@ function startWorkout(workout, savedData = null) {
     });
     showView("workout-view");
 }
-
-// --- ÖVRIGT ---
-document.getElementById("global-home").onclick = renderHome;
-document.getElementById("calendar-mode").onclick = renderCalendar;
-document.getElementById("view-exercises-btn").onclick = () => { showView("exercises-view"); filterExercises('Ben'); };
-document.getElementById("view-programs-btn").onclick = renderProgramView;
-document.getElementById("stats-mode").onclick = () => { showView("stats-view"); renderStats(); };
-
-document.getElementById("start-new-btn").onclick = () => {
-    const today = new Date().toISOString().split('T')[0];
-    const dayOfWeek = new Date().getDay();
-    let toStart = programData.routine[0];
-    if ([2,4,6].includes(dayOfWeek)) {
-        const dayCounter = Math.floor(new Date().getTime() / (1000 * 60 * 60 * 24 * 2));
-        toStart = programData.routine[dayCounter % programData.routine.length];
-    }
-    startWorkout(toStart);
-};
 
 document.getElementById("save-workout-btn").onclick = () => {
     const log = {
@@ -300,6 +293,23 @@ document.getElementById("save-workout-btn").onclick = () => {
     localStorage.setItem("workoutHistory", JSON.stringify(workoutHistory));
     localStorage.removeItem("activeWorkoutDraft");
     location.reload();
+};
+
+// --- NAVIGATION & UTILS ---
+document.getElementById("global-home").onclick = renderHome;
+document.getElementById("calendar-mode").onclick = renderCalendar;
+document.getElementById("view-exercises-btn").onclick = () => { showView("exercises-view"); filterExercises('Ben'); };
+document.getElementById("view-programs-btn").onclick = renderProgramView;
+document.getElementById("stats-mode").onclick = () => { showView("stats-view"); renderStats(); };
+
+document.getElementById("start-new-btn").onclick = () => {
+    const dayOfWeek = new Date().getDay();
+    let toStart = programData.routine[0];
+    if ([2,4,6].includes(dayOfWeek)) {
+        const dayCounter = Math.floor(new Date().getTime() / (1000 * 60 * 60 * 24 * 2));
+        toStart = programData.routine[dayCounter % programData.routine.length];
+    }
+    startWorkout(toStart);
 };
 
 function closeModal() { document.getElementById("workout-modal").classList.add("hidden"); }
