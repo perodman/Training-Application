@@ -31,6 +31,8 @@ function startWorkout(workout, savedData = null) {
         const val = savedData ? savedData[i] : { weight: "", reps: "", sets: ex.defaultSets };
         const container = document.createElement("div");
         container.className = "exercise-card-container";
+        const imgPath = ex.image && ex.image !== "" ? ex.image : "https://via.placeholder.com/300x150?text=" + encodeURIComponent(ex.name);
+        
         container.innerHTML = `
             <div class="exercise-card-inner">
                 <div class="card-front">
@@ -44,8 +46,8 @@ function startWorkout(workout, savedData = null) {
                 </div>
                 <div class="card-back">
                     <strong>TIPS & FORM</strong>
-                    <p style="font-size:11px; margin:5px 0;">${ex.description || "Ingen beskrivning."}</p>
-                    <img src="${ex.image}" class="exercise-image" onerror="this.src='https://via.placeholder.com/300x150?text=Bild+laddas...'">
+                    <p style="font-size:11px; margin:5px 0;">${ex.description || "Isolera muskeln och håll tempot."}</p>
+                    <img src="${imgPath}" class="exercise-image">
                 </div>
             </div>
         `;
@@ -75,7 +77,6 @@ function renderCalendar() {
         cell.className = "calendar-cell";
         cell.innerHTML = d;
 
-        // Färglogik per pass (Mån=A, Ons=B, Fre=C, nästa Mån=D osv)
         if ([1, 3, 5].includes(date.getDay())) {
             const dayCounter = Math.floor(date.getTime() / 86400000);
             const passIdx = dayCounter % 4;
@@ -95,8 +96,8 @@ function renderCalendar() {
 function showDayInfo(date, pass) {
     const modal = document.getElementById("workout-modal");
     const body = document.getElementById("modal-body");
-    body.innerHTML = `<h3>${date.toLocaleDateString('sv-SE')}</h3><h2>${pass.name}</h2>`;
-    pass.exercises.forEach(e => body.innerHTML += `<div>• ${e.name}</div>`);
+    body.innerHTML = `<h3>${date.toLocaleDateString('sv-SE')}</h3><h2>${pass.name}</h2><hr>`;
+    pass.exercises.forEach(e => body.innerHTML += `<div style="padding:4px 0">• ${e.name} (${e.target})</div>`);
     modal.classList.remove("hidden");
 }
 
@@ -104,8 +105,52 @@ function closeModal() { document.getElementById("workout-modal").classList.add("
 function changeMonth(offset) { currentViewDate.setMonth(currentViewDate.getMonth() + offset); renderCalendar(); }
 function showView(id) { document.querySelectorAll(".view").forEach(v => v.classList.add("hidden")); document.getElementById(id).classList.remove("hidden"); }
 
-document.getElementById("start-new-btn").onclick = () => startWorkout(programData.routine[0]);
+document.getElementById("start-new-btn").onclick = () => {
+    const lastWorkout = workoutHistory[workoutHistory.length - 1];
+    let nextIdx = 0;
+    if (lastWorkout) {
+        const lastIdx = programData.routine.findIndex(p => p.name === lastWorkout.programName);
+        nextIdx = (lastIdx + 1) % programData.routine.length;
+    }
+    startWorkout(programData.routine[nextIdx]);
+};
+
 document.getElementById("calendar-mode").onclick = renderCalendar;
 document.getElementById("global-home").onclick = renderHome;
 document.getElementById("resume-workout-btn").onclick = () => startWorkout(activeDraft.workout, activeDraft.exercises);
-document.getElementById("save-workout-btn").onclick = () => { /* Logik för att spara */ location.reload(); };
+document.getElementById("pause-workout-btn").onclick = () => {
+    activeDraft.exercises = activeDraft.workout.exercises.map((ex, i) => ({
+        weight: document.getElementById(`w-${i}`).value,
+        reps: document.getElementById(`r-${i}`).value,
+        sets: document.getElementById(`s-${i}`).value
+    }));
+    localStorage.setItem("activeWorkoutDraft", JSON.stringify(activeDraft));
+    renderHome();
+};
+
+document.getElementById("save-workout-btn").onclick = () => {
+    const log = {
+        date: new Date().toISOString(),
+        programName: activeDraft.workout.name,
+        exercises: activeDraft.workout.exercises.map((ex, i) => ({
+            name: ex.name,
+            weight: document.getElementById(`w-${i}`).value,
+            reps: document.getElementById(`r-${i}`).value,
+            sets: document.getElementById(`s-${i}`).value
+        }))
+    };
+    workoutHistory.push(log);
+    localStorage.setItem("workoutHistory", JSON.stringify(workoutHistory));
+    localStorage.removeItem("activeWorkoutDraft");
+    activeDraft = null;
+    location.reload();
+};
+
+document.getElementById("view-programs-btn").onclick = () => {
+    const list = document.getElementById("modal-body");
+    list.innerHTML = "<h2>Programöversikt</h2>";
+    programData.routine.forEach(p => {
+        list.innerHTML += `<div class="card"><h3>${p.name}</h3>${p.exercises.map(e => `<div>• ${e.name}</div>`).join("")}</div>`;
+    });
+    document.getElementById("workout-modal").classList.remove("hidden");
+};
