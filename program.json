@@ -1,0 +1,22 @@
+{
+  "routine": [
+    {
+      "id": "pass-a",
+      "name": "Pass A: Underkropp & Mage",
+      "exercises": [
+        { "name": "Knäböj", "target": "Ben", "defaultSets": 3 },
+        { "name": "Marklyft", "target": "Rygg/Ben", "defaultSets": 3 },
+        { "name": "Plankan", "target": "Mage", "defaultSets": 3 }
+      ]
+    },
+    {
+      "id": "pass-b",
+      "name": "Pass B: Överkropp - Press",
+      "exercises": [
+        { "name": "Bänkpress", "target": "Bröst", "defaultSets": 4 },
+        { "name": "Militärpress", "target": "Axlar", "defaultSets": 3 },
+        { "name": "Dips", "target": "Triceps", "defaultSets": 3 }
+      ]
+    }
+  ]
+}
