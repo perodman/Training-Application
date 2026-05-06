@@ -8,8 +8,6 @@ let currentViewDate = new Date();
 // --- INIT ---
 fetch("program.json").then(r => r.json()).then(json => {
     const saved = JSON.parse(localStorage.getItem("myCustomProgram"));
-    
-    // Fyll masterlistan för övningsbanken
     json.routine.forEach(p => {
         p.exercises.forEach(ex => {
             if (!masterExercises.find(m => m.name === ex.name)) {
@@ -17,7 +15,6 @@ fetch("program.json").then(r => r.json()).then(json => {
             }
         });
     });
-
     programData = saved || json;
     renderHome();
 });
@@ -45,12 +42,11 @@ function renderHome() {
     } else {
         draftAlert.classList.add("hidden");
         startBtn.classList.remove("hidden");
-        // Starta Nytt Pass leder nu till kalendern för datumval
         startBtn.onclick = () => renderCalendar();
     }
 }
 
-// --- KALENDER LOGIK ---
+// --- KALENDER ---
 function renderCalendar() {
     const grid = document.getElementById("calendar-grid");
     const label = document.getElementById("month-label");
@@ -68,16 +64,15 @@ function renderCalendar() {
     for (let i = 0; i < offset; i++) grid.innerHTML += `<div></div>`;
 
     for (let d = 1; d <= daysInMonth; d++) {
-        const dateObj = new Date(year, month, d);
-        // Fix för datumsträng som inte påverkas av tidszoner vid midnatt
         const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+        const dateObj = new Date(year, month, d);
         
         const cell = document.createElement("div");
         cell.className = "calendar-cell";
 
         const isDone = workoutHistory.some(w => w.date.startsWith(dateStr));
-        const dayOfWeek = dateObj.getDay(); // 0=Sön, 1=Mån...
-        const isAutoDay = [2, 4, 6].includes(dayOfWeek); // Tis, Tor, Lör
+        const dayOfWeek = dateObj.getDay();
+        const isAutoDay = [2, 4, 6].includes(dayOfWeek);
         const override = calendarOverrides[dateStr];
 
         let displayPass = null;
@@ -92,7 +87,7 @@ function renderCalendar() {
         let passLabel = "";
         if (isDone) {
             cell.classList.add("cell-completed");
-            passLabel = "KLART";
+            passLabel = "GENOMFÖRT";
         } else if (displayPass) {
             cell.classList.add("cell-planned");
             passLabel = displayPass.name.split(" ").pop();
@@ -105,26 +100,20 @@ function renderCalendar() {
     showView("calendar-view");
 }
 
-function openDayManager(dateStr, pass, isDone) {
+function openDayManager(dateStr, currentPass, isDone) {
     const body = document.getElementById("modal-body");
     
     if (isDone) {
-        body.innerHTML = `<h3>${dateStr}</h3><p>Passet är redan genomfört!</p>`;
+        body.innerHTML = `<h3>${dateStr}</h3><p>Passet är genomfört!</p>`;
     } else {
         body.innerHTML = `
             <h3>${dateStr}</h3>
-            ${pass ? `
-                <div class="card" style="background:#f0f7ff; border:1px solid #3b82f6;">
-                    <p style="margin:0; font-weight:800; color:#1d4ed8;">Planerat: ${pass.name}</p>
-                </div>
-                <button class="mode-btn green" onclick="prepareStart('${dateStr}', '${pass.id}')">Starta detta pass 🔥</button>
-            ` : `
-                <p>Ingen träning planerad (Vila).</p>
-            `}
+            <p>Planerat: <strong>${currentPass ? currentPass.name : 'Vila'}</strong></p>
+            ${currentPass ? `<button class="mode-btn green" onclick="prepareStart('${dateStr}', '${currentPass.id}')">Starta passet 🔥</button>` : ''}
             <hr>
-            <h4>Välj/Ändra program:</h4>
+            <h4>Ändra planering (utan att starta):</h4>
             ${programData.routine.map(p => `
-                <button class="mode-btn blue" onclick="prepareStart('${dateStr}', '${p.id}')">Starta ${p.name}</button>
+                <button class="mode-btn blue" onclick="setOverride('${dateStr}', '${p.id}')">Planera ${p.name}</button>
             `).join("")}
             <button class="mode-btn red" onclick="setOverride('${dateStr}', 'none')">Sätt som vilodag</button>
         `;
@@ -145,13 +134,12 @@ function setOverride(dateStr, val) {
     renderCalendar();
 }
 
-// --- TRÄNINGS-VY LOGIK ---
+// --- TRÄNINGS-VY ---
 function startWorkout(workout, savedData = null, workoutDate = null) {
-    // Om inget datum skickas med (från utkast), använd dagens datum
     const finalDate = workoutDate || new Date().toISOString().split('T')[0];
-    
     activeDraft = { workout: workout, data: savedData, date: finalDate };
-    document.getElementById("active-title").textContent = `${workout.name} (${finalDate})`;
+    
+    document.getElementById("active-title").textContent = `${workout.name}`;
     const list = document.getElementById("exercise-list");
     list.innerHTML = "";
     
@@ -183,20 +171,9 @@ function startWorkout(workout, savedData = null, workoutDate = null) {
     showView("workout-view");
 }
 
-document.getElementById("pause-workout-btn").onclick = () => {
-    const draftData = activeDraft.workout.exercises.map((ex, i) => ({
-        weight: document.getElementById(`w-${i}`).value,
-        reps: document.getElementById(`r-${i}`).value,
-        sets: document.getElementById(`s-${i}`).value
-    }));
-    activeDraft.data = draftData;
-    localStorage.setItem("activeWorkoutDraft", JSON.stringify(activeDraft));
-    location.reload();
-};
-
 document.getElementById("save-workout-btn").onclick = () => {
     const log = {
-        date: activeDraft.date, // Sparar på det valda datumet från kalendern
+        date: activeDraft.date,
         programName: activeDraft.workout.name,
         exercises: activeDraft.workout.exercises.map((ex, i) => ({
             name: ex.name,
@@ -211,7 +188,18 @@ document.getElementById("save-workout-btn").onclick = () => {
     location.reload();
 };
 
-// --- ÖVRIG NAVIGATION & UTILS ---
+document.getElementById("pause-workout-btn").onclick = () => {
+    const draftData = activeDraft.workout.exercises.map((ex, i) => ({
+        weight: document.getElementById(`w-${i}`).value,
+        reps: document.getElementById(`r-${i}`).value,
+        sets: document.getElementById(`s-${i}`).value
+    }));
+    activeDraft.data = draftData;
+    localStorage.setItem("activeWorkoutDraft", JSON.stringify(activeDraft));
+    location.reload();
+};
+
+// --- NAVIGATION & UTILS ---
 function filterExercises(category) {
     document.querySelectorAll(".cat-btn").forEach(b => b.classList.remove("active"));
     const btn = document.querySelector(`[data-cat="${category}"]`);
@@ -296,6 +284,17 @@ function openEditModal(pIdx) {
     document.getElementById("workout-modal").classList.remove("hidden");
 }
 
+function updateExerciseDropdown() {
+    const muscle = document.getElementById("muscle-group-select").value;
+    const bankSelect = document.getElementById("bank-select");
+    const addBtn = document.getElementById("add-btn-modal");
+    bankSelect.innerHTML = "";
+    if (!muscle) { bankSelect.disabled = true; addBtn.disabled = true; return; }
+    const filtered = masterExercises.filter(ex => ex.target === muscle);
+    filtered.forEach(ex => { bankSelect.innerHTML += `<option value="${ex.name}">${ex.name}</option>`; });
+    bankSelect.disabled = false; addBtn.disabled = false;
+}
+
 function moveExercise(pIdx, exIdx, direction) {
     const exercises = programData.routine[pIdx].exercises;
     const newIdx = exIdx + direction;
@@ -307,17 +306,6 @@ function moveExercise(pIdx, exIdx, direction) {
         openEditModal(pIdx);
         showProgramDetails(pIdx);
     }
-}
-
-function updateExerciseDropdown() {
-    const muscle = document.getElementById("muscle-group-select").value;
-    const bankSelect = document.getElementById("bank-select");
-    const addBtn = document.getElementById("add-btn-modal");
-    bankSelect.innerHTML = "";
-    if (!muscle) { bankSelect.disabled = true; addBtn.disabled = true; return; }
-    const filtered = masterExercises.filter(ex => ex.target === muscle);
-    filtered.forEach(ex => { bankSelect.innerHTML += `<option value="${ex.name}">${ex.name}</option>`; });
-    bankSelect.disabled = false; addBtn.disabled = false;
 }
 
 function removeFromPass(pIdx, exIdx) {
