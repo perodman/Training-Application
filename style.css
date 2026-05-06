@@ -1,61 +1,34 @@
-:root {
-  --primary: #3b82f6;
-  --secondary: #6366f1;
-  --success: #10b981;
-  --warning: #f59e0b;
-  --planned: #bae6fd;
-  --bg: #f8fafc;
-  --card: #ffffff;
-  --text: #1e293b;
-  --text-light: #64748b;
+{
+  "routine": [
+    {
+      "id": "pass-a",
+      "name": "Pass A",
+      "exercises": [
+        { "name": "Leg Press", "target": "Ben", "defaultSets": 3, "description": "Pressa plattan kontrollerat bort från kroppen. Lås inte knäna.", "image": "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&q=80&w=300" },
+        { "name": "Barbell Bench Press", "target": "Bröst", "defaultSets": 3, "description": "Sänk stången till bröstet, pressa upp med kraft.", "image": "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?auto=format&fit=crop&q=80&w=300" },
+        { "name": "Pull-ups", "target": "Rygg", "defaultSets": 3, "description": "Dra dig upp tills hakan är över stången.", "image": "https://images.unsplash.com/photo-1598971639058-aba3c39433d7?auto=format&fit=crop&q=80&w=300" }
+      ]
+    },
+    {
+      "id": "pass-b",
+      "name": "Pass B",
+      "exercises": [
+        { "name": "Romanian DB Deadlifts", "target": "Ben", "defaultSets": 3, "description": "Fäll i höften, känn stretchen i baksidan.", "image": "https://images.unsplash.com/photo-1541534741688-6078c64b52d3?auto=format&fit=crop&q=80&w=300" }
+      ]
+    },
+    {
+      "id": "pass-c",
+      "name": "Pass C",
+      "exercises": [
+        { "name": "Walking Lunges", "target": "Ben", "defaultSets": 3, "description": "Ta stora steg framåt.", "image": "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&q=80&w=300" }
+      ]
+    },
+    {
+      "id": "pass-d",
+      "name": "Pass D",
+      "exercises": [
+        { "name": "Lying Leg Curls", "target": "Ben", "defaultSets": 3, "description": "Dra hälarna mot sätet.", "image": "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&q=80&w=300" }
+      ]
+    }
+  ]
 }
-
-* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding-bottom: 40px; overflow-x: hidden; }
-
-.app-container { max-width: 500px; margin: auto; padding: 80px 15px 20px; }
-.hidden { display: none !important; }
-
-.main-title { font-family: 'Montserrat', sans-serif; font-size: 48px; font-weight: 900; text-align: center; margin: 0; background: linear-gradient(135deg, var(--text), var(--primary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-.subtitle { text-align: center; color: var(--text-light); font-weight: 800; text-transform: uppercase; font-size: 11px; letter-spacing: 2px; margin-bottom: 20px; }
-
-.card { background: var(--card); padding: 20px; border-radius: 24px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); margin-bottom: 20px; border: 1px solid rgba(0,0,0,0.02); }
-
-.mode-btn { width: 100%; padding: 18px; border-radius: 18px; border: none; color: white; font-weight: 800; font-size: 15px; cursor: pointer; transition: 0.1s; display: flex; align-items: center; justify-content: center; gap: 8px; }
-.mode-btn:active { transform: scale(0.97); }
-.blue { background: var(--primary); }
-.indigo { background: var(--secondary); }
-.green { background: var(--success); }
-.orange { background: var(--warning); }
-.gray { background: #94a3b8; margin-top: 10px; }
-
-/* KALENDER */
-.calendar-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-.nav-btn { background: none; border: none; font-size: 24px; cursor: pointer; color: var(--primary); }
-.calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
-.calendar-day-label { font-size: 10px; font-weight: 900; color: var(--text-light); text-align: center; margin-bottom: 5px; }
-.calendar-cell { aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; background: white; border-radius: 10px; font-size: 12px; font-weight: 700; border: 1px solid #f1f5f9; cursor: pointer; position: relative; }
-.cell-completed { background-color: var(--success) !important; color: white !important; }
-.cell-planned { background-color: var(--planned) !important; color: #0369a1 !important; }
-.cell-draft { background-color: var(--warning) !important; color: white !important; }
-
-/* FLIP CARD */
-.exercise-card-container { perspective: 1000px; margin-bottom: 15px; }
-.exercise-card-inner { position: relative; width: 100%; transition: transform 0.6s; transform-style: preserve-3d; min-height: 160px; }
-.exercise-card-container.flipped .exercise-card-inner { transform: rotateY(180deg); }
-.card-front, .card-back { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; border-radius: 20px; padding: 20px; background: white; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-.card-back { transform: rotateY(180deg); background: var(--primary); color: white; text-align: center; overflow: hidden; display: flex; flex-direction: column; justify-content: center; align-items: center; }
-
-.exercise-image { width: 100%; height: 90px; object-fit: cover; border-radius: 12px; margin-top: 5px; border: 2px solid white; }
-
-.input-group { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 10px; }
-.input-field { display: flex; flex-direction: column; gap: 4px; }
-.input-field label { font-size: 10px; font-weight: 900; color: var(--text-light); text-align: center; }
-.log-input { width: 100%; padding: 10px; border-radius: 10px; border: 2px solid #e2e8f0; text-align: center; font-weight: 800; font-size: 16px; }
-
-/* MODAL */
-.modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; z-index: 2000; }
-.modal-content { background: white; padding: 30px; border-radius: 28px; width: 90%; max-height: 80vh; overflow-y: auto; }
-
-.global-header { position: fixed; top: 0; left: 0; right: 0; padding: 15px; display: flex; justify-content: space-between; background: rgba(248, 250, 252, 0.8); backdrop-filter: blur(10px); z-index: 1000; }
-.circle-ctrl { background: white; width: 45px; height: 45px; border-radius: 15px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.08); cursor: pointer; }
