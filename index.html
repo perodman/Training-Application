@@ -13,19 +13,23 @@
   </div>
 
   <div class="app-container">
+    <!-- HEMSKÄRM -->
     <div id="home-view" class="view">
       <h1 class="main-title">LIFT</h1>
       <p class="subtitle">Gym & Progress</p>
       
-      <div id="draft-alert" class="hidden" style="background: #fffbeb; padding: 20px; border-radius: 20px; margin-bottom: 20px; border: 2px solid #fcd34d; text-align: center;">
-        <button id="resume-workout-btn" class="mode-btn orange">Fortsätt Träningen ⏱️</button>
+      <div id="draft-alert" class="hidden" style="margin-bottom: 20px;">
+        <button id="resume-workout-btn" class="mode-btn orange">Fortsätt träningen ⏱️</button>
       </div>
 
       <button id="start-new-btn" class="mode-btn blue">Starta Nytt Pass 🔥</button>
-      <button id="view-programs-btn" class="mode-btn indigo">📋 Se Övningar</button>
+      <button id="view-exercises-btn" class="mode-btn indigo">🏋️ Övningar</button>
+      <button id="view-programs-btn" class="mode-btn indigo">📋 Programöversikt</button>
       <button id="calendar-mode" class="mode-btn gray">📅 Månadsschema</button>
+      <button id="stats-mode" class="mode-btn gray">📊 Statistik</button>
     </div>
 
+    <!-- KALENDER -->
     <div id="calendar-view" class="view hidden">
       <div class="calendar-nav">
         <button onclick="changeMonth(-1)" class="nav-arrow">❮</button>
@@ -34,26 +38,57 @@
       </div>
       <div class="card">
         <div class="calendar-grid" id="calendar-grid"></div>
-        
         <div class="legend">
-          <div class="legend-item"><div class="legend-color" style="background:#ef4444"></div> Pass A</div>
-          <div class="legend-item"><div class="legend-color" style="background:#3b82f6"></div> Pass B</div>
-          <div class="legend-item"><div class="legend-color" style="background:#10b981"></div> Pass C</div>
-          <div class="legend-item"><div class="legend-color" style="background:#f59e0b"></div> Pass D</div>
+          <div class="legend-item"><div class="legend-color" style="background:#3b82f6"></div> Kommande</div>
+          <div class="legend-item"><div class="legend-color" style="background:#10b981"></div> Färdigt</div>
         </div>
       </div>
     </div>
 
+    <!-- ÖVNINGSBANK (Kategoriserad) -->
+    <div id="exercises-view" class="view hidden">
+      <h2 class="section-title">Övningar</h2>
+      <div id="category-menu" class="category-grid">
+        <button class="cat-btn" onclick="filterExercises('Ben')">Ben</button>
+        <button class="cat-btn" onclick="filterExercises('Bröst')">Bröst</button>
+        <button class="cat-btn" onclick="filterExercises('Rygg')">Rygg</button>
+        <button class="cat-btn" onclick="filterExercises('Axlar')">Axlar</button>
+        <button class="cat-btn" onclick="filterExercises('Armar')">Armar</button>
+        <button class="cat-btn" onclick="filterExercises('Bål')">Bål</button>
+      </div>
+      <div id="exercise-results" class="exercise-bank-list"></div>
+    </div>
+
+    <!-- PROGRAMÖVERSIKT -->
+    <div id="programs-view" class="view hidden">
+      <h2 class="section-title">Programöversikt</h2>
+      <div class="pass-selector">
+        <button class="mode-btn blue" onclick="showProgramPass(0)">Pass A</button>
+        <button class="mode-btn blue" onclick="showProgramPass(1)">Pass B</button>
+        <button class="mode-btn blue" onclick="showProgramPass(2)">Pass C</button>
+        <button class="mode-btn blue" onclick="showProgramPass(3)">Pass D</button>
+      </div>
+      <div id="program-exercise-list" class="card hidden"></div>
+    </div>
+
+    <!-- STATISTIK -->
+    <div id="stats-view" class="view hidden">
+      <h2 class="section-title">Statistik</h2>
+      <div id="stats-content"></div>
+    </div>
+
+    <!-- TRÄNINGS-VY -->
     <div id="workout-view" class="view hidden">
       <h2 id="active-title" style="text-align: center;"></h2>
       <div id="exercise-list"></div>
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-        <button id="pause-workout-btn" class="mode-btn orange">Spara Utkast</button>
-        <button id="save-workout-btn" class="mode-btn green">Avsluta Pass</button>
+        <button id="pause-workout-btn" class="mode-btn orange">Spara utkast</button>
+        <button id="save-workout-btn" class="mode-btn green">Avsluta pass</button>
       </div>
     </div>
   </div>
 
+  <!-- MODAL -->
   <div id="workout-modal" class="modal hidden">
     <div class="modal-content">
       <div id="modal-body"></div>
