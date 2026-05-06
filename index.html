@@ -10,45 +10,58 @@
 <body>
   <div class="global-header">
     <div id="global-home" class="circle-ctrl">🏠</div>
+    <div id="status-tag" style="font-size: 10px; font-weight: 900; color: #64748b; padding-top: 12px;">SYSTEM READY</div>
   </div>
 
   <div class="app-container">
-    <!-- STARTVY -->
+    <!-- STARTSIDA -->
     <div id="home-view" class="view">
-      <h1 class="main-title">LIFT</h1>
-      <p class="subtitle">Gym & Progress</p>
+      <h1 style="font-family: 'Montserrat'; font-size: 40px; margin: 0; text-align: center;">LIFT</h1>
+      <p style="text-align: center; font-size: 12px; font-weight: 800; color: #64748b; letter-spacing: 2px; margin-bottom: 30px;">PROGRESS TRACKER</p>
       
-      <div class="card">
-        <div class="target-label" style="text-align: center;">Ditt nästa pass</div>
-        <h2 id="next-workout-name" style="text-align: center; margin: 10px 0 20px 0;">Laddar...</h2>
-        <button id="start-workout-btn" class="mode-btn blue">Starta Träning 🔥</button>
+      <div id="draft-alert" class="hidden" style="background: #fef3c7; padding: 15px; border-radius: 15px; margin-bottom: 20px; border: 1px solid #fcd34d; text-align: center;">
+        <p style="margin: 0 0 10px 0; font-weight: 700; font-size: 14px;">Du har ett pågående pass!</p>
+        <button id="resume-workout-btn" class="mode-btn orange">Återuppta pass ⏱️</button>
       </div>
 
-      <button id="calendar-mode" class="mode-btn indigo">📅 Veckoschema</button>
-      <button id="stats-mode" class="mode-btn purple" style="margin-top:10px;">📊 Statistik & Historik</button>
+      <button id="start-new-btn" class="mode-btn blue">Starta Träningspass 🔥</button>
+      <button id="view-programs-btn" class="mode-btn indigo">📋 Se Programöversikt</button>
+      <button id="calendar-mode" class="mode-btn gray">📅 Månadsschema</button>
+      <button id="stats-mode" class="mode-btn gray">📊 Statistik</button>
     </div>
 
-    <!-- SCHEMAVY -->
+    <!-- PROGRAMÖVERSIKT -->
+    <div id="programs-view" class="view hidden">
+      <h2 style="text-align: center;">Programöversikt</h2>
+      <div id="programs-list"></div>
+    </div>
+
+    <!-- KALENDERVY -->
     <div id="calendar-view" class="view hidden">
-      <h1 class="section-title">Veckoschema</h1>
-      <div class="card" id="schedule-list">
-        <!-- Renderas via JS -->
+      <div class="calendar-header">
+        <span id="month-label">Maj 2026</span>
       </div>
-      <p class="subtitle">Historik</p>
-      <div id="history-list"></div>
+      <div class="card">
+        <div class="calendar-grid" id="calendar-grid"></div>
+      </div>
+      <div id="day-details" style="margin-top: 20px;"></div>
     </div>
 
     <!-- TRÄNINGSVY -->
     <div id="workout-view" class="view hidden">
-      <h1 id="active-workout-title" class="section-title">Tränar</h1>
+      <h2 id="active-title" style="text-align: center;"></h2>
       <div id="exercise-list"></div>
-      <button id="save-workout-btn" class="mode-btn green">Slutför & Spara ✅</button>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px;">
+        <button id="pause-workout-btn" class="mode-btn orange">Spara utkast</button>
+        <button id="save-workout-btn" class="mode-btn green">Avsluta pass</button>
+      </div>
     </div>
 
     <!-- STATISTIKVY -->
     <div id="stats-view" class="view hidden">
-      <h1 class="section-title">Statistik</h1>
-      <div id="stats-content" class="card"></div>
+      <h2 style="text-align: center;">Statistik</h2>
+      <div id="stats-summary" class="card"></div>
+      <div id="stats-charts"></div>
     </div>
   </div>
 
