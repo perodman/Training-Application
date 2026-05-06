@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>LIFT Tracker</title>
+  <title>LIFT Tracker Pro</title>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@800;900&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
@@ -24,7 +24,7 @@
 
       <button id="start-new-btn" class="mode-btn blue">Starta Nytt Pass 🔥</button>
       <button id="view-exercises-btn" class="mode-btn indigo">🏋️ Övningar</button>
-      <button id="view-programs-btn" class="mode-btn indigo">📋 Programöversikt</button>
+      <button id="view-programs-btn" class="mode-btn indigo">📋 Program & Redigera</button>
       <button id="calendar-mode" class="mode-btn gray">📅 Månadsschema</button>
       <button id="stats-mode" class="mode-btn gray">📊 Statistik</button>
     </div>
@@ -39,29 +39,29 @@
       <div class="card">
         <div class="calendar-grid" id="calendar-grid"></div>
         <div class="legend">
-          <div class="legend-item"><div class="legend-color" style="background:#3b82f6"></div> Kommande</div>
-          <div class="legend-item"><div class="legend-color" style="background:#10b981"></div> Färdigt</div>
+          <div class="legend-item"><div class="legend-color" style="background:#3b82f6"></div> Planerat</div>
+          <div class="legend-item"><div class="legend-color" style="background:#10b981"></div> Genomfört</div>
         </div>
       </div>
     </div>
 
-    <!-- ÖVNINGSBANK (Kategoriserad) -->
+    <!-- ÖVNINGAR -->
     <div id="exercises-view" class="view hidden">
       <h2 class="section-title">Övningar</h2>
       <div id="category-menu" class="category-grid">
-        <button class="cat-btn" onclick="filterExercises('Ben')">Ben</button>
-        <button class="cat-btn" onclick="filterExercises('Bröst')">Bröst</button>
-        <button class="cat-btn" onclick="filterExercises('Rygg')">Rygg</button>
-        <button class="cat-btn" onclick="filterExercises('Axlar')">Axlar</button>
-        <button class="cat-btn" onclick="filterExercises('Armar')">Armar</button>
-        <button class="cat-btn" onclick="filterExercises('Bål')">Bål</button>
+        <button class="cat-btn" data-cat="Ben" onclick="filterExercises('Ben')">🦵 Ben</button>
+        <button class="cat-btn" data-cat="Bröst" onclick="filterExercises('Bröst')">💪 Bröst</button>
+        <button class="cat-btn" data-cat="Rygg" onclick="filterExercises('Rygg')">👐 Rygg</button>
+        <button class="cat-btn" data-cat="Axlar" onclick="filterExercises('Axlar')">肩 Axlar</button>
+        <button class="cat-btn" data-cat="Armar" onclick="filterExercises('Armar')">🦾 Armar</button>
+        <button class="cat-btn" data-cat="Bål" onclick="filterExercises('Bål')">🧘 Bål</button>
       </div>
       <div id="exercise-results" class="exercise-bank-list"></div>
     </div>
 
-    <!-- PROGRAMÖVERSIKT -->
+    <!-- PROGRAMÖVERSIKT & REDIGERING -->
     <div id="programs-view" class="view hidden">
-      <h2 class="section-title">Programöversikt</h2>
+      <h2 class="section-title">Program & Redigera</h2>
       <div class="pass-selector">
         <button class="mode-btn blue" onclick="showProgramPass(0)">Pass A</button>
         <button class="mode-btn blue" onclick="showProgramPass(1)">Pass B</button>
@@ -69,12 +69,30 @@
         <button class="mode-btn blue" onclick="showProgramPass(3)">Pass D</button>
       </div>
       <div id="program-exercise-list" class="card hidden"></div>
+      <button id="add-custom-pass-btn" class="mode-btn gray" style="margin-top:20px;">+ Skapa Nytt Pass</button>
     </div>
 
     <!-- STATISTIK -->
     <div id="stats-view" class="view hidden">
-      <h2 class="section-title">Statistik</h2>
-      <div id="stats-content"></div>
+      <h2 class="section-title">Din Progress</h2>
+      <div class="card">
+        <h3>Pass per månad</h3>
+        <div id="chart-container" class="chart-wrapper"></div>
+      </div>
+      <div class="card">
+        <h3>Filtrera per muskelgrupp</h3>
+        <select id="stats-muscle-filter" class="log-input" onchange="renderMuscleStats()">
+          <option value="Alla">Alla muskelgrupper</option>
+          <option value="Ben">Ben</option>
+          <option value="Bröst">Bröst</option>
+          <option value="Rygg">Rygg</option>
+          <option value="Axlar">Axlar</option>
+          <option value="Biceps">Biceps</option>
+          <option value="Triceps">Triceps</option>
+          <option value="Bål">Bål</option>
+        </select>
+        <div id="muscle-stats-results" style="margin-top:15px;"></div>
+      </div>
     </div>
 
     <!-- TRÄNINGS-VY -->
