@@ -1,0 +1,22 @@
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+body { font-family: 'Inter', sans-serif; background: #f0f4f8; margin: 0; padding: 20px; }
+
+.app-container { max-width: 500px; margin: auto; padding-top: 60px; }
+.hidden { display: none; }
+
+.main-title { font-family: 'Montserrat', sans-serif; font-size: 60px; text-align: center; margin: 0; background: linear-gradient(135deg, #1e293b, #3b82f6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.subtitle { text-align: center; color: #64748b; font-weight: 800; text-transform: uppercase; font-size: 12px; letter-spacing: 2px; }
+
+.card { background: white; padding: 25px; border-radius: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); margin-top: 20px; text-align: center; }
+
+.mode-btn { width: 100%; padding: 20px; border-radius: 20px; border: none; color: white; font-weight: 800; font-size: 18px; cursor: pointer; margin-top: 10px; }
+.blue { background: #3b82f6; }
+.purple { background: #8b5cf6; }
+.green { background: #10b981; }
+
+.exercise-item { background: white; padding: 20px; border-radius: 20px; margin-bottom: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
+.input-row { display: flex; gap: 10px; margin-top: 10px; }
+.log-input { width: 100%; padding: 12px; border-radius: 10px; border: 2px solid #e2e8f0; text-align: center; font-weight: 700; }
+
+.global-header { position: fixed; top: 15px; right: 15px; z-index: 1000; }
+.circle-ctrl { background: white; width: 45px; height: 45px; border-radius: 12px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.1); cursor: pointer; }
