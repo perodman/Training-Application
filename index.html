@@ -36,11 +36,14 @@
         <h2 id="month-label"></h2>
         <button onclick="changeMonth(1)" class="nav-arrow">❯</button>
       </div>
-      <div class="card">
+      <div class="card calendar-card">
+        <div class="calendar-weekdays">
+          <div>Mån</div><div>Tis</div><div>Ons</div><div>Tor</div><div>Fre</div><div>Lör</div><div>Sön</div>
+        </div>
         <div class="calendar-grid" id="calendar-grid"></div>
         <div class="legend">
           <div class="legend-item"><div class="legend-color cell-planned"></div> Planerat</div>
-          <div class="legend-item"><div class="legend-color cell-completed"></div> Genomfört</div>
+          <div class="legend-item"><div class="legend-color cell-completed"></div> Klart</div>
         </div>
       </div>
     </div>
@@ -74,20 +77,7 @@
         <h3>Pass per månad</h3>
         <div id="chart-container" class="chart-wrapper"></div>
       </div>
-      <div class="card">
-        <h3>Muskelgrupp</h3>
-        <select id="stats-muscle-filter" class="log-input" onchange="renderMuscleStats()">
-          <option value="Alla">Alla</option>
-          <option value="Ben">Ben</option>
-          <option value="Bröst">Bröst</option>
-          <option value="Rygg">Rygg</option>
-          <option value="Axlar">Axlar</option>
-          <option value="Biceps">Biceps</option>
-          <option value="Triceps">Triceps</option>
-          <option value="Bål">Bål</option>
-        </select>
-        <div id="muscle-stats-results" style="margin-top:15px;"></div>
-      </div>
+      <div id="muscle-stats-results" style="margin-top:15px;"></div>
     </div>
 
     <!-- TRÄNINGS-VY -->
