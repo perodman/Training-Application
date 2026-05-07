@@ -45,7 +45,7 @@
         </div>
 
         <div id="exercises-view" class="view hidden">
-            <h2 class="section-title">Muskelgrupper</h2>
+            <h2 class="section-title">Övningar</h2>
             <div id="category-menu" class="category-grid">
                 <button class="cat-btn glass active" data-cat="Ben" onclick="filterExercises('Ben')"><span class="cat-icon"> 🦵 </span> Ben</button>
                 <button class="cat-btn glass" data-cat="Bröst" onclick="filterExercises('Bröst')"><span class="cat-icon"> 🏋️ </span> Bröst</button>
@@ -56,7 +56,6 @@
             </div>
             <div class="separator"></div>
             <div style="display: flex; align-items: center; justify-content: center; position: relative; margin-bottom: 20px;">
-                <h2 class="section-title" style="margin:0;">Övningar</h2>
                 <button class="add-inline-btn" onclick="openCreateExerciseModal()">+</button>
             </div>
             <div id="exercise-results" class="exercise-bank-list"></div>
@@ -70,13 +69,6 @@
                 <div id="program-exercise-list" class="card glass-modern"></div>
             </div>
             <button class="mode-btn glass-border" style="margin-top:20px;" onclick="openCreatePassModal()">+ Skapa Nytt Pass</button>
-        </div>
-
-        <div id="stats-view" class="view hidden">
-            <h2 class="section-title">Statistik</h2>
-            <div class="card glass">
-                <div id="chart-container" class="chart-wrapper"></div>
-            </div>
         </div>
 
         <div id="workout-view" class="view hidden">
