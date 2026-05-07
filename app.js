@@ -39,14 +39,22 @@ function showView(id) {
     window.scrollTo(0, 0);
 }
 
+function closeModal() {
+    document.getElementById("workout-modal").classList.add("hidden");
+}
+
+function openModal() {
+    document.getElementById("workout-modal").classList.remove("hidden");
+}
+
 // --- ÖVNINGAR & INSTÄLLNINGAR ---
 function openCreateExerciseModal() {
     const body = document.getElementById("modal-body");
     body.innerHTML = `
         <h3>Skapa Ny Övning</h3>
-        <label style="font-size:12px; color:var(--text-light);">Namn</label>
+        <label style="font-size:12px; color:var(--text-light); text-align:left; display:block; margin-left:10px;">NAMN</label>
         <input type="text" id="new-ex-name" class="log-input" placeholder="T.ex. Knäböj">
-        <label style="font-size:12px; color:var(--text-light);">Kategori</label>
+        <label style="font-size:12px; color:var(--text-light); text-align:left; display:block; margin-left:10px;">KATEGORI</label>
         <select id="new-ex-cat" class="log-input">
             <option value="Ben">Ben</option>
             <option value="Bröst">Bröst</option>
@@ -58,7 +66,7 @@ function openCreateExerciseModal() {
         </select>
         <button class="mode-btn blue" onclick="saveNewExercise()">Spara Övning</button>
     `;
-    document.getElementById("workout-modal").classList.remove("hidden");
+    openModal();
 }
 
 function saveNewExercise() {
@@ -78,9 +86,8 @@ function openEditExerciseModal(id) {
         <div style="text-align:left;">
             <label style="font-size:12px; color:var(--text-light); margin-left:10px;">NAMN PÅ ÖVNING</label>
             <input type="text" id="edit-ex-name" class="log-input" value="${ex.name}">
-            
             <label style="font-size:12px; color:var(--text-light); margin-left:10px;">KATEGORI</label>
-            <select id="edit-ex-cat" class="log-input" style="font-size:16px;">
+            <select id="edit-ex-cat" class="log-input">
                 <option value="Ben" ${ex.target==='Ben'?'selected':''}>Ben</option>
                 <option value="Bröst" ${ex.target==='Bröst'?'selected':''}>Bröst</option>
                 <option value="Rygg" ${ex.target==='Rygg'?'selected':''}>Rygg</option>
@@ -90,12 +97,10 @@ function openEditExerciseModal(id) {
                 <option value="Bål" ${ex.target==='Bål'?'selected':''}>Bål</option>
             </select>
         </div>
-        <div style="margin-top:20px;">
-            <button class="mode-btn blue" onclick="updateExercise(${id})">Uppdatera</button>
-            <button class="mode-btn" style="color:var(--danger); background:none; font-size:14px;" onclick="deleteMasterExercise(${id})">Radera övning permanent</button>
-        </div>
+        <button class="mode-btn blue" style="margin-top:20px;" onclick="updateExercise(${id})">Uppdatera</button>
+        <button class="mode-btn" style="color:var(--danger); background:none; font-size:14px;" onclick="deleteMasterExercise(${id})">Radera övning permanent</button>
     `;
-    document.getElementById("workout-modal").classList.remove("hidden");
+    openModal();
 }
 
 function updateExercise(id) {
@@ -106,7 +111,7 @@ function updateExercise(id) {
 }
 
 function deleteMasterExercise(id) {
-    if(confirm("Vill du radera denna övning permanent från listan?")) {
+    if(confirm("Vill du radera denna övning permanent?")) {
         masterExercises = masterExercises.filter(e => e.id != id);
         saveAll(); closeModal(); filterExercises(currentExerciseCategory);
     }
@@ -128,18 +133,7 @@ function filterExercises(category) {
     });
 }
 
-// --- KALENDER ---
-function openMonthPicker() {
-    const body = document.getElementById("modal-body");
-    let html = `<h3>Välj månad</h3><div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">`;
-    const months = ["Januari", "Februari", "Mars", "April", "Maj", "Juni", "Juli", "Augusti", "September", "Oktober", "November", "December"];
-    months.forEach((m, i) => { html += `<button class="mode-btn glass-border" style="font-size:14px;" onclick="selectMonth(${i})">${m}</button>`; });
-    body.innerHTML = html + `</div>`;
-    document.getElementById("workout-modal").classList.remove("hidden");
-}
-
-function selectMonth(m) { currentViewDate.setMonth(m); closeModal(); renderCalendar(); }
-
+// --- KALENDER (Popup Fixad) ---
 function renderCalendar() {
     const grid = document.getElementById("calendar-grid");
     const label = document.getElementById("month-label");
@@ -166,10 +160,12 @@ function renderCalendar() {
         let displayPass = null;
         if (override && override !== "none") displayPass = programData.routine.find(p => p.id === override);
         else if (isAutoDay && override !== "none") displayPass = programData.routine[d % programData.routine.length];
+        
         let info = "";
         if (hasWorkouts.length > 0) { cell.classList.add("cell-completed"); info = "✓"; }
         else if (isOngoing) { cell.classList.add("cell-ongoing"); info = "⏱️"; }
         else if (displayPass) { cell.classList.add("cell-planned"); info = displayPass.name.split(" ").pop(); }
+        
         cell.innerHTML = `<span>${d}</span><span style="font-size:10px; font-weight:900;">${info}</span>`;
         cell.onclick = () => openDayManager(dateStr, displayPass, hasWorkouts, isOngoing);
         grid.appendChild(cell);
@@ -180,9 +176,10 @@ function renderCalendar() {
 function openDayManager(dateStr, planned, completed, isOngoing) {
     const body = document.getElementById("modal-body");
     let html = `<h3>${dateStr}</h3>`;
+    
     if (completed.length > 0) {
         completed.forEach((w, idx) => {
-            html += `<div class="card glass" style="border-left:4px solid var(--success); text-align:left;">
+            html += `<div class="card glass" style="border-left:4px solid var(--success); text-align:left; margin-bottom:10px;">
                 <div style="display:flex; justify-content:space-between; align-items:center;">
                     <strong>${w.programName}</strong>
                     <div>
@@ -194,7 +191,7 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
             w.exercises.forEach(ex => {
                 html += `<div style="font-size:12px; margin-bottom:5px; border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:3px;">
                     <span style="color:var(--text-light)">${ex.name}:</span><br>
-                    <span style="color:var(--primary); font-weight:700;">${ex.weight} kg x ${ex.reps} reps x ${ex.sets} set</span>
+                    <span style="color:var(--primary); font-weight:700;">${ex.weight} kg x ${ex.reps} x ${ex.sets} set</span>
                 </div>`;
             });
             html += `</div></div>`;
@@ -204,7 +201,7 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
     } else {
         html += `<p style="text-align:center;">Planerat: <strong>${planned ? planned.name : 'Vila'}</strong></p>`;
         if(planned) html += `<button class="mode-btn green" onclick="prepareStart('${dateStr}', '${planned.id}')">Starta passet   🔥  </button>`;
-        html += `<div class="separator" style="margin:20px 0;"></div><p style="font-size:11px; text-transform:uppercase; color:var(--text-light); text-align:center;">Ändra planering:</p>`;
+        html += `<div class="separator"></div><p style="font-size:11px; text-transform:uppercase; color:var(--text-light); text-align:center;">Ändra planering:</p>`;
         programData.routine.forEach(p => {
             const isPlanned = planned && p.id === planned.id;
             html += `<button ${isPlanned ? 'disabled' : ''} class="mode-btn ${isPlanned ? 'btn-disabled' : 'glass-border'}" style="font-size:14px;" onclick="setOverride('${dateStr}', '${p.id}')">${p.name}</button>`;
@@ -212,29 +209,21 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
         html += `<button class="mode-btn" style="color:var(--danger); background:none; font-size:14px;" onclick="setOverride('${dateStr}', 'none')">Vila denna dag</button>`;
     }
     body.innerHTML = html;
-    document.getElementById("workout-modal").classList.remove("hidden");
+    openModal();
 }
 
-function deleteLoggedWorkout(date, idx) {
-    if(confirm("Är du säker på att du vill radera detta träningspass?")) {
-        const filtered = workoutHistory.filter(w => w.date === date);
-        const item = filtered[idx];
-        workoutHistory = workoutHistory.filter(w => w !== item);
-        saveAll(); closeModal(); renderCalendar();
-    }
+function openMonthPicker() {
+    const body = document.getElementById("modal-body");
+    let html = `<h3>Välj månad</h3><div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">`;
+    const months = ["Januari", "Februari", "Mars", "April", "Maj", "Juni", "Juli", "Augusti", "September", "Oktober", "November", "December"];
+    months.forEach((m, i) => { html += `<button class="mode-btn glass-border" style="font-size:14px;" onclick="selectMonth(${i})">${m}</button>`; });
+    body.innerHTML = html + `</div>`;
+    openModal();
 }
 
-function editLoggedWorkout(date, idx) {
-    const filtered = workoutHistory.filter(w => w.date === date);
-    const item = filtered[idx];
-    const workoutObj = { name: item.programName, exercises: item.exercises.map(ex => ({ name: ex.name })) };
-    const dataObj = item.exercises.map(ex => ({ weight: ex.weight, reps: ex.reps, sets: ex.sets }));
-    workoutHistory = workoutHistory.filter(w => w !== item);
-    closeModal();
-    startWorkout(workoutObj, dataObj, date);
-}
+function selectMonth(m) { currentViewDate.setMonth(m); closeModal(); renderCalendar(); }
 
-// --- PROGRAM-VY & ORDNING ---
+// --- PROGRAM & REDIGERING ---
 function renderProgramView(activeIdx = null) {
     const selector = document.getElementById("pass-selector-list");
     selector.innerHTML = "";
@@ -272,10 +261,8 @@ function openEditProgramModal(idx) {
     const body = document.getElementById("modal-body");
     body.innerHTML = `
         <h3>Redigera ${pass.name}</h3>
-        <div style="text-align:left;">
-            <label style="font-size:12px; color:var(--text-light); margin-left:10px;">NAMN PÅ PASS</label>
-            <input type="text" id="edit-pass-name" class="log-input" value="${pass.name}">
-        </div>
+        <label style="font-size:12px; color:var(--text-light); text-align:left; display:block; margin-left:10px;">NAMN PÅ PASS</label>
+        <input type="text" id="edit-pass-name" class="log-input" value="${pass.name}">
         <div id="edit-pass-exercises">
             ${pass.exercises.map((ex, i) => `
                 <div class="edit-item-row">
@@ -288,16 +275,8 @@ function openEditProgramModal(idx) {
                 </div>`).join("")}
         </div>
         <button class="mode-btn blue" style="margin-top:20px;" onclick="saveProgramEdit(${idx})">Spara ändringar</button>
-        <button class="mode-btn" style="background:none; color:var(--danger); font-size:14px;" onclick="deleteProgram(${idx})">Radera hela passet</button>
     `;
-    document.getElementById("workout-modal").classList.remove("hidden");
-}
-
-function deleteProgram(idx) {
-    if(confirm("Vill du radera detta pass helt?")) {
-        programData.routine.splice(idx, 1);
-        saveAll(); closeModal(); renderProgramView();
-    }
+    openModal();
 }
 
 function moveExercise(pIdx, eIdx, dir) {
@@ -372,7 +351,7 @@ function moveActiveExercise(i, dir) {
 }
 
 function removeActiveExercise(i) {
-    if(confirm("Ta bort övningen från passet?")) {
+    if(confirm("Ta bort övningen?")) {
         activeDraft.workout.exercises.splice(i, 1);
         activeDraft.data.splice(i, 1);
         renderActiveWorkout();
@@ -413,9 +392,7 @@ document.getElementById("save-workout-btn").onclick = () => {
     renderCalendar();
 };
 
-document.getElementById("pause-workout-btn").onclick = () => {
-    location.reload();
-};
+document.getElementById("pause-workout-btn").onclick = () => { location.reload(); };
 
 function renderStats() {
     const container = document.getElementById("chart-container");
@@ -432,7 +409,23 @@ function renderStats() {
     showView("stats-view");
 }
 
-function closeModal() { document.getElementById("workout-modal").classList.add("hidden"); }
 function changeMonth(off) { currentViewDate.setMonth(currentViewDate.getMonth() + off); renderCalendar(); }
 function setOverride(date, val) { calendarOverrides[date] = val; saveAll(); closeModal(); renderCalendar(); }
 function prepareStart(date, id) { const p = programData.routine.find(x => x.id === id); closeModal(); startWorkout(p, null, date); }
+function deleteLoggedWorkout(date, idx) {
+    if(confirm("Radera passet?")) {
+        const filtered = workoutHistory.filter(w => w.date === date);
+        const item = filtered[idx];
+        workoutHistory = workoutHistory.filter(w => w !== item);
+        saveAll(); closeModal(); renderCalendar();
+    }
+}
+function editLoggedWorkout(date, idx) {
+    const filtered = workoutHistory.filter(w => w.date === date);
+    const item = filtered[idx];
+    const workoutObj = { name: item.programName, exercises: item.exercises.map(ex => ({ name: ex.name })) };
+    const dataObj = item.exercises.map(ex => ({ weight: ex.weight, reps: ex.reps, sets: ex.sets }));
+    workoutHistory = workoutHistory.filter(w => w !== item);
+    closeModal();
+    startWorkout(workoutObj, dataObj, date);
+}
