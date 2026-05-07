@@ -59,7 +59,7 @@
                 <button class="cat-btn glass" data-cat="Armar" onclick="filterExercises('Armar')"><span class="cat-icon"> 💪 </span> Armar</button>
                 <button class="cat-btn glass" data-cat="Bål" onclick="filterExercises('Bål')"><span class="cat-icon"> 🧘 </span> Bål</button>
             </div>
-            <div class="separator" style="margin: 30px 0;"></div>
+            <div class="separator"></div>
             <div style="display: flex; align-items: center; justify-content: center; position: relative; margin-bottom: 20px;">
                 <h2 class="section-title" style="margin:0;">Övningar</h2>
                 <button class="add-inline-btn" onclick="openCreateExerciseModal()">+</button>
@@ -71,10 +71,10 @@
             <h2 class="section-title">Träningsprogram</h2>
             <div id="pass-selector-list" class="program-modern-grid"></div>
             <div id="program-details-area" class="hidden">
-                <div class="separator" style="margin: 30px 0;"></div>
+                <div class="separator"></div>
                 <div id="program-exercise-list" class="card glass-modern"></div>
             </div>
-            <button id="add-custom-pass-btn" class="mode-btn glass-border" style="margin-top:20px;">+ Skapa Nytt Pass</button>
+            <button id="add-custom-pass-btn" class="mode-btn glass-border" style="margin-top:20px;" onclick="openCreatePassModal()">+ Skapa Nytt Pass</button>
         </div>
 
         <div id="stats-view" class="view hidden">
