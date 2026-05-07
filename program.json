@@ -4,12 +4,12 @@
       "id": "pass-a",
       "name": "Pass A",
       "exercises": [
-        { "name": "Leg Press", "target": "Ben", "defaultSets": 3, "description": "Pressa plattan kontrollerat bort från kroppen. Lås inte knäna.", "image": "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=300&h=150&auto=format&fit=crop" },
-        { "name": "Barbell Bench Press", "target": "Bröst", "defaultSets": 3, "description": "Sänk stången till bröstet, pressa upp med kraft.", "image": "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?q=80&w=300&h=150&auto=format&fit=crop" },
-        { "name": "Pull-ups", "target": "Rygg", "defaultSets": 3, "description": "Dra dig upp tills hakan är över stången.", "image": "https://images.unsplash.com/photo-1598971639058-aba3c39433d7?q=80&w=300&h=150&auto=format&fit=crop" },
-        { "name": "Seated DB Press", "target": "Axlar", "defaultSets": 3, "description": "Pressa hantlarna rakt upp över huvudet.", "image": "https://images.unsplash.com/photo-1541534741688-6078c64b52d3?q=80&w=300&h=150&auto=format&fit=crop" },
-        { "name": "Back Extensions", "target": "Ländrygg", "defaultSets": 3, "description": "Kontrollerad fällning i höften.", "image": "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=300&h=150&auto=format&fit=crop" },
-        { "name": "Front Delt Raises", "target": "Axlar", "defaultSets": 3, "description": "Lyft hantlarna framåt till axelhöjd.", "image": "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?q=80&w=300&h=150&auto=format&fit=crop" },
+        { "name": "Leg Press", "target": "Ben", "defaultSets": 3, "description": "Pressa plattan kontrollerat bort från kroppen. Lås inte knäna.", "image": "" },
+        { "name": "Barbell Bench Press", "target": "Bröst", "defaultSets": 3, "description": "Sänk stången till bröstet, pressa upp med kraft.", "image": "" },
+        { "name": "Pull-ups", "target": "Rygg", "defaultSets": 3, "description": "Dra dig upp tills hakan är över stången.", "image": "" },
+        { "name": "Seated DB Press", "target": "Axlar", "defaultSets": 3, "description": "Pressa hantlarna rakt upp över huvudet.", "image": "" },
+        { "name": "Back Extensions", "target": "Ländrygg", "defaultSets": 3, "description": "Kontrollerad fällning i höften.", "image": "" },
+        { "name": "Front Delt Raises", "target": "Axlar", "defaultSets": 3, "description": "Lyft hantlarna framåt till axelhöjd.", "image": "" },
         { "name": "Preacher Curls", "target": "Biceps", "defaultSets": 3, "description": "Isolera biceps mot dynan.", "image": "" },
         { "name": "Tricep Pushdowns", "target": "Triceps", "defaultSets": 3, "description": "Pressa ner stången, håll armbågarna stilla.", "image": "" },
         { "name": "Hanging Leg Raises", "target": "Bål", "defaultSets": 3, "description": "Lyft benen med magmusklerna.", "image": "" }
