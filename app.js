@@ -44,9 +44,9 @@ function openCreateExerciseModal() {
     const body = document.getElementById("modal-body");
     body.innerHTML = `
         <h3>Skapa Ny Övning</h3>
-        <label style="font-size:11px;">Namn</label>
+        <label style="font-size:12px; color:var(--text-light);">Namn</label>
         <input type="text" id="new-ex-name" class="log-input" placeholder="T.ex. Knäböj">
-        <label style="font-size:11px;">Kategori</label>
+        <label style="font-size:12px; color:var(--text-light);">Kategori</label>
         <select id="new-ex-cat" class="log-input">
             <option value="Ben">Ben</option>
             <option value="Bröst">Bröst</option>
@@ -75,18 +75,25 @@ function openEditExerciseModal(id) {
     const body = document.getElementById("modal-body");
     body.innerHTML = `
         <h3>Redigera Övning</h3>
-        <input type="text" id="edit-ex-name" class="log-input" value="${ex.name}">
-        <select id="edit-ex-cat" class="log-input">
-            <option value="Ben" ${ex.target==='Ben'?'selected':''}>Ben</option>
-            <option value="Bröst" ${ex.target==='Bröst'?'selected':''}>Bröst</option>
-            <option value="Rygg" ${ex.target==='Rygg'?'selected':''}>Rygg</option>
-            <option value="Axlar" ${ex.target==='Axlar'?'selected':''}>Axlar</option>
-            <option value="Biceps" ${ex.target==='Biceps'?'selected':''}>Biceps</option>
-            <option value="Triceps" ${ex.target==='Triceps'?'selected':''}>Triceps</option>
-            <option value="Bål" ${ex.target==='Bål'?'selected':''}>Bål</option>
-        </select>
-        <button class="mode-btn blue" onclick="updateExercise(${id})">Uppdatera</button>
-        <button class="mode-btn" style="color:var(--danger); background:none;" onclick="deleteMasterExercise(${id})">Radera övning</button>
+        <div style="text-align:left;">
+            <label style="font-size:12px; color:var(--text-light); margin-left:10px;">NAMN PÅ ÖVNING</label>
+            <input type="text" id="edit-ex-name" class="log-input" value="${ex.name}">
+            
+            <label style="font-size:12px; color:var(--text-light); margin-left:10px;">KATEGORI</label>
+            <select id="edit-ex-cat" class="log-input" style="font-size:16px;">
+                <option value="Ben" ${ex.target==='Ben'?'selected':''}>Ben</option>
+                <option value="Bröst" ${ex.target==='Bröst'?'selected':''}>Bröst</option>
+                <option value="Rygg" ${ex.target==='Rygg'?'selected':''}>Rygg</option>
+                <option value="Axlar" ${ex.target==='Axlar'?'selected':''}>Axlar</option>
+                <option value="Biceps" ${ex.target==='Biceps'?'selected':''}>Biceps</option>
+                <option value="Triceps" ${ex.target==='Triceps'?'selected':''}>Triceps</option>
+                <option value="Bål" ${ex.target==='Bål'?'selected':''}>Bål</option>
+            </select>
+        </div>
+        <div style="margin-top:20px;">
+            <button class="mode-btn blue" onclick="updateExercise(${id})">Uppdatera</button>
+            <button class="mode-btn" style="color:var(--danger); background:none; font-size:14px;" onclick="deleteMasterExercise(${id})">Radera övning permanent</button>
+        </div>
     `;
     document.getElementById("workout-modal").classList.remove("hidden");
 }
@@ -126,7 +133,7 @@ function openMonthPicker() {
     const body = document.getElementById("modal-body");
     let html = `<h3>Välj månad</h3><div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">`;
     const months = ["Januari", "Februari", "Mars", "April", "Maj", "Juni", "Juli", "Augusti", "September", "Oktober", "November", "December"];
-    months.forEach((m, i) => { html += `<button class="mode-btn glass-border" onclick="selectMonth(${i})">${m}</button>`; });
+    months.forEach((m, i) => { html += `<button class="mode-btn glass-border" style="font-size:14px;" onclick="selectMonth(${i})">${m}</button>`; });
     body.innerHTML = html + `</div>`;
     document.getElementById("workout-modal").classList.remove("hidden");
 }
@@ -151,25 +158,18 @@ function renderCalendar() {
         const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
         const cell = document.createElement("div");
         cell.className = "calendar-cell";
-        
         const hasWorkouts = workoutHistory.filter(w => w.date === dateStr);
         const isOngoing = activeDraft && activeDraft.date === dateStr;
         const dayOfWeek = new Date(year, month, d).getDay();
         const isAutoDay = [1, 3, 5].includes(dayOfWeek);
         const override = calendarOverrides[dateStr];
-
         let displayPass = null;
-        if (override && override !== "none") {
-            displayPass = programData.routine.find(p => p.id === override);
-        } else if (isAutoDay && override !== "none") {
-            displayPass = programData.routine[d % programData.routine.length];
-        }
-
+        if (override && override !== "none") displayPass = programData.routine.find(p => p.id === override);
+        else if (isAutoDay && override !== "none") displayPass = programData.routine[d % programData.routine.length];
         let info = "";
         if (hasWorkouts.length > 0) { cell.classList.add("cell-completed"); info = "✓"; }
         else if (isOngoing) { cell.classList.add("cell-ongoing"); info = "⏱️"; }
         else if (displayPass) { cell.classList.add("cell-planned"); info = displayPass.name.split(" ").pop(); }
-        
         cell.innerHTML = `<span>${d}</span><span style="font-size:10px; font-weight:900;">${info}</span>`;
         cell.onclick = () => openDayManager(dateStr, displayPass, hasWorkouts, isOngoing);
         grid.appendChild(cell);
@@ -180,7 +180,6 @@ function renderCalendar() {
 function openDayManager(dateStr, planned, completed, isOngoing) {
     const body = document.getElementById("modal-body");
     let html = `<h3>${dateStr}</h3>`;
-    
     if (completed.length > 0) {
         completed.forEach((w, idx) => {
             html += `<div class="card glass" style="border-left:4px solid var(--success); text-align:left;">
@@ -203,14 +202,14 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
     } else if (isOngoing) {
         html += `<button class="mode-btn orange" onclick="closeModal(); startWorkout(activeDraft.workout, activeDraft.data, activeDraft.date)">Fortsätt pågående pass</button>`;
     } else {
-        html += `<p>Just nu: <strong>${planned ? planned.name : 'Vila'}</strong></p>`;
+        html += `<p style="text-align:center;">Planerat: <strong>${planned ? planned.name : 'Vila'}</strong></p>`;
         if(planned) html += `<button class="mode-btn green" onclick="prepareStart('${dateStr}', '${planned.id}')">Starta passet   🔥  </button>`;
-        html += `<div class="separator" style="margin:20px 0;"></div><p style="font-size:11px; text-transform:uppercase; color:var(--text-light);">Ändra planering:</p>`;
+        html += `<div class="separator" style="margin:20px 0;"></div><p style="font-size:11px; text-transform:uppercase; color:var(--text-light); text-align:center;">Ändra planering:</p>`;
         programData.routine.forEach(p => {
             const isPlanned = planned && p.id === planned.id;
-            html += `<button ${isPlanned ? 'disabled' : ''} class="mode-btn ${isPlanned ? 'btn-disabled' : 'glass-border'}" onclick="setOverride('${dateStr}', '${p.id}')">${p.name}</button>`;
+            html += `<button ${isPlanned ? 'disabled' : ''} class="mode-btn ${isPlanned ? 'btn-disabled' : 'glass-border'}" style="font-size:14px;" onclick="setOverride('${dateStr}', '${p.id}')">${p.name}</button>`;
         });
-        html += `<button class="mode-btn" style="color:var(--danger); background:none;" onclick="setOverride('${dateStr}', 'none')">Vila denna dag</button>`;
+        html += `<button class="mode-btn" style="color:var(--danger); background:none; font-size:14px;" onclick="setOverride('${dateStr}', 'none')">Vila denna dag</button>`;
     }
     body.innerHTML = html;
     document.getElementById("workout-modal").classList.remove("hidden");
@@ -273,21 +272,32 @@ function openEditProgramModal(idx) {
     const body = document.getElementById("modal-body");
     body.innerHTML = `
         <h3>Redigera ${pass.name}</h3>
-        <input type="text" id="edit-pass-name" class="log-input" value="${pass.name}">
+        <div style="text-align:left;">
+            <label style="font-size:12px; color:var(--text-light); margin-left:10px;">NAMN PÅ PASS</label>
+            <input type="text" id="edit-pass-name" class="log-input" value="${pass.name}">
+        </div>
         <div id="edit-pass-exercises">
             ${pass.exercises.map((ex, i) => `
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; background:rgba(0,0,0,0.2); padding:10px; border-radius:10px;">
-                    <div style="display:flex; gap:5px;">
+                <div class="edit-item-row">
+                    <div style="display:flex; gap:8px;">
                         <button class="reorder-btn" onclick="moveExercise(${idx}, ${i}, -1)">▲</button>
                         <button class="reorder-btn" onclick="moveExercise(${idx}, ${i}, 1)">▼</button>
                     </div>
-                    <span style="flex-grow:1; margin-left:10px; font-size:13px;">${ex.name}</span>
+                    <span style="flex-grow:1; margin-left:15px; font-size:14px; font-weight:600;">${ex.name}</span>
                     <button onclick="removeExFromPass(${idx}, ${i})" style="color:var(--danger); background:none; border:none; font-size:18px;"> ✖ </button>
                 </div>`).join("")}
         </div>
-        <button class="mode-btn blue" onclick="saveProgramEdit(${idx})">Spara ändringar</button>
+        <button class="mode-btn blue" style="margin-top:20px;" onclick="saveProgramEdit(${idx})">Spara ändringar</button>
+        <button class="mode-btn" style="background:none; color:var(--danger); font-size:14px;" onclick="deleteProgram(${idx})">Radera hela passet</button>
     `;
     document.getElementById("workout-modal").classList.remove("hidden");
+}
+
+function deleteProgram(idx) {
+    if(confirm("Vill du radera detta pass helt?")) {
+        programData.routine.splice(idx, 1);
+        saveAll(); closeModal(); renderProgramView();
+    }
 }
 
 function moveExercise(pIdx, eIdx, dir) {
@@ -308,7 +318,7 @@ function saveProgramEdit(idx) {
     saveAll(); closeModal(); renderProgramView(idx); showProgramDetails(idx);
 }
 
-// --- AKTIVT PASS ORDNING ---
+// --- AKTIVT PASS ---
 function startWorkout(workout, data = null, date = null) {
     activeDraft = { workout, data: data || workout.exercises.map(()=>({weight:"", reps:"", sets:3})), date: date || new Date().toISOString().split('T')[0] };
     renderActiveWorkout();
@@ -323,18 +333,21 @@ function renderActiveWorkout() {
         const div = document.createElement("div");
         div.className = "card glass";
         div.innerHTML = `
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-            <div style="display:flex; gap:5px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+            <div style="display:flex; gap:8px;">
                 <button class="reorder-btn" onclick="moveActiveExercise(${i}, -1)">▲</button>
                 <button class="reorder-btn" onclick="moveActiveExercise(${i}, 1)">▼</button>
             </div>
-            <strong>${ex.name}</strong>
-            <button onclick="removeActiveExercise(${i})" style="color:var(--danger); background:none; border:none;"> ✖ </button>
+            <strong style="font-size:16px;">${ex.name}</strong>
+            <button onclick="removeActiveExercise(${i})" style="color:var(--danger); background:none; border:none; font-size:20px;"> ✖ </button>
         </div>
         <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:10px;">
-            <input type="number" id="w-${i}" class="log-input" placeholder="KG" value="${val.weight}" onchange="updateDraftData(${i})">
-            <input type="number" id="r-${i}" class="log-input" placeholder="Reps" value="${val.reps}" onchange="updateDraftData(${i})">
-            <input type="number" id="s-${i}" class="log-input" placeholder="Set" value="${val.sets}" onchange="updateDraftData(${i})">
+            <div><small style="display:block; text-align:center; color:var(--text-light); font-size:10px;">KG</small>
+            <input type="number" id="w-${i}" class="log-input" placeholder="0" value="${val.weight}" onchange="updateDraftData(${i})"></div>
+            <div><small style="display:block; text-align:center; color:var(--text-light); font-size:10px;">REPS</small>
+            <input type="number" id="r-${i}" class="log-input" placeholder="0" value="${val.reps}" onchange="updateDraftData(${i})"></div>
+            <div><small style="display:block; text-align:center; color:var(--text-light); font-size:10px;">SET</small>
+            <input type="number" id="s-${i}" class="log-input" placeholder="0" value="${val.sets}" onchange="updateDraftData(${i})"></div>
         </div>`;
         list.appendChild(div);
     });
@@ -401,7 +414,6 @@ document.getElementById("save-workout-btn").onclick = () => {
 };
 
 document.getElementById("pause-workout-btn").onclick = () => {
-    updateDraftData(0); // Triggar bara sparning av nuvarande fält
     location.reload();
 };
 
