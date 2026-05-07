@@ -36,10 +36,7 @@
             <h2 class="section-title">Träningsschema</h2>
             <div class="calendar-nav">
                 <button onclick="changeMonth(-1)" class="nav-arrow"> ❮ </button>
-                <div class="month-selector-wrapper">
-                    <select id="month-select-dropdown" onchange="jumpToMonth(this.value)"></select>
-                    <h2 id="month-label"></h2>
-                </div>
+                <h2 id="month-label"></h2>
                 <button onclick="changeMonth(1)" class="nav-arrow"> ❯ </button>
             </div>
             <div class="card calendar-card glass-light">
@@ -68,26 +65,31 @@
             <div class="separator"></div>
             <div style="display: flex; align-items: center; justify-content: center; position: relative; margin-bottom: 20px;">
                 <h2 class="section-title" style="margin:0;">Övningar</h2>
-                <button class="add-inline-btn" id="add-exercise-btn" onclick="openCreateExerciseModal()">+</button>
+                <button class="add-inline-btn" onclick="openCreateExerciseModal()">+</button>
             </div>
             <div id="exercise-results" class="exercise-bank-list"></div>
         </div>
 
         <div id="programs-view" class="view hidden">
             <h2 class="section-title">Träningsprogram</h2>
-            <div id="pass-selector-list" class="program-modern-list"></div>
+            <div id="pass-selector-list" class="program-mini-grid"></div>
+            
             <div class="separator"></div>
+
             <div id="program-exercise-list" class="card glass hidden"></div>
             <button id="add-custom-pass-btn" class="mode-btn glass-border" style="margin-top:20px;">+ Skapa Nytt Pass</button>
         </div>
 
         <div id="stats-view" class="view hidden">
             <h2 class="section-title">Statistik</h2>
-            <div class="card glass"><div id="chart-container" class="chart-wrapper"></div></div>
+            <div class="card glass">
+                <h3 style="text-align:center; margin-bottom:20px;">Pass per månad</h3>
+                <div id="chart-container" class="chart-wrapper"></div>
+            </div>
         </div>
 
         <div id="workout-view" class="view hidden">
-            <h2 id="active-title" style="text-align:center;"></h2>
+            <h2 id="active-title" style="text-align:center; margin-bottom:20px;"></h2>
             <div id="exercise-list"></div>
             <div class="workout-footer">
                 <button id="pause-workout-btn" class="mode-btn glass-border">Spara utkast</button>
