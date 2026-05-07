@@ -33,6 +33,8 @@ body { font-family: 'Inter', sans-serif; background: #0f172a; color: var(--text)
 
 .card { padding: 20px; margin-bottom: 15px; }
 
+.separator { height: 1px; background: linear-gradient(90deg, transparent, var(--glass-border), transparent); width: 100%; }
+
 /* Modern Program Styles */
 .program-modern-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
 
@@ -75,14 +77,13 @@ body { font-family: 'Inter', sans-serif; background: #0f172a; color: var(--text)
 .orange { background: var(--warning); }
 .glass-border { background: transparent; border: 2px solid var(--glass-border); color: white; }
 
-/* Disabled Button Fix */
 .btn-disabled { 
-    opacity: 0.6; 
+    opacity: 0.8; 
     cursor: not-allowed; 
     pointer-events: none; 
     background: rgba(255,255,255,0.05) !important;
-    border: 1px solid rgba(255,255,255,0.2) !important;
-    color: var(--text-light) !important;
+    border: 1px solid rgba(255,255,255,0.1) !important;
+    color: rgba(255,255,255,0.3) !important;
 }
 
 /* Kalender */
@@ -91,9 +92,18 @@ body { font-family: 'Inter', sans-serif; background: #0f172a; color: var(--text)
 .calendar-weekdays { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; font-size: 11px; margin-bottom: 10px; color: var(--text-light); }
 .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
 .calendar-cell { aspect-ratio: 1; border-radius: 12px; background: rgba(0,0,0,0.2); display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 14px; border: 1px solid transparent; cursor: pointer; }
-.cell-completed { background: var(--success) !important; color: white; }
-.cell-ongoing { border: 1px solid var(--warning) !important; color: var(--warning); }
-.cell-planned { border: 1px solid var(--primary) !important; color: var(--primary); }
+
+/* Status-färger för kalender */
+.cell-completed { background: var(--success) !important; color: white !important; }
+.cell-ongoing { background: transparent !important; border: 2px solid var(--warning) !important; color: var(--warning) !important; }
+.cell-planned { background: transparent !important; border: 1px solid var(--primary) !important; color: var(--primary) !important; }
+
+.legend { display: flex; gap: 15px; justify-content: center; margin-top: 20px; font-size: 12px; }
+.legend-item { display: flex; align-items: center; gap: 5px; }
+.legend-color { width: 12px; height: 12px; border-radius: 3px; }
+.legend-color.planned { border: 1px solid var(--primary); }
+.legend-color.ongoing { border: 2px solid var(--warning); }
+.legend-color.completed { background: var(--success); }
 
 .category-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
 .cat-btn { display: flex; flex-direction: column; align-items: center; padding: 15px 5px; border-radius: 20px; font-size: 11px; color: var(--text-light); cursor: pointer; border: 1px solid var(--glass-border); background: var(--card); }
@@ -106,5 +116,10 @@ body { font-family: 'Inter', sans-serif; background: #0f172a; color: var(--text)
 .modal-content { padding: 25px; border-radius: 28px; width: 100%; max-width: 400px; background: #161e2d; border: 1px solid var(--glass-border); overflow-y: auto; max-height: 80vh; }
 
 .add-inline-btn { position: absolute; right: 0; background: var(--primary); border: none; color: #0f172a; width: 32px; height: 32px; border-radius: 10px; font-weight: 900; cursor: pointer; }
+
+/* Reorder buttons */
+.reorder-btn { background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); color: white; border-radius: 8px; width: 30px; height: 30px; cursor: pointer; font-size: 12px; display: flex; align-items: center; justify-content: center; }
+.reorder-btn:active { background: var(--primary); color: #000; }
+
 .chart-wrapper { display: flex; align-items: flex-end; gap: 10px; height: 150px; padding-top: 20px; }
 .chart-bar { flex: 1; background: var(--primary); border-radius: 6px 6px 0 0; position: relative; }
