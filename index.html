@@ -32,9 +32,9 @@
         <div id="calendar-view" class="view hidden">
             <h2 class="section-title">Träningsschema</h2>
             <div class="calendar-nav">
-                <button onclick="changeMonth(-1)" class="nav-arrow">   ❮   </button>
-                <h2 id="month-label" onclick="openMonthPicker()" style="cursor:pointer; text-decoration: underline; text-decoration-color: var(--primary);"></h2>
-                <button onclick="changeMonth(1)" class="nav-arrow">   ❯   </button>
+                <button id="prev-month-btn" class="nav-arrow">   ❮   </button>
+                <h2 id="month-label"></h2>
+                <button id="next-month-btn" class="nav-arrow">   ❯   </button>
             </div>
             <div class="card calendar-card glass-light">
                 <div class="calendar-weekdays">
@@ -52,17 +52,17 @@
         <div id="exercises-view" class="view hidden">
             <h2 class="section-title">Muskelgrupper</h2>
             <div id="category-menu" class="category-grid">
-                <button class="cat-btn glass" data-cat="Ben" onclick="filterExercises('Ben')"><span class="cat-icon">  🦵  </span> Ben</button>
-                <button class="cat-btn glass" data-cat="Bröst" onclick="filterExercises('Bröst')"><span class="cat-icon">  🏋️  </span> Bröst</button>
-                <button class="cat-btn glass" data-cat="Rygg" onclick="filterExercises('Rygg')"><span class="cat-icon">  🪵  </span> Rygg</button>
-                <button class="cat-btn glass" data-cat="Axlar" onclick="filterExercises('Axlar')"><span class="cat-icon">  👐  </span> Axlar</button>
-                <button class="cat-btn glass" data-cat="Armar" onclick="filterExercises('Armar')"><span class="cat-icon">  💪  </span> Armar</button>
-                <button class="cat-btn glass" data-cat="Bål" onclick="filterExercises('Bål')"><span class="cat-icon">  🧘  </span> Bål</button>
+                <button class="cat-btn glass active" data-cat="Ben">  🦵  <br>Ben</button>
+                <button class="cat-btn glass" data-cat="Bröst">  🏋️  <br>Bröst</button>
+                <button class="cat-btn glass" data-cat="Rygg">  🪵  <br>Rygg</button>
+                <button class="cat-btn glass" data-cat="Axlar">  👐  <br>Axlar</button>
+                <button class="cat-btn glass" data-cat="Armar">  💪  <br>Armar</button>
+                <button class="cat-btn glass" data-cat="Bål">  🧘  <br>Bål</button>
             </div>
-            <div class="separator" style="margin: 30px 0;"></div>
+            <div class="separator"></div>
             <div style="display: flex; align-items: center; justify-content: center; position: relative; margin-bottom: 20px;">
                 <h2 class="section-title" style="margin:0;">Övningar</h2>
-                <button class="add-inline-btn" onclick="openCreateExerciseModal()">+</button>
+                <button class="add-inline-btn" id="add-new-exercise-btn">+</button>
             </div>
             <div id="exercise-results" class="exercise-bank-list"></div>
         </div>
@@ -71,7 +71,7 @@
             <h2 class="section-title">Träningsprogram</h2>
             <div id="pass-selector-list" class="program-modern-grid"></div>
             <div id="program-details-area" class="hidden">
-                <div class="separator" style="margin: 30px 0;"></div>
+                <div class="separator"></div>
                 <div id="program-exercise-list" class="card glass-modern"></div>
             </div>
             <button id="add-custom-pass-btn" class="mode-btn glass-border" style="margin-top:20px;">+ Skapa Nytt Pass</button>
@@ -80,13 +80,12 @@
         <div id="stats-view" class="view hidden">
             <h2 class="section-title">Statistik</h2>
             <div class="card glass">
-                <h3 style="text-align:center; margin-bottom:20px;">Pass per månad</h3>
                 <div id="chart-container" class="chart-wrapper"></div>
             </div>
         </div>
 
         <div id="workout-view" class="view hidden">
-            <h2 id="active-title" style="text-align:center; margin-bottom:20px;"></h2>
+            <h2 id="active-title" style="text-align:center;"></h2>
             <div id="exercise-list"></div>
             <div class="workout-footer">
                 <button id="pause-workout-btn" class="mode-btn glass-border">Spara utkast</button>
@@ -98,7 +97,7 @@
     <div id="workout-modal" class="modal hidden">
         <div class="modal-content">
             <div id="modal-body"></div>
-            <button class="mode-btn glass-border" onclick="closeModal()" style="margin-top: 20px;">Stäng</button>
+            <button class="mode-btn glass-border" id="close-modal-btn" style="margin-top: 20px;">Stäng</button>
         </div>
     </div>
 
