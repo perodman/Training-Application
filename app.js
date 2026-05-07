@@ -107,26 +107,17 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
         });
     } else if (isOngoing) {
         html += `<button class="mode-btn orange" onclick="closeModal(); startWorkout(activeDraft.workout, activeDraft.data, activeDraft.date)">Fortsätt pass</button>`;
-        html += `<button class="mode-btn" style="color:var(--danger); background:none;" onclick="cancelOngoing()">Radera pågående</button>`;
     } else {
         html += `<p style="text-align:center;">Planerat: <strong>${planned ? planned.name : 'Vila'}</strong></p>`;
         if(planned) html += `<button class="mode-btn green" onclick="prepareStart('${dateStr}', '${planned.id}')">Starta 🔥</button>`;
         html += `<div class="separator"></div><p style="font-size:11px; text-align:center;">ÄNDRA PLANERING</p>`;
         programData.routine.forEach(p => {
-            html += `<div style="display:flex; gap:5px; margin-bottom:5px;">
-                <button class="mode-btn glass-border" style="font-size:14px; margin:0; flex-grow:1;" onclick="setOverride('${dateStr}', '${p.id}')">${p.name}</button>
-                <button onclick="previewPass('${p.id}')" style="background:var(--card); border:1px solid var(--glass-border); border-radius:12px; width:45px; color:var(--primary);">ℹ️</button>
-            </div>`;
+            html += `<button class="mode-btn glass-border" style="font-size:14px;" onclick="setOverride('${dateStr}', '${p.id}')">${p.name}</button>`;
         });
         html += `<button class="mode-btn" style="color:var(--danger); background:none;" onclick="setOverride('${dateStr}', 'none')">Vila</button>`;
     }
     body.innerHTML = html;
     openModal();
-}
-
-function previewPass(id) {
-    const p = programData.routine.find(x => x.id === id);
-    alert(`Innehåll i ${p.name}:\n\n` + (p.exercises.length ? p.exercises.map(e => `- ${e.name}`).join("\n") : "Inga övningar tillagda"));
 }
 
 // --- PROGRAMS VIEW ---
@@ -162,43 +153,43 @@ function openEditProgramModal(idx) {
         <input type="text" id="edit-pass-name" class="log-input" value="${pass.name}">
         <div id="edit-pass-exercises">
             ${pass.exercises.map((ex, i) => `<div class="edit-item-row">
-                <button onclick="moveExercise(${idx}, ${i}, -1)" style="color:var(--primary); background:none; border:1px solid var(--primary); border-radius:5px;">▲</button>
-                <span style="flex-grow:1; margin:0 10px; font-size:14px;">${ex.name}</span>
+                <span style="flex-grow:1; font-size:14px;">${ex.name}</span>
                 <button onclick="removeExFromPass(${idx}, ${i})" style="color:var(--danger); background:none; border:none;">✖</button>
             </div>`).join("")}
         </div>
         <div class="separator"></div>
-        <select id="add-ex-select" class="log-input">
+        <select id="add-ex-select" class="log-input" onchange="addExToPass(${idx}, this.value)">
             <option value="">+ Lägg till övning...</option>
             ${masterExercises.map(m=>`<option value="${m.id}">${m.name}</option>`).join("")}
         </select>
         <button class="mode-btn blue" onclick="saveProgramEdit(${idx})">Spara & Stäng</button>
-        <button class="mode-btn" style="color:var(--danger); background:none;" onclick="deleteProgram(${idx})">Radera Pass</button>
     `;
     openModal();
 }
 
-// --- LOGIC ---
+function addExToPass(pIdx, exId) {
+    if(!exId) return;
+    const ex = masterExercises.find(e => e.id == exId);
+    programData.routine[pIdx].exercises.push({...ex});
+    openEditProgramModal(pIdx);
+}
+
+function removeExFromPass(pIdx, eIdx) {
+    programData.routine[pIdx].exercises.splice(eIdx, 1);
+    openEditProgramModal(pIdx);
+}
+
 function saveProgramEdit(idx) {
-    const exId = document.getElementById("add-ex-select").value;
-    if(exId) programData.routine[idx].exercises.push({...masterExercises.find(e => e.id == exId)});
     programData.routine[idx].name = document.getElementById("edit-pass-name").value;
     saveAll(); closeModal(); renderProgramView(idx); showProgramDetails(idx);
 }
 
-function deleteProgram(idx) { if(confirm("Radera pass?")) { programData.routine.splice(idx, 1); saveAll(); closeModal(); renderProgramView(); } }
 function openCreatePassModal() { 
     const name = prompt("Namn på nytt pass:");
     if(!name) return;
     programData.routine.push({ id: "p" + Date.now(), name, exercises: [] });
     saveAll(); renderProgramView(); 
 }
-
-function moveExercise(pIdx, eIdx, dir) {
-    const ex = programData.routine[pIdx].exercises;
-    if(eIdx+dir >= 0 && eIdx+dir < ex.length) { [ex[eIdx], ex[eIdx+dir]] = [ex[eIdx+dir], ex[eIdx]]; openEditProgramModal(pIdx); }
-}
-function removeExFromPass(pIdx, eIdx) { programData.routine[pIdx].exercises.splice(eIdx, 1); openEditProgramModal(pIdx); }
 
 // --- EXERCISES ---
 function filterExercises(category) {
@@ -281,7 +272,6 @@ function renderStats() {
 function changeMonth(off) { currentViewDate.setMonth(currentViewDate.getMonth() + off); renderCalendar(); }
 function setOverride(date, val) { calendarOverrides[date] = val; saveAll(); closeModal(); renderCalendar(); }
 function prepareStart(date, id) { const p = programData.routine.find(x => x.id === id); closeModal(); startWorkout(p, null, date); }
-function cancelOngoing() { activeDraft = null; saveAll(); closeModal(); renderCalendar(); }
 function deleteLoggedWorkout(date, idx) {
     const dayWorkouts = workoutHistory.filter(w => w.date === date);
     workoutHistory = workoutHistory.filter(w => w !== dayWorkouts[idx]);
