@@ -24,7 +24,7 @@
             </div>
 
             <div class="menu-grid">
-                <button id="start-new-btn" class="mode-btn blue main-action">Starta Nytt Pass  🔥 </button>
+                <button id="start-new-btn" class="mode-btn blue main-action">Starta Nytt Träningspass  🔥 </button>
                 <button id="view-exercises-btn" class="mode-btn glass"> 🏋️  Övningar</button>
                 <button id="view-programs-btn" class="mode-btn glass"> 📋  Program</button>
                 <button id="calendar-mode" class="mode-btn glass"> 📅  Träningsschema</button>
@@ -39,7 +39,7 @@
                 <h2 id="month-label"></h2>
                 <button onclick="changeMonth(1)" class="nav-arrow"> ❯ </button>
             </div>
-            <div class="card calendar-card glass">
+            <div class="card calendar-card glass-light">
                 <div class="calendar-weekdays">
                     <div>Mån</div><div>Tis</div><div>Ons</div><div>Tor</div><div>Fre</div><div>Lör</div><div>Sön</div>
                 </div>
@@ -47,16 +47,13 @@
                 <div class="legend">
                     <div class="legend-item"><div class="legend-color planned"></div> Planerat</div>
                     <div class="legend-item"><div class="legend-color ongoing"></div> Pågående</div>
-                    <div class="legend-item"><div class="legend-color completed"></div> Klart</div>
+                    <div class="legend-item"><div class="legend-color completed"></div> Genomfört</div>
                 </div>
             </div>
         </div>
 
         <div id="exercises-view" class="view hidden">
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
-                <h2 class="section-title" style="margin:0;">Muskelgrupper</h2>
-                <button class="circle-ctrl" style="position:static; width:35px; height:35px; font-weight:900;" onclick="openCreateExerciseModal()">+</button>
-            </div>
+            <h2 class="section-title">Muskelgrupper</h2>
             <div id="category-menu" class="category-grid">
                 <button class="cat-btn glass" data-cat="Ben" onclick="filterExercises('Ben')">Ben</button>
                 <button class="cat-btn glass" data-cat="Bröst" onclick="filterExercises('Bröst')">Bröst</button>
@@ -65,7 +62,15 @@
                 <button class="cat-btn glass" data-cat="Armar" onclick="filterExercises('Armar')">Armar</button>
                 <button class="cat-btn glass" data-cat="Bål" onclick="filterExercises('Bål')">Bål</button>
             </div>
-            <div id="exercise-results" class="exercise-bank-list" style="margin-top:20px;"></div>
+            
+            <div class="separator"></div>
+
+            <div style="display: flex; align-items: center; justify-content: center; position: relative; margin-bottom: 20px;">
+                <h2 class="section-title" style="margin:0;">Övningar</h2>
+                <button class="add-inline-btn" onclick="openCreateExerciseModal()">+</button>
+            </div>
+            
+            <div id="exercise-results" class="exercise-bank-list"></div>
         </div>
 
         <div id="programs-view" class="view hidden">
