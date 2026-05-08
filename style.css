@@ -24,11 +24,6 @@ body { font-family: 'Inter', sans-serif; background: #0f172a; color: var(--text)
     animation: fadeIn 0.4s ease-out;
 }
 
-/* Separat animation för kalenderbyten */
-.calendar-animate {
-    animation: fadeIn 0.3s ease-out;
-}
-
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(10px); }
     to { opacity: 1; transform: translateY(0); }
@@ -50,7 +45,7 @@ body { font-family: 'Inter', sans-serif; background: #0f172a; color: var(--text)
     text-shadow: 0 0 15px rgba(34, 211, 238, 0.3);
 }
 
-/* 3. Modern Månadslabel */
+/* 3. Modern Månadslabel (utan blå linje) */
 #month-label {
     font-size: 1.1rem;
     font-weight: 700;
@@ -78,6 +73,7 @@ body { font-family: 'Inter', sans-serif; background: #0f172a; color: var(--text)
     border: none;
 }
 
+/* Resten behålls enligt original */
 .section-title { text-align: center; font-weight: 800; margin-bottom: 25px; font-size: 1.4rem; width: 100%; }
 .modern-header { font-family: 'Montserrat', sans-serif; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; background: linear-gradient(to right, #fff, var(--primary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 1.6rem; margin-top: 10px; }
 .hero-section { padding: 20px 0; }
@@ -102,25 +98,8 @@ body { font-family: 'Inter', sans-serif; background: #0f172a; color: var(--text)
 .nav-arrow { background: var(--card); border: 1px solid var(--glass-border); color: white; padding: 10px 15px; border-radius: 12px; cursor: pointer; }
 .calendar-weekdays { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; font-size: 11px; margin-bottom: 10px; color: var(--text-light); }
 .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
-
-/* JUSTERAD KALENDERCELL FÖR IKONPLACERING */
-.calendar-cell { 
-    aspect-ratio: 1; 
-    border-radius: 12px; 
-    background: rgba(255,255,255,0.05); 
-    display: flex; 
-    flex-direction: column; 
-    align-items: center; 
-    justify-content: flex-start; /* Ändrad från center */
-    padding-top: 10px;
-    gap: 4px; /* Bestämmer avståndet mellan siffra och ikon */
-    font-size: 14px; 
-    border: 1px solid transparent; 
-    cursor: pointer; 
-    overflow: hidden; 
-}
-.calendar-cell span:last-child { font-size: 10px; font-weight: 900; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-
+.calendar-cell { aspect-ratio: 1; border-radius: 12px; background: rgba(255,255,255,0.05); display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 14px; border: 1px solid transparent; cursor: pointer; overflow: hidden; }
+.calendar-cell span:last-child { font-size: 10px; font-weight: 900; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding: 0 2px; }
 .cell-completed { background: var(--success) !important; color: white !important; }
 .cell-ongoing { background: transparent !important; border: 2px solid var(--warning) !important; color: var(--warning) !important; }
 .cell-planned { background: transparent !important; border: 1px solid var(--primary) !important; color: var(--primary) !important; }
@@ -136,21 +115,7 @@ body { font-family: 'Inter', sans-serif; background: #0f172a; color: var(--text)
 .cat-btn.active { background: rgba(34, 211, 238, 0.15); border-color: var(--primary); color: var(--primary); }
 .circle-ctrl { background: var(--card); border: 1px solid var(--glass-border); backdrop-filter: blur(10px); width: 45px; height: 45px; border-radius: 15px; display: flex; align-items: center; justify-content: center; position: fixed; top: 20px; right: 20px; z-index: 1000; cursor: pointer; color: white; }
 .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px); display: flex; align-items: center; justify-content: center; z-index: 9999; padding: 20px; }
-.modal-content { padding: 40px 25px 25px; border-radius: 28px; width: 100%; max-width: 420px; background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%); border: 1px solid var(--glass-border); overflow-y: auto; max-height: 85vh; box-shadow: 0 20px 50px rgba(0,0,0,0.6); position: relative; }
-
-/* KRYSS-KNAPP I MODAL */
-.close-x-btn {
-    position: absolute;
-    top: 15px;
-    left: 15px;
-    background: none;
-    border: none;
-    color: var(--text-light);
-    font-size: 20px;
-    cursor: pointer;
-    z-index: 10;
-}
-
+.modal-content { padding: 25px; border-radius: 28px; width: 100%; max-width: 420px; background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%); border: 1px solid var(--glass-border); overflow-y: auto; max-height: 85vh; box-shadow: 0 20px 50px rgba(0,0,0,0.6); }
 .modal-content h3 { text-align: center; margin-bottom: 25px; font-weight: 800; font-size: 1.4rem; color: var(--primary); }
 .log-input { width: 100%; padding: 12px; border-radius: 12px; border: 1px solid var(--glass-border); background: rgba(0,0,0,0.2); color: white; text-align: center; font-weight: 700; margin: 5px 0 15px; font-size: 16px !important; }
 select.log-input { font-size: 16px !important; text-align-last: center; appearance: none; }
