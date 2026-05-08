@@ -42,6 +42,7 @@ function showView(id) {
     const target = document.getElementById(id);
     if(target) {
         target.classList.remove("hidden");
+        // Trigga animation genom att ta bort och lägga till klassen (om den redan finns)
         target.style.animation = 'none';
         target.offsetHeight; 
         target.style.animation = null;
@@ -72,6 +73,7 @@ function startTimer() {
     timerInterval = setInterval(() => {
         secondsElapsed++;
         updateTimerDisplay();
+        // Spara tid i draften löpande
         if(activeDraft) {
             activeDraft.secondsElapsed = secondsElapsed;
             localStorage.setItem("activeWorkoutDraft", JSON.stringify(activeDraft));
@@ -180,18 +182,9 @@ function deleteMasterExercise(id) {
 }
 
 // --- KALENDER ---
-function renderCalendar(animate = false) {
+function renderCalendar() {
     const grid = document.getElementById("calendar-grid");
     const label = document.getElementById("month-label");
-    const animateArea = document.getElementById("calendar-animate-area");
-    
-    // Om animate är sant, kör vi bara animationen på kalender-delarna
-    if(animate) {
-        animateArea.classList.remove("calendar-animate");
-        animateArea.offsetHeight; 
-        animateArea.classList.add("calendar-animate");
-    }
-
     grid.innerHTML = "";
     const year = currentViewDate.getFullYear();
     const month = currentViewDate.getMonth();
@@ -257,7 +250,7 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
         html += `<button class="mode-btn orange" onclick="closeModal(); startWorkout(activeDraft.workout, activeDraft.data, activeDraft.date)">Fortsätt pågående pass</button>`;
     } else {
         html += `<p style="text-align:center;">Planerat: <strong>${planned ? planned.name : 'Vila'}</strong></p>`;
-        if(planned) html += `<button class="mode-btn green" onclick="prepareStart('${dateStr}', '${planned.id}')">Starta passet      🔥    </button>`;
+        if(planned) html += `<button class="mode-btn green" onclick="prepareStart('${dateStr}', '${planned.id}')">Starta passet     🔥    </button>`;
         html += `<div class="separator"></div><p style="font-size:11px; text-transform:uppercase; color:var(--text-light); text-align:center;">Ändra planering:</p>`;
         programData.routine.forEach(p => {
             const isPlanned = planned && p.id === planned.id;
@@ -278,7 +271,7 @@ function openMonthPicker() {
     openModal();
 }
 
-function selectMonth(m) { currentViewDate.setMonth(m); closeModal(); renderCalendar(true); }
+function selectMonth(m) { currentViewDate.setMonth(m); closeModal(); renderCalendar(); }
 
 // --- PROGRAM & REDIGERING ---
 function renderProgramView(activeIdx = null) {
@@ -414,17 +407,8 @@ function saveNewProgram() {
 
 // --- AKTIVT PASS ---
 function startWorkout(workout, data = null, date = null) {
-    // FIX PÅ PUNKT 1: Om vi laddar in ett pass som redan har sparad tid, använd den.
-    // Annars, om vi har en pågående draft, använd dess tid.
-    // Annars nollställ.
-    if (data && data.totalTime) {
-        const parts = data.totalTime.split(':');
-        secondsElapsed = (parseInt(parts[0]) * 3600) + (parseInt(parts[1]) * 60) + parseInt(parts[2]);
-    } else if (activeDraft && activeDraft.secondsElapsed) {
-        secondsElapsed = activeDraft.secondsElapsed;
-    } else {
-        secondsElapsed = 0;
-    }
+    // Om det finns en draft med sparad tid, ladda den
+    secondsElapsed = (activeDraft && activeDraft.secondsElapsed) ? activeDraft.secondsElapsed : 0;
     
     activeDraft = { 
         workout, 
@@ -495,12 +479,11 @@ function removeActiveExercise(i) {
 
 // --- STANDARD-LOGIK ---
 document.getElementById("global-home").onclick = () => {
-    // FIX PÅ PUNKT 2: Pausa inte timern när man går hem.
-    showView("home-view");
-    renderHome();
+    pauseTimer(); // Stoppa intervallet om vi går hem
+    location.reload();
 }
-document.getElementById("start-new-btn").onclick = () => renderCalendar();
-document.getElementById("calendar-mode").onclick = () => renderCalendar();
+document.getElementById("start-new-btn").onclick = renderCalendar;
+document.getElementById("calendar-mode").onclick = renderCalendar;
 document.getElementById("view-exercises-btn").onclick = () => { showView("exercises-view"); filterExercises(currentExerciseCategory); };
 document.getElementById("view-programs-btn").onclick = () => renderProgramView();
 document.getElementById("stats-mode").onclick = renderStats;
@@ -512,9 +495,6 @@ function renderHome() {
         document.getElementById("draft-alert").classList.remove("hidden");
         document.getElementById("start-new-btn").classList.add("hidden");
         document.getElementById("resume-workout-btn").onclick = () => startWorkout(activeDraft.workout, activeDraft.data, activeDraft.date);
-    } else {
-        document.getElementById("draft-alert").classList.add("hidden");
-        document.getElementById("start-new-btn").classList.remove("hidden");
     }
 }
 
@@ -542,7 +522,6 @@ document.getElementById("save-workout-btn").onclick = () => {
 };
 
 document.getElementById("pause-workout-btn").onclick = () => { 
-    // Punkt 2: Om man "sparar utkast" via pause-knappen så pausas timern enligt nuvarande logik för att indikera stopp.
     pauseTimer();
     location.reload(); 
 };
@@ -562,7 +541,7 @@ function renderStats() {
     showView("stats-view");
 }
 
-function changeMonth(off) { currentViewDate.setMonth(currentViewDate.getMonth() + off); renderCalendar(true); }
+function changeMonth(off) { currentViewDate.setMonth(currentViewDate.getMonth() + off); renderCalendar(); }
 function setOverride(date, val) { calendarOverrides[date] = val; saveAll(); closeModal(); renderCalendar(); }
 function prepareStart(date, id) { const p = programData.routine.find(x => x.id === id); closeModal(); startWorkout(p, null, date); }
 
@@ -571,6 +550,8 @@ function deleteLoggedWorkout(date, idx) {
         const filtered = workoutHistory.filter(w => w.date === date);
         const item = filtered[idx];
         workoutHistory = workoutHistory.filter(w => w !== item);
+        localStorage.removeItem("activeWorkoutDraft");
+        activeDraft = null; 
         saveAll(); closeModal(); renderCalendar();
     }
 }
@@ -579,11 +560,7 @@ function editLoggedWorkout(date, idx) {
     const filtered = workoutHistory.filter(w => w.date === date);
     const item = filtered[idx];
     const workoutObj = { name: item.programName, exercises: item.exercises.map(ex => ({ name: ex.name })) };
-    
-    // Punkt 1: Skicka med totalTime till startWorkout för att ladda klockan
     const dataObj = item.exercises.map(ex => ({ weight: ex.weight, reps: ex.reps, sets: ex.sets }));
-    dataObj.totalTime = item.totalTime;
-
     workoutHistory = workoutHistory.filter(w => w !== item);
     localStorage.removeItem("activeWorkoutDraft");
     activeDraft = null;
