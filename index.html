@@ -31,20 +31,23 @@
 
         <div id="calendar-view" class="view hidden">
             <h2 class="section-title modern-header">Träningsschema</h2>
-            <div class="calendar-nav">
-                <button onclick="changeMonth(-1)" class="nav-arrow">  ❮  </button>
-                <h2 id="month-label" onclick="openMonthPicker()" style="cursor:pointer;"></h2>
-                <button onclick="changeMonth(1)" class="nav-arrow">  ❯  </button>
-            </div>
-            <div class="card calendar-card glass-light">
-                <div class="calendar-weekdays">
-                    <div>Mån</div><div>Tis</div><div>Ons</div><div>Tor</div><div>Fre</div><div>Lör</div><div>Sön</div>
+            <!-- Behållaren som animeras vid månadsskifte -->
+            <div id="calendar-animate-area">
+                <div class="calendar-nav">
+                    <button onclick="changeMonth(-1)" class="nav-arrow">  ❮  </button>
+                    <h2 id="month-label" onclick="openMonthPicker()" style="cursor:pointer;"></h2>
+                    <button onclick="changeMonth(1)" class="nav-arrow">  ❯  </button>
                 </div>
-                <div class="calendar-grid" id="calendar-grid"></div>
-                <div class="legend">
-                    <div class="legend-item"><div class="legend-color planned"></div> Planerat</div>
-                    <div class="legend-item"><div class="legend-color ongoing"></div> Pågående</div>
-                    <div class="legend-item"><div class="legend-color completed"></div> Genomfört</div>
+                <div class="card calendar-card glass-light">
+                    <div class="calendar-weekdays">
+                        <div>Mån</div><div>Tis</div><div>Ons</div><div>Tor</div><div>Fre</div><div>Lör</div><div>Sön</div>
+                    </div>
+                    <div class="calendar-grid" id="calendar-grid"></div>
+                    <div class="legend">
+                        <div class="legend-item"><div class="legend-color planned"></div> Planerat</div>
+                        <div class="legend-item"><div class="legend-color ongoing"></div> Pågående</div>
+                        <div class="legend-item"><div class="legend-color completed"></div> Genomfört</div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -88,7 +91,6 @@
         <div id="workout-view" class="view hidden">
             <h2 id="active-title" class="section-title modern-header" style="margin-bottom:10px;"></h2>
             
-            <!-- Nytt Timer Gränssnitt -->
             <div class="card glass" style="margin-bottom: 20px; padding: 15px;">
                 <div id="workout-timer" class="timer-display">00:00:00</div>
                 <div style="display: flex; gap: 10px;">
@@ -106,6 +108,8 @@
 
     <div id="workout-modal" class="modal hidden">
         <div class="modal-content">
+            <!-- Nytt kryss i hörnet -->
+            <button class="close-x-btn" onclick="closeModal()">✕</button>
             <div id="modal-body"></div>
             <button class="mode-btn glass-border" onclick="closeModal()" style="margin-top: 20px;">Stäng</button>
         </div>
