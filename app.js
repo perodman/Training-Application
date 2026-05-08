@@ -6,6 +6,11 @@ let calendarOverrides = JSON.parse(localStorage.getItem("calendarOverrides") || 
 let currentViewDate = new Date();
 let currentExerciseCategory = "Ben";
 
+// Timer-variabler
+let timerInterval = null;
+let secondsElapsed = 0;
+let isTimerRunning = false;
+
 // --- INIT ---
 fetch("program.json")
 .then(r => r.json())
@@ -35,7 +40,13 @@ function saveAll() {
 function showView(id) {
     document.querySelectorAll(".view").forEach(v => v.classList.add("hidden"));
     const target = document.getElementById(id);
-    if(target) target.classList.remove("hidden");
+    if(target) {
+        target.classList.remove("hidden");
+        // Trigga animation genom att ta bort och lägga till klassen (om den redan finns)
+        target.style.animation = 'none';
+        target.offsetHeight; 
+        target.style.animation = null;
+    }
     window.scrollTo(0, 0);
 }
 
@@ -46,6 +57,40 @@ function closeModal() {
 function openModal() {
     document.getElementById("workout-modal").classList.remove("hidden");
 }
+
+// --- TIMER LOGIK ---
+function updateTimerDisplay() {
+    const hrs = String(Math.floor(secondsElapsed / 3600)).padStart(2, '0');
+    const mins = String(Math.floor((secondsElapsed % 3600) / 60)).padStart(2, '0');
+    const secs = String(secondsElapsed % 60).padStart(2, '0');
+    document.getElementById("workout-timer").textContent = `${hrs}:${mins}:${secs}`;
+}
+
+function startTimer() {
+    if (isTimerRunning) return;
+    isTimerRunning = true;
+    document.getElementById("timer-toggle-btn").textContent = "Pausa ⏸️";
+    timerInterval = setInterval(() => {
+        secondsElapsed++;
+        updateTimerDisplay();
+        // Spara tid i draften löpande
+        if(activeDraft) {
+            activeDraft.secondsElapsed = secondsElapsed;
+            localStorage.setItem("activeWorkoutDraft", JSON.stringify(activeDraft));
+        }
+    }, 1000);
+}
+
+function pauseTimer() {
+    isTimerRunning = false;
+    clearInterval(timerInterval);
+    document.getElementById("timer-toggle-btn").textContent = "Fortsätt ▶️";
+}
+
+document.getElementById("timer-toggle-btn").onclick = () => {
+    if (isTimerRunning) pauseTimer();
+    else startTimer();
+};
 
 // --- ÖVNINGAR & INSTÄLLNINGAR ---
 function openCreateExerciseModal(callback = null) {
@@ -182,9 +227,11 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
     
     if (completed.length > 0) {
         completed.forEach((w, idx) => {
+            const timeStr = w.totalTime ? `⏱️ ${w.totalTime}` : "";
             html += `<div class="card glass" style="border-left:4px solid var(--success); text-align:left; margin-bottom:10px;">
                 <div style="display:flex; justify-content:space-between; align-items:center;">
                     <strong>${w.programName}</strong>
+                    <div style="font-size:10px; color:var(--text-light)">${timeStr}</div>
                     <div>
                         <button onclick="editLoggedWorkout('${dateStr}', ${idx})" style="background:none; border:none; color:var(--primary); cursor:pointer; font-size:16px; margin-right:10px;"> ✏️ </button>
                         <button onclick="deleteLoggedWorkout('${dateStr}', ${idx})" style="background:none; border:none; color:var(--danger); cursor:pointer; font-size:16px;"> ✖ </button>
@@ -360,8 +407,19 @@ function saveNewProgram() {
 
 // --- AKTIVT PASS ---
 function startWorkout(workout, data = null, date = null) {
-    activeDraft = { workout, data: data || workout.exercises.map(()=>({weight:"", reps:"", sets:3})), date: date || new Date().toISOString().split('T')[0] };
+    // Om det finns en draft med sparad tid, ladda den
+    secondsElapsed = (activeDraft && activeDraft.secondsElapsed) ? activeDraft.secondsElapsed : 0;
+    
+    activeDraft = { 
+        workout, 
+        data: data || workout.exercises.map(()=>({weight:"", reps:"", sets:3})), 
+        date: date || new Date().toISOString().split('T')[0],
+        secondsElapsed: secondsElapsed
+    };
+    
     renderActiveWorkout();
+    updateTimerDisplay();
+    startTimer();
 }
 
 function renderActiveWorkout() {
@@ -420,7 +478,10 @@ function removeActiveExercise(i) {
 }
 
 // --- STANDARD-LOGIK ---
-document.getElementById("global-home").onclick = () => location.reload();
+document.getElementById("global-home").onclick = () => {
+    pauseTimer(); // Stoppa intervallet om vi går hem
+    location.reload();
+}
 document.getElementById("start-new-btn").onclick = renderCalendar;
 document.getElementById("calendar-mode").onclick = renderCalendar;
 document.getElementById("view-exercises-btn").onclick = () => { showView("exercises-view"); filterExercises(currentExerciseCategory); };
@@ -438,9 +499,13 @@ function renderHome() {
 }
 
 document.getElementById("save-workout-btn").onclick = () => {
+    pauseTimer();
+    const finalTime = document.getElementById("workout-timer").textContent;
+    
     const log = {
         date: activeDraft.date,
         programName: activeDraft.workout.name,
+        totalTime: finalTime,
         exercises: activeDraft.workout.exercises.map((ex, i) => ({
             name: ex.name,
             weight: document.getElementById(`w-${i}`).value || "0",
@@ -452,10 +517,14 @@ document.getElementById("save-workout-btn").onclick = () => {
     saveAll();
     localStorage.removeItem("activeWorkoutDraft");
     activeDraft = null; 
+    secondsElapsed = 0;
     renderCalendar();
 };
 
-document.getElementById("pause-workout-btn").onclick = () => { location.reload(); };
+document.getElementById("pause-workout-btn").onclick = () => { 
+    pauseTimer();
+    location.reload(); 
+};
 
 function renderStats() {
     const container = document.getElementById("chart-container");
