@@ -440,6 +440,7 @@ document.getElementById("save-workout-btn").onclick = () => {
     workoutHistory.push(log);
     saveAll();
     localStorage.removeItem("activeWorkoutDraft");
+    activeDraft = null; // Fix: Nollställ variabeln direkt
     renderCalendar();
 };
 
@@ -469,6 +470,11 @@ function deleteLoggedWorkout(date, idx) {
         const filtered = workoutHistory.filter(w => w.date === date);
         const item = filtered[idx];
         workoutHistory = workoutHistory.filter(w => w !== item);
+        
+        // Fix: Om vi raderar något, se till att rensa eventuellt utkast så det inte visas som orange
+        localStorage.removeItem("activeWorkoutDraft");
+        activeDraft = null; 
+        
         saveAll(); closeModal(); renderCalendar();
     }
 }
@@ -479,6 +485,11 @@ function editLoggedWorkout(date, idx) {
     const workoutObj = { name: item.programName, exercises: item.exercises.map(ex => ({ name: ex.name })) };
     const dataObj = item.exercises.map(ex => ({ weight: ex.weight, reps: ex.reps, sets: ex.sets }));
     workoutHistory = workoutHistory.filter(w => w !== item);
+    
+    // Fix: Nollställ gammalt utkast innan vi startar redigeringen som ett nytt utkast
+    localStorage.removeItem("activeWorkoutDraft");
+    activeDraft = null;
+    
     closeModal();
     startWorkout(workoutObj, dataObj, date);
 }
