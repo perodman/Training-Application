@@ -30,7 +30,7 @@
         </div>
 
         <div id="calendar-view" class="view hidden">
-            <h2 class="section-title">Träningsschema</h2>
+            <h2 class="section-title modern-header">Träningsschema</h2>
             <div class="calendar-nav">
                 <button onclick="changeMonth(-1)" class="nav-arrow">  ❮  </button>
                 <h2 id="month-label" onclick="openMonthPicker()" style="cursor:pointer; text-decoration: underline; text-decoration-color: var(--primary);"></h2>
@@ -50,7 +50,7 @@
         </div>
 
         <div id="exercises-view" class="view hidden">
-            <h2 class="section-title">Muskelgrupper</h2>
+            <h2 class="section-title modern-header">Muskelgrupper</h2>
             <div id="category-menu" class="category-grid">
                 <button class="cat-btn glass" data-cat="Ben" onclick="filterExercises('Ben')"><span class="cat-icon"> 🦵 </span> Ben</button>
                 <button class="cat-btn glass" data-cat="Bröst" onclick="filterExercises('Bröst')"><span class="cat-icon"> 🏋️ </span> Bröst</button>
@@ -61,14 +61,14 @@
             </div>
             <div class="separator" style="margin: 30px 0;"></div>
             <div style="display: flex; align-items: center; justify-content: center; position: relative; margin-bottom: 20px;">
-                <h2 class="section-title" style="margin:0;">Övningar</h2>
+                <h2 class="section-title modern-header" style="margin:0;">Övningar</h2>
                 <button class="add-inline-btn" onclick="openCreateExerciseModal()">+</button>
             </div>
             <div id="exercise-results" class="exercise-bank-list"></div>
         </div>
 
         <div id="programs-view" class="view hidden">
-            <h2 class="section-title">Träningsprogram</h2>
+            <h2 class="section-title modern-header">Träningsprogram</h2>
             <div id="pass-selector-list" class="program-modern-grid"></div>
             <div id="program-details-area" class="hidden">
                 <div class="separator" style="margin: 30px 0;"></div>
@@ -78,7 +78,7 @@
         </div>
 
         <div id="stats-view" class="view hidden">
-            <h2 class="section-title">Statistik</h2>
+            <h2 class="section-title modern-header">Statistik</h2>
             <div class="card glass">
                 <h3 style="text-align:center; margin-bottom:20px;">Pass per månad</h3>
                 <div id="chart-container" class="chart-wrapper"></div>
@@ -86,7 +86,7 @@
         </div>
 
         <div id="workout-view" class="view hidden">
-            <h2 id="active-title" style="text-align:center; margin-bottom:20px;"></h2>
+            <h2 id="active-title" class="section-title modern-header" style="margin-bottom:20px;"></h2>
             <div id="exercise-list"></div>
             <div class="workout-footer">
                 <button id="pause-workout-btn" class="mode-btn glass-border">Spara utkast</button>
