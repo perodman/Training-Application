@@ -48,7 +48,7 @@ function openModal() {
 }
 
 // --- ÖVNINGAR & INSTÄLLNINGAR ---
-function openCreateExerciseModal() {
+function openCreateExerciseModal(callback = null) {
     const body = document.getElementById("modal-body");
     body.innerHTML = `
         <h3>Skapa Ny Övning</h3>
@@ -64,17 +64,36 @@ function openCreateExerciseModal() {
             <option value="Triceps">Triceps</option>
             <option value="Bål">Bål</option>
         </select>
-        <button class="mode-btn blue" onclick="saveNewExercise()">Spara Övning</button>
+        <button class="mode-btn blue" id="save-new-ex-btn">Spara Övning</button>
     `;
+    
+    document.getElementById("save-new-ex-btn").onclick = () => {
+        const name = document.getElementById("new-ex-name").value.trim();
+        const target = document.getElementById("new-ex-cat").value;
+        if(!name) return alert("Ange ett namn!");
+        const newEx = { id: Date.now(), name, target, defaultSets: 3 };
+        masterExercises.push(newEx);
+        saveAll();
+        if(callback) callback(newEx);
+        else { closeModal(); filterExercises(currentExerciseCategory); }
+    };
     openModal();
 }
 
-function saveNewExercise() {
-    const name = document.getElementById("new-ex-name").value.trim();
-    const target = document.getElementById("new-ex-cat").value;
-    if(!name) return alert("Ange ett namn!");
-    masterExercises.push({ id: Date.now(), name, target, defaultSets: 3 });
-    saveAll(); closeModal(); filterExercises(currentExerciseCategory);
+function filterExercises(category) {
+    currentExerciseCategory = category;
+    document.querySelectorAll(".cat-btn").forEach(b => b.classList.toggle("active", b.dataset.cat === category));
+    const results = document.getElementById("exercise-results");
+    results.innerHTML = "";
+    const filtered = masterExercises.filter(ex => category === "Armar" ? (ex.target === "Biceps" || ex.target === "Triceps") : ex.target === category);
+    filtered.forEach(ex => {
+        const div = document.createElement("div");
+        div.className = "card glass";
+        div.style.cssText = "padding:15px; display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;";
+        div.innerHTML = `<div><strong style="font-size:16px;">${ex.name}</strong><br><small style="color:var(--primary); font-weight:800; text-transform:uppercase; font-size:10px;">${ex.target}</small></div>
+        <button style="background:none; border:none; font-size:18px; cursor:pointer;" onclick="openEditExerciseModal(${ex.id})">  ⚙️  </button>`;
+        results.appendChild(div);
+    });
 }
 
 function openEditExerciseModal(id) {
@@ -117,23 +136,7 @@ function deleteMasterExercise(id) {
     }
 }
 
-function filterExercises(category) {
-    currentExerciseCategory = category;
-    document.querySelectorAll(".cat-btn").forEach(b => b.classList.toggle("active", b.dataset.cat === category));
-    const results = document.getElementById("exercise-results");
-    results.innerHTML = "";
-    const filtered = masterExercises.filter(ex => category === "Armar" ? (ex.target === "Biceps" || ex.target === "Triceps") : ex.target === category);
-    filtered.forEach(ex => {
-        const div = document.createElement("div");
-        div.className = "card glass";
-        div.style.cssText = "padding:15px; display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;";
-        div.innerHTML = `<div><strong style="font-size:16px;">${ex.name}</strong><br><small style="color:var(--primary); font-weight:800; text-transform:uppercase; font-size:10px;">${ex.target}</small></div>
-        <button style="background:none; border:none; font-size:18px; cursor:pointer;" onclick="openEditExerciseModal(${ex.id})">  ⚙️  </button>`;
-        results.appendChild(div);
-    });
-}
-
-// --- KALENDER (Popup Fixad) ---
+// --- KALENDER ---
 function renderCalendar() {
     const grid = document.getElementById("calendar-grid");
     const label = document.getElementById("month-label");
@@ -166,7 +169,7 @@ function renderCalendar() {
         else if (isOngoing) { cell.classList.add("cell-ongoing"); info = "⏱️"; }
         else if (displayPass) { cell.classList.add("cell-planned"); info = displayPass.name.split(" ").pop(); }
         
-        cell.innerHTML = `<span>${d}</span><span style="font-size:10px; font-weight:900;">${info}</span>`;
+        cell.innerHTML = `<span>${d}</span><span>${info}</span>`;
         cell.onclick = () => openDayManager(dateStr, displayPass, hasWorkouts, isOngoing);
         grid.appendChild(cell);
     }
@@ -200,7 +203,7 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
         html += `<button class="mode-btn orange" onclick="closeModal(); startWorkout(activeDraft.workout, activeDraft.data, activeDraft.date)">Fortsätt pågående pass</button>`;
     } else {
         html += `<p style="text-align:center;">Planerat: <strong>${planned ? planned.name : 'Vila'}</strong></p>`;
-        if(planned) html += `<button class="mode-btn green" onclick="prepareStart('${dateStr}', '${planned.id}')">Starta passet   🔥  </button>`;
+        if(planned) html += `<button class="mode-btn green" onclick="prepareStart('${dateStr}', '${planned.id}')">Starta passet    🔥    </button>`;
         html += `<div class="separator"></div><p style="font-size:11px; text-transform:uppercase; color:var(--text-light); text-align:center;">Ändra planering:</p>`;
         programData.routine.forEach(p => {
             const isPlanned = planned && p.id === planned.id;
@@ -263,6 +266,7 @@ function openEditProgramModal(idx) {
         <h3>Redigera ${pass.name}</h3>
         <label style="font-size:12px; color:var(--text-light); text-align:left; display:block; margin-left:10px;">NAMN PÅ PASS</label>
         <input type="text" id="edit-pass-name" class="log-input" value="${pass.name}">
+        
         <div id="edit-pass-exercises">
             ${pass.exercises.map((ex, i) => `
                 <div class="edit-item-row">
@@ -274,9 +278,34 @@ function openEditProgramModal(idx) {
                     <button onclick="removeExFromPass(${idx}, ${i})" style="color:var(--danger); background:none; border:none; font-size:18px;"> ✖ </button>
                 </div>`).join("")}
         </div>
-        <button class="mode-btn blue" style="margin-top:20px;" onclick="saveProgramEdit(${idx})">Spara ändringar</button>
+
+        <div class="separator" style="margin: 20px 0;"></div>
+        <p style="font-size:11px; text-transform:uppercase; color:var(--text-light); text-align:center;">Lägg till övning:</p>
+        <select id="add-ex-select" class="log-input">
+            <option value="">Välj från banken...</option>
+            ${masterExercises.map(ex => `<option value="${ex.id}">${ex.name} (${ex.target})</option>`).join("")}
+        </select>
+        <button class="mode-btn glass-border" style="font-size:13px; padding:10px;" onclick="addExerciseToPass(${idx})">+ Lägg till vald</button>
+        <button class="mode-btn glass-border" style="font-size:13px; padding:10px;" onclick="createNewExForPass(${idx})">+ Skapa ny övning till banken</button>
+
+        <button class="mode-btn blue" style="margin-top:20px;" onclick="saveProgramEdit(${idx})">Spara alla ändringar</button>
     `;
     openModal();
+}
+
+function addExerciseToPass(pIdx) {
+    const exId = document.getElementById("add-ex-select").value;
+    if(!exId) return;
+    const ex = masterExercises.find(e => e.id == exId);
+    programData.routine[pIdx].exercises.push({ name: ex.name, target: ex.target, defaultSets: 3 });
+    openEditProgramModal(pIdx);
+}
+
+function createNewExForPass(pIdx) {
+    openCreateExerciseModal((newEx) => {
+        programData.routine[pIdx].exercises.push({ name: newEx.name, target: newEx.target, defaultSets: 3 });
+        openEditProgramModal(pIdx);
+    });
 }
 
 function moveExercise(pIdx, eIdx, dir) {
@@ -295,6 +324,27 @@ function removeExFromPass(pIdx, eIdx) {
 function saveProgramEdit(idx) {
     programData.routine[idx].name = document.getElementById("edit-pass-name").value;
     saveAll(); closeModal(); renderProgramView(idx); showProgramDetails(idx);
+}
+
+function openCreateProgramModal() {
+    const body = document.getElementById("modal-body");
+    body.innerHTML = `
+        <h3>Skapa Nytt Pass</h3>
+        <label style="font-size:12px; color:var(--text-light); text-align:left; display:block; margin-left:10px;">NAMN PÅ PASS</label>
+        <input type="text" id="new-pass-name" class="log-input" placeholder="T.ex. Överkropp Deluxe">
+        <button class="mode-btn blue" onclick="saveNewProgram()">Spara och Redigera</button>
+    `;
+    openModal();
+}
+
+function saveNewProgram() {
+    const name = document.getElementById("new-pass-name").value.trim();
+    if(!name) return alert("Ange ett namn!");
+    const newPass = { id: "pass-" + Date.now(), name, exercises: [] };
+    programData.routine.push(newPass);
+    saveAll();
+    const newIdx = programData.routine.length - 1;
+    openEditProgramModal(newIdx);
 }
 
 // --- AKTIVT PASS ---
@@ -365,6 +415,7 @@ document.getElementById("calendar-mode").onclick = renderCalendar;
 document.getElementById("view-exercises-btn").onclick = () => { showView("exercises-view"); filterExercises(currentExerciseCategory); };
 document.getElementById("view-programs-btn").onclick = () => renderProgramView();
 document.getElementById("stats-mode").onclick = renderStats;
+document.getElementById("add-custom-pass-btn").onclick = openCreateProgramModal;
 
 function renderHome() {
     showView("home-view");
@@ -412,6 +463,7 @@ function renderStats() {
 function changeMonth(off) { currentViewDate.setMonth(currentViewDate.getMonth() + off); renderCalendar(); }
 function setOverride(date, val) { calendarOverrides[date] = val; saveAll(); closeModal(); renderCalendar(); }
 function prepareStart(date, id) { const p = programData.routine.find(x => x.id === id); closeModal(); startWorkout(p, null, date); }
+
 function deleteLoggedWorkout(date, idx) {
     if(confirm("Radera passet?")) {
         const filtered = workoutHistory.filter(w => w.date === date);
@@ -420,6 +472,7 @@ function deleteLoggedWorkout(date, idx) {
         saveAll(); closeModal(); renderCalendar();
     }
 }
+
 function editLoggedWorkout(date, idx) {
     const filtered = workoutHistory.filter(w => w.date === date);
     const item = filtered[idx];
