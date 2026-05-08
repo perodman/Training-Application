@@ -33,7 +33,7 @@
             <h2 class="section-title modern-header">Träningsschema</h2>
             <div class="calendar-nav">
                 <button onclick="changeMonth(-1)" class="nav-arrow">  ❮  </button>
-                <h2 id="month-label" onclick="openMonthPicker()" style="cursor:pointer; text-decoration: underline; text-decoration-color: var(--primary);"></h2>
+                <h2 id="month-label" onclick="openMonthPicker()" style="cursor:pointer;"></h2>
                 <button onclick="changeMonth(1)" class="nav-arrow">  ❯  </button>
             </div>
             <div class="card calendar-card glass-light">
@@ -86,7 +86,16 @@
         </div>
 
         <div id="workout-view" class="view hidden">
-            <h2 id="active-title" class="section-title modern-header" style="margin-bottom:20px;"></h2>
+            <h2 id="active-title" class="section-title modern-header" style="margin-bottom:10px;"></h2>
+            
+            <!-- Nytt Timer Gränssnitt -->
+            <div class="card glass" style="margin-bottom: 20px; padding: 15px;">
+                <div id="workout-timer" class="timer-display">00:00:00</div>
+                <div style="display: flex; gap: 10px;">
+                    <button id="timer-toggle-btn" class="mode-btn glass-border" style="margin-bottom:0; padding:10px;">Pausa ⏸️</button>
+                </div>
+            </div>
+
             <div id="exercise-list"></div>
             <div class="workout-footer">
                 <button id="pause-workout-btn" class="mode-btn glass-border">Spara utkast</button>
