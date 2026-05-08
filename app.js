@@ -203,7 +203,7 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
         html += `<button class="mode-btn orange" onclick="closeModal(); startWorkout(activeDraft.workout, activeDraft.data, activeDraft.date)">Fortsätt pågående pass</button>`;
     } else {
         html += `<p style="text-align:center;">Planerat: <strong>${planned ? planned.name : 'Vila'}</strong></p>`;
-        if(planned) html += `<button class="mode-btn green" onclick="prepareStart('${dateStr}', '${planned.id}')">Starta passet    🔥    </button>`;
+        if(planned) html += `<button class="mode-btn green" onclick="prepareStart('${dateStr}', '${planned.id}')">Starta passet     🔥    </button>`;
         html += `<div class="separator"></div><p style="font-size:11px; text-transform:uppercase; color:var(--text-light); text-align:center;">Ändra planering:</p>`;
         programData.routine.forEach(p => {
             const isPlanned = planned && p.id === planned.id;
@@ -289,8 +289,19 @@ function openEditProgramModal(idx) {
         <button class="mode-btn glass-border" style="font-size:13px; padding:10px;" onclick="createNewExForPass(${idx})">+ Skapa ny övning till banken</button>
 
         <button class="mode-btn blue" style="margin-top:20px;" onclick="saveProgramEdit(${idx})">Spara alla ändringar</button>
+        <button class="mode-btn" style="color:var(--danger); background:none; font-size:14px; margin-top:10px;" onclick="deleteEntireProgram(${idx})">Radera pass permanent</button>
     `;
     openModal();
+}
+
+function deleteEntireProgram(idx) {
+    if(confirm("Vill du radera hela detta pass permanent?")) {
+        programData.routine.splice(idx, 1);
+        saveAll();
+        closeModal();
+        document.getElementById("program-details-area").classList.add("hidden");
+        renderProgramView();
+    }
 }
 
 function addExerciseToPass(pIdx) {
@@ -440,7 +451,7 @@ document.getElementById("save-workout-btn").onclick = () => {
     workoutHistory.push(log);
     saveAll();
     localStorage.removeItem("activeWorkoutDraft");
-    activeDraft = null; // Fix: Nollställ variabeln direkt
+    activeDraft = null; 
     renderCalendar();
 };
 
@@ -470,11 +481,8 @@ function deleteLoggedWorkout(date, idx) {
         const filtered = workoutHistory.filter(w => w.date === date);
         const item = filtered[idx];
         workoutHistory = workoutHistory.filter(w => w !== item);
-        
-        // Fix: Om vi raderar något, se till att rensa eventuellt utkast så det inte visas som orange
         localStorage.removeItem("activeWorkoutDraft");
         activeDraft = null; 
-        
         saveAll(); closeModal(); renderCalendar();
     }
 }
@@ -485,11 +493,8 @@ function editLoggedWorkout(date, idx) {
     const workoutObj = { name: item.programName, exercises: item.exercises.map(ex => ({ name: ex.name })) };
     const dataObj = item.exercises.map(ex => ({ weight: ex.weight, reps: ex.reps, sets: ex.sets }));
     workoutHistory = workoutHistory.filter(w => w !== item);
-    
-    // Fix: Nollställ gammalt utkast innan vi startar redigeringen som ett nytt utkast
     localStorage.removeItem("activeWorkoutDraft");
     activeDraft = null;
-    
     closeModal();
     startWorkout(workoutObj, dataObj, date);
 }
