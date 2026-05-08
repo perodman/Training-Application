@@ -80,7 +80,7 @@
         <div id="stats-view" class="view hidden">
             <h2 class="section-title">Statistik</h2>
             <div class="card glass">
-                <h3 style="text-align:center; margin-bottom:20px; font-weight: 700;">Pass per månad</h3>
+                <h3 style="text-align:center; margin-bottom:20px;">Pass per månad</h3>
                 <div id="chart-container" class="chart-wrapper"></div>
             </div>
         </div>
@@ -95,10 +95,8 @@
         </div>
     </div>
 
-    <!-- MODAL MED KRYSS OCH STÄNG-LOGIK -->
-    <div id="workout-modal" class="modal hidden" onclick="if(event.target === this) closeModal()">
-        <div class="modal-content" onclick="event.stopPropagation()">
-            <button class="close-modal-x" onclick="closeModal()">×</button>
+    <div id="workout-modal" class="modal hidden">
+        <div class="modal-content">
             <div id="modal-body"></div>
             <button class="mode-btn glass-border" onclick="closeModal()" style="margin-top: 20px;">Stäng</button>
         </div>
