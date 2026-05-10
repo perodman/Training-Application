@@ -12,6 +12,7 @@
         <div id="global-home" class="circle-ctrl">🏠</div>
     </div>
     <div class="app-container">
+        <!-- Hem-vy -->
         <div id="home-view" class="view">
             <div class="hero-section">
                 <h1 class="main-title">LIFT</h1>
@@ -29,41 +30,29 @@
             </div>
         </div>
 
-        <!-- Kalender-vy -->
+        <!-- Kalender/Schema-vy -->
         <div id="calendar-view" class="view hidden">
-            <h2 class="section-title modern-header">Träningsschema</h2>
+            <h2 class="section-title">Träningsschema</h2>
             <div class="calendar-nav">
                 <button onclick="changeMonth(-1)" class="nav-arrow">❮</button>
                 <h2 id="month-label"></h2>
                 <button onclick="changeMonth(1)" class="nav-arrow">❯</button>
             </div>
-            <div class="card calendar-card glass-light">
+            <div class="card glass">
                 <div class="calendar-weekdays">
                     <div>Mån</div><div>Tis</div><div>Ons</div><div>Tor</div><div>Fre</div><div>Lör</div><div>Sön</div>
                 </div>
                 <div class="calendar-grid" id="calendar-grid"></div>
-                <div class="legend">
-                    <div class="legend-item"><div class="legend-color planned"></div> Planerat</div>
-                    <div class="legend-item"><div class="legend-color ongoing"></div> Pågående</div>
-                    <div class="legend-item"><div class="legend-color completed"></div> Klart</div>
-                </div>
+            </div>
+            <div class="legend" style="margin-top: 15px;">
+                <div class="legend-item"><div class="legend-color completed"></div> Klart</div>
+                <div class="legend-item"><div class="legend-color ongoing"></div> Pågående</div>
             </div>
         </div>
 
-        <!-- Program-vy -->
-        <div id="programs-view" class="view hidden">
-            <h2 class="section-title modern-header">Träningsprogram</h2>
-            <div id="pass-selector-list" class="program-modern-grid"></div>
-            <div id="program-details-area" class="hidden">
-                <div class="separator"></div>
-                <div id="program-exercise-list" class="card glass-modern"></div>
-            </div>
-            <button id="add-custom-pass-btn" class="mode-btn glass-border" style="margin-top:20px;">+ Skapa Nytt Pass</button>
-        </div>
-
-        <!-- Övnings-vy -->
+        <!-- Övnings-vy (Återställd design) -->
         <div id="exercises-view" class="view hidden">
-            <h2 class="section-title modern-header">Muskelgrupper</h2>
+            <h2 class="section-title">Muskelgrupper</h2>
             <div id="category-menu" class="category-grid">
                 <button class="cat-btn glass" data-cat="Ben" onclick="filterExercises('Ben')"><span class="cat-icon">🦵</span> Ben</button>
                 <button class="cat-btn glass" data-cat="Bröst" onclick="filterExercises('Bröst')"><span class="cat-icon">🏋️</span> Bröst</button>
@@ -73,21 +62,25 @@
                 <button class="cat-btn glass" data-cat="Bål" onclick="filterExercises('Bål')"><span class="cat-icon">🧘</span> Bål</button>
             </div>
             <div class="separator"></div>
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
-                <h2 class="section-title modern-header" style="margin:0; text-align:left;">Övningar</h2>
-                <button class="add-inline-btn" onclick="openCreateExerciseModal()">+</button>
+            <div id="exercise-results"></div>
+        </div>
+
+        <!-- Program-vy -->
+        <div id="programs-view" class="view hidden">
+            <h2 class="section-title">Träningsprogram</h2>
+            <div id="pass-selector-list" class="program-modern-grid"></div>
+            <div id="program-details-area" class="hidden">
+                <div class="separator"></div>
+                <div id="program-exercise-list" class="card glass"></div>
             </div>
-            <div id="exercise-results" class="exercise-bank-list"></div>
         </div>
 
         <!-- Aktivt Pass-vy -->
         <div id="workout-view" class="view hidden">
-            <h2 id="active-title" class="section-title modern-header"></h2>
-            <div class="card glass" style="margin-bottom: 20px; padding: 15px;">
+            <h2 id="active-title" class="section-title"></h2>
+            <div class="card glass" style="margin-bottom: 20px; text-align: center;">
                 <div id="workout-timer" class="timer-display">00:00:00</div>
-                <div style="display: flex; gap: 10px;">
-                    <button id="timer-toggle-btn" class="mode-btn glass-border" style="margin:0; padding:10px;">Pausa ⏸️</button>
-                </div>
+                <button id="timer-toggle-btn" class="mode-btn glass-border" style="width: auto; display: inline-flex; padding: 10px 20px;">Pausa ⏸️</button>
             </div>
             <div id="exercise-list"></div>
             <div class="workout-footer">
@@ -95,18 +88,8 @@
                 <button id="save-workout-btn" class="mode-btn green">Avsluta pass</button>
             </div>
         </div>
-
-        <!-- Statistik-vy -->
-        <div id="stats-view" class="view hidden">
-            <h2 class="section-title modern-header">Statistik</h2>
-            <div class="card glass">
-                <h3 style="text-align:center; margin-bottom:20px;">Aktivitet</h3>
-                <div id="chart-container" class="chart-wrapper"></div>
-            </div>
-        </div>
     </div>
 
-    <!-- Modal -->
     <div id="workout-modal" class="modal hidden">
         <div class="modal-content">
             <div id="modal-body"></div>
