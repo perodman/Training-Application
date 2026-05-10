@@ -130,3 +130,21 @@ select.log-input { font-size: 16px !important; text-align-last: center; appearan
     user-select: none;
 }
 .drag-handle:active { cursor: grabbing; }
+
+/* Det kortet som blir kvar under de andra medan du drar */
+.sortable-ghost {
+    opacity: 0.3;
+    background: var(--primary) !important;
+}
+
+/* Det kortet du faktiskt håller i (medan det rör sig) */
+.sortable-chosen {
+    border: 2px solid var(--primary);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.4);
+    transform: scale(1.02);
+}
+
+/* Förstärk känslan av att kortet lyfts */
+.sortable-drag {
+    cursor: grabbing;
+}
