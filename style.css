@@ -124,3 +124,20 @@ select.log-input { font-size: 16px !important; text-align-last: center; appearan
 .reorder-btn:active { background: var(--primary); color: #000; }
 .chart-wrapper { display: flex; align-items: flex-end; gap: 10px; height: 150px; padding-top: 20px; }
 .chart-bar { flex: 1; background: var(--primary); border-radius: 6px 6px 0 0; position: relative; }
+
+/* Ny styling för avklarad övning */
+.exercise-done {
+    border-color: var(--success) !important;
+    background: rgba(16, 185, 129, 0.1) !important;
+    opacity: 0.8;
+}
+
+.exercise-done strong {
+    text-decoration: line-through;
+    color: var(--success);
+}
+
+.exercise-done input {
+    pointer-events: none;
+    opacity: 0.5;
+}
