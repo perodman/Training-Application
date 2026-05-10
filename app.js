@@ -37,7 +37,8 @@ function saveAll() {
     localStorage.setItem("calendarOverrides", JSON.stringify(calendarOverrides));
 }
 
-function showView(id) {
+// Uppdaterad showView för att hantera scroll-läge
+function showView(id, skipScroll = false) {
     const target = document.getElementById(id);
     if(!target) return;
     
@@ -48,7 +49,7 @@ function showView(id) {
         target.offsetHeight; 
         target.style.animation = null;
     }
-    window.scrollTo(0, 0);
+    if(!skipScroll) window.scrollTo(0, 0);
 }
 
 function closeModal() {
@@ -242,7 +243,6 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
             w.exercises.forEach(ex => {
                 html += `<div style="font-size:12px; margin-bottom:5px; border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:3px;">
                     <span style="color:var(--text-light)">${ex.name}:</span><br>`;
-                // Hantera både gammalt format och nytt set-format för visning
                 if(ex.sets_data) {
                     ex.sets_data.forEach((s, sIdx) => {
                         html += `<span style="color:var(--primary); font-weight:700;">Set ${sIdx+1}: ${s.weight}kg x ${s.reps}</span><br>`;
@@ -431,16 +431,13 @@ function saveNewProgram() {
 
 // --- LOGIK FÖR HISTORIK ---
 function getExerciseHistory(exerciseName) {
-    // Sök baklänges i historiken för att hitta senaste körda set för just denna övning
     for (let i = workoutHistory.length - 1; i >= 0; i--) {
         const workout = workoutHistory[i];
         const exMatch = workout.exercises.find(e => e.name === exerciseName);
         if (exMatch) {
-            // Om det är gammalt format (en rad för alla set)
             if (!exMatch.sets_data) {
                 return Array(parseInt(exMatch.sets || 3)).fill({ weight: exMatch.weight, reps: exMatch.reps });
             }
-            // Om det är nya formatet
             return exMatch.sets_data;
         }
     }
@@ -451,15 +448,13 @@ function getExerciseHistory(exerciseName) {
 function startWorkout(workout, data = null, date = null, isImmediateStart = false) {
     secondsElapsed = (activeDraft && activeDraft.secondsElapsed) ? activeDraft.secondsElapsed : 0;
     
-    // Om inget data skickas med (nytt pass), skapa initial data-struktur baserat på historik
     if(!data) {
         data = workout.exercises.map(ex => {
             const history = getExerciseHistory(ex.name);
             if (history) {
-                return { sets_data: JSON.parse(JSON.stringify(history)) };
+                return { completed: false, sets_data: JSON.parse(JSON.stringify(history)) };
             }
-            // Default om ingen historik finns
-            return { sets_data: [{ weight: "", reps: "" }, { weight: "", reps: "" }, { weight: "", reps: "" }] };
+            return { completed: false, sets_data: [{ weight: "", reps: "" }, { weight: "", reps: "" }, { weight: "", reps: "" }] };
         });
     }
 
@@ -477,7 +472,7 @@ function startWorkout(workout, data = null, date = null, isImmediateStart = fals
     else pauseTimer();
 }
 
-function renderActiveWorkout() {
+function renderActiveWorkout(skipScroll = false) {
     document.getElementById("active-title").textContent = activeDraft.workout.name;
     const list = document.getElementById("exercise-list");
     list.innerHTML = "";
@@ -490,14 +485,15 @@ function renderActiveWorkout() {
             <p style="color:var(--text-light); font-size:13px; text-align:center; margin-top:10px;">Klicka på knappen ovan för att starta klockan.</p>
         `;
         document.getElementById("workout-timer").textContent = "00:00:00";
-        showView("workout-view");
+        showView("workout-view", skipScroll);
         return;
     }
 
     activeDraft.workout.exercises.forEach((ex, i) => {
         const exerciseData = activeDraft.data[i];
+        const isDone = exerciseData.completed;
         const div = document.createElement("div");
-        div.className = "card glass";
+        div.className = `card glass ${isDone ? 'exercise-done-card' : ''}`;
         
         let setsHtml = `<div style="margin-top:10px;">
             <div style="display:grid; grid-template-columns: 35px 1fr 1fr 30px; gap:8px; margin-bottom:5px; align-items:center;">
@@ -527,8 +523,11 @@ function renderActiveWorkout() {
                 <button class="reorder-btn" onclick="moveActiveExercise(${i}, -1)">▲</button>
                 <button class="reorder-btn" onclick="moveActiveExercise(${i}, 1)">▼</button>
             </div>
-            <strong style="font-size:16px;">${ex.name}</strong>
-            <button onclick="removeActiveExercise(${i})" style="color:var(--danger); background:none; border:none; font-size:20px;"> ✖ </button>
+            <strong style="font-size:16px; flex-grow:1; text-align:center; ${isDone ? 'text-decoration:line-through; opacity:0.6;' : ''}">${ex.name}</strong>
+            <div style="display:flex; gap:8px; align-items:center;">
+                <button onclick="toggleExerciseDone(${i})" style="background:${isDone ? 'var(--success)' : 'rgba(255,255,255,0.1)'}; border:none; color:${isDone ? '#000' : '#fff'}; width:30px; height:30px; border-radius:8px; cursor:pointer; font-size:14px; font-weight:bold;">${isDone ? '✓' : 'Klar'}</button>
+                <button onclick="removeActiveExercise(${i})" style="color:var(--danger); background:none; border:none; font-size:20px;"> ✖ </button>
+            </div>
         </div>
         ${setsHtml}`;
         
@@ -542,7 +541,14 @@ function renderActiveWorkout() {
     addBtn.onclick = openAddExerciseToWorkoutModal;
     list.appendChild(addBtn);
 
-    showView("workout-view");
+    showView("workout-view", skipScroll);
+}
+
+// Funktion för att markera övning som klar
+function toggleExerciseDone(i) {
+    activeDraft.data[i].completed = !activeDraft.data[i].completed;
+    localStorage.setItem("activeWorkoutDraft", JSON.stringify(activeDraft));
+    renderActiveWorkout(true); // skipScroll = true
 }
 
 // --- FUNKTIONER FÖR SET-HANTERING ---
@@ -558,13 +564,13 @@ function addSetToExercise(exIdx) {
     const newWeight = lastSet ? lastSet.weight : "";
     const newReps = lastSet ? lastSet.reps : "";
     activeDraft.data[exIdx].sets_data.push({ weight: newWeight, reps: newReps });
-    renderActiveWorkout();
+    renderActiveWorkout(true); // skipScroll = true
     localStorage.setItem("activeWorkoutDraft", JSON.stringify(activeDraft));
 }
 
 function removeSetFromExercise(exIdx, setIdx) {
     activeDraft.data[exIdx].sets_data.splice(setIdx, 1);
-    renderActiveWorkout();
+    renderActiveWorkout(true); // skipScroll = true
     localStorage.setItem("activeWorkoutDraft", JSON.stringify(activeDraft));
 }
 
@@ -627,14 +633,14 @@ function confirmAddExerciseToActive(exId) {
     
     const history = getExerciseHistory(ex.name);
     if(history) {
-        activeDraft.data.push({ sets_data: JSON.parse(JSON.stringify(history)) });
+        activeDraft.data.push({ completed: false, sets_data: JSON.parse(JSON.stringify(history)) });
     } else {
-        activeDraft.data.push({ sets_data: [{ weight: "", reps: "" }, { weight: "", reps: "" }, { weight: "", reps: "" }] });
+        activeDraft.data.push({ completed: false, sets_data: [{ weight: "", reps: "" }, { weight: "", reps: "" }, { weight: "", reps: "" }] });
     }
     
     localStorage.setItem("activeWorkoutDraft", JSON.stringify(activeDraft));
     closeModal();
-    renderActiveWorkout();
+    renderActiveWorkout(true); // skipScroll = true
 }
 
 function moveActiveExercise(i, dir) {
@@ -642,14 +648,14 @@ function moveActiveExercise(i, dir) {
     if(newIdx < 0 || newIdx >= activeDraft.workout.exercises.length) return;
     [activeDraft.workout.exercises[i], activeDraft.workout.exercises[newIdx]] = [activeDraft.workout.exercises[newIdx], activeDraft.workout.exercises[i]];
     [activeDraft.data[i], activeDraft.data[newIdx]] = [activeDraft.data[newIdx], activeDraft.data[i]];
-    renderActiveWorkout();
+    renderActiveWorkout(true); // skipScroll = true
 }
 
 function removeActiveExercise(i) {
     if(confirm("Ta bort övningen?")) {
         activeDraft.workout.exercises.splice(i, 1);
         activeDraft.data.splice(i, 1);
-        renderActiveWorkout();
+        renderActiveWorkout(true); // skipScroll = true
     }
 }
 
@@ -659,10 +665,6 @@ document.getElementById("global-home").onclick = () => {
     location.reload();
 }
 document.getElementById("start-new-btn").onclick = renderCalendar;
-
-// Händelsehanterare för startsidans knappar (Fritt pass-knappen är borttagen från HTML men logiken lämnas för säkerhet)
-const freeBtn = document.getElementById("start-free-btn");
-if(freeBtn) freeBtn.onclick = () => startFreeWorkoutOnDate(null);
 
 document.getElementById("calendar-mode").onclick = renderCalendar;
 document.getElementById("view-exercises-btn").onclick = () => { showView("exercises-view"); filterExercises(currentExerciseCategory); };
@@ -675,8 +677,6 @@ function renderHome() {
     if(activeDraft) {
         document.getElementById("draft-alert").classList.remove("hidden");
         document.getElementById("start-new-btn").classList.add("hidden");
-        const freeBtn = document.getElementById("start-free-btn");
-        if(freeBtn) freeBtn.classList.add("hidden");
         document.getElementById("resume-workout-btn").onclick = () => startWorkout(activeDraft.workout, activeDraft.data, activeDraft.date);
     }
 }
@@ -700,7 +700,7 @@ document.getElementById("save-workout-btn").onclick = () => {
         exercises: activeDraft.workout.exercises.map((ex, i) => {
             return {
                 name: ex.name,
-                sets_data: activeDraft.data[i].sets_data // Spara den nya detaljerade datan
+                sets_data: activeDraft.data[i].sets_data 
             };
         })
     };
@@ -766,10 +766,9 @@ function editLoggedWorkout(date, idx) {
     const item = filtered[idx];
     const workoutObj = { id: "edit-" + Date.now(), name: item.programName, exercises: item.exercises.map(ex => ({ name: ex.name })) };
     
-    // Konvertera data till nya formatet om det behövs
     const dataObj = item.exercises.map(ex => {
-        if(ex.sets_data) return { sets_data: ex.sets_data };
-        return { sets_data: Array(parseInt(ex.sets || 1)).fill({ weight: ex.weight, reps: ex.reps }) };
+        if(ex.sets_data) return { completed: true, sets_data: ex.sets_data };
+        return { completed: true, sets_data: Array(parseInt(ex.sets || 1)).fill({ weight: ex.weight, reps: ex.reps }) };
     });
 
     workoutHistory = workoutHistory.filter(w => w !== item);
