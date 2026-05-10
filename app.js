@@ -355,10 +355,13 @@ function openEditProgramModal(idx) {
         <button class="mode-btn" style="color:var(--danger); background:none; font-size:14px; margin-top:10px;" onclick="deleteEntireProgram(${idx})">Radera pass permanent</button>
     `;
 
-    // Initiera SortableJS för att ändra ordning i programmet
     const el = document.getElementById('edit-pass-exercises-sortable');
     Sortable.create(el, {
-        animation: 150,
+        animation: 250,
+        ghostClass: 'sortable-ghost',
+        chosenClass: 'sortable-chosen',
+        dragClass: 'sortable-drag',
+        forceFallback: true,
         onEnd: function() {
             const newOrder = [];
             el.querySelectorAll('.edit-item-row').forEach(row => {
@@ -462,7 +465,7 @@ function renderActiveWorkout() {
         div.setAttribute("data-index", i);
         div.innerHTML = `
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-            <div style="display:flex; align-items:center; color:var(--primary); font-size:20px; cursor:grab;">☰</div>
+            <div style="display:flex; align-items:center; color:var(--primary); font-size:20px; cursor:grab;" class="drag-handle">☰</div>
             <strong style="font-size:16px;">${ex.name}</strong>
             <button onclick="removeActiveExercise(${i})" style="color:var(--danger); background:none; border:none; font-size:20px;"> ✖ </button>
         </div>
@@ -479,10 +482,12 @@ function renderActiveWorkout() {
     
     list.appendChild(sortContainer);
 
-    // Initiera Sortable för det aktiva passet
     Sortable.create(sortContainer, {
-        animation: 150,
-        handle: '.card',
+        animation: 250,
+        handle: '.drag-handle',
+        ghostClass: 'sortable-ghost',
+        chosenClass: 'sortable-chosen',
+        forceFallback: true,
         onEnd: function() {
             const newExOrder = [];
             const newDataOrder = [];
@@ -494,7 +499,7 @@ function renderActiveWorkout() {
             activeDraft.workout.exercises = newExOrder;
             activeDraft.data = newDataOrder;
             localStorage.setItem("activeWorkoutDraft", JSON.stringify(activeDraft));
-            renderActiveWorkout(); // Rendera om för att uppdatera alla ID:n i input-fälten
+            renderActiveWorkout(); 
         }
     });
 
@@ -550,7 +555,7 @@ function handleInstantExerciseCreated(newEx) {
 }
 
 function confirmAddExerciseToActive(exId) {
-    const ex = masterExercises.find(e => e.id == exId);
+    const ex = masterExercises.find(e => e.id == id);
     activeDraft.workout.exercises.push({ name: ex.name, target: ex.target });
     activeDraft.data.push({ weight: "", reps: "", sets: 3 });
     localStorage.setItem("activeWorkoutDraft", JSON.stringify(activeDraft));
@@ -620,7 +625,7 @@ document.getElementById("save-workout-btn").onclick = () => {
             sets: document.getElementById(`s-${i}`).value || "0"
         }))
     };
-    if (activeDraft.workout.id.startsWith("free-")) {
+    if (activeDraft.workout.id && activeDraft.workout.id.toString().startsWith("free-")) {
         if (confirm("Vill du spara detta som ett nytt träningsprogram?")) {
             const newName = prompt("Namnge passet:", "Mitt nya pass");
             if (newName) {
