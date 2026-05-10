@@ -357,14 +357,16 @@ function openEditProgramModal(idx) {
 
     const el = document.getElementById('edit-pass-exercises-sortable');
     Sortable.create(el, {
-        animation: 300,
+        animation: 250,
         ghostClass: 'sortable-ghost',
         chosenClass: 'sortable-chosen',
         dragClass: 'sortable-drag',
         forceFallback: true,
-        fallbackTolerance: 3, // Tillåter lite fingerrörelse innan drag startar
-        swapThreshold: 0.65, // Gör att kortet byter plats tidigare
-        onEnd: function() {
+        fallbackOnBody: true,
+        scroll: true,
+        onStart: () => document.body.style.overflow = 'hidden',
+        onEnd: () => {
+            document.body.style.overflow = '';
             const newOrder = [];
             el.querySelectorAll('.edit-item-row').forEach(row => {
                 newOrder.push(pass.exercises[parseInt(row.getAttribute('data-id'))]);
@@ -467,7 +469,7 @@ function renderActiveWorkout() {
         div.setAttribute("data-index", i);
         div.innerHTML = `
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-            <div style="display:flex; align-items:center; color:var(--primary); font-size:20px; padding: 10px; margin: -10px; cursor:grab;" class="drag-handle">☰</div>
+            <div style="display:flex; align-items:center; color:var(--primary); font-size:24px; padding: 10px; cursor:grab;" class="drag-handle">☰</div>
             <strong style="font-size:16px;">${ex.name}</strong>
             <button onclick="removeActiveExercise(${i})" style="color:var(--danger); background:none; border:none; font-size:20px;"> ✖ </button>
         </div>
@@ -485,16 +487,16 @@ function renderActiveWorkout() {
     list.appendChild(sortContainer);
 
     Sortable.create(sortContainer, {
-        animation: 300,
+        animation: 250,
         handle: '.drag-handle',
         ghostClass: 'sortable-ghost',
         chosenClass: 'sortable-chosen',
         dragClass: 'sortable-drag',
         forceFallback: true,
-        fallbackTolerance: 3,
-        swapThreshold: 0.65,
-        invertSwap: true,
+        fallbackOnBody: true,
+        onStart: () => document.body.style.overflow = 'hidden', // Låser skärmen vid drag
         onEnd: function() {
+            document.body.style.overflow = ''; // Låser upp skärmen
             const newExOrder = [];
             const newDataOrder = [];
             sortContainer.querySelectorAll('.active-workout-item').forEach(item => {
