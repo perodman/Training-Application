@@ -6,7 +6,6 @@ let calendarOverrides = JSON.parse(localStorage.getItem("calendarOverrides") || 
 let currentViewDate = new Date();
 let currentExerciseCategory = "Ben";
 
-// Timer-variabler
 let timerInterval = null;
 let secondsElapsed = 0;
 let isTimerRunning = false;
@@ -189,10 +188,9 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
 
 function startFreeWorkoutOnDate(date) { startWorkout({ id: "free-" + Date.now(), name: "Fritt Pass", exercises: [] }, null, date, false); }
 function changeMonth(off) { currentViewDate.setMonth(currentViewDate.getMonth() + off); renderCalendar(); }
-function setOverride(date, val) { calendarOverrides[date] = val; saveAll(); closeModal(); renderCalendar(); }
 function prepareStart(date, id) { const p = programData.routine.find(x => x.id === id); closeModal(); startWorkout(p, null, date, false); }
 
-// --- PROGRAM ---
+// --- PROGRAM (UPPDATERAD FÖR ATT ÅTERSTÄLLA DESIGN) ---
 function renderProgramView(activeIdx = null) {
     const selector = document.getElementById("pass-selector-list");
     selector.innerHTML = "";
@@ -200,7 +198,10 @@ function renderProgramView(activeIdx = null) {
         const div = document.createElement("div");
         div.className = `prog-card ${activeIdx === i ? 'active' : ''}`;
         div.innerHTML = `<h4>${pass.name}</h4><small>${pass.exercises.length} övningar</small>`;
-        div.onclick = () => { showProgramDetails(i); };
+        div.onclick = () => { 
+            renderProgramView(i); // Uppdatera 'active' klassen
+            showProgramDetails(i); 
+        };
         selector.appendChild(div);
     });
     showView("programs-view");
@@ -211,8 +212,16 @@ function showProgramDetails(idx) {
     const detailsArea = document.getElementById("program-details-area");
     const list = document.getElementById("program-exercise-list");
     detailsArea.classList.remove("hidden");
-    list.innerHTML = `<div style="display:flex; justify-content:space-between;"><h3>${pass.name}</h3><button class="mode-btn blue" style="width:auto; padding:5px 15px;" onclick="openEditProgramModal(${idx})">Redigera</button></div>
-    ${pass.exercises.map(e => `<div style="padding:10px 0; border-bottom:1px solid var(--glass-border);">${e.name}</div>`).join("")}`;
+    list.innerHTML = `
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+            <h3 style="margin:0;">${pass.name}</h3>
+            <button class="mode-btn blue" style="width:auto; padding:5px 15px; margin:0;" onclick="openEditProgramModal(${idx})">Redigera</button>
+        </div>
+        <div class="glass-modern">
+            ${pass.exercises.map(e => `<div style="padding:10px 0; border-bottom:1px solid var(--glass-border); display:flex; justify-content:space-between;"><span>${e.name}</span><small style="color:var(--primary);">${e.target}</small></div>`).join("")}
+        </div>
+        <button class="mode-btn green" style="margin-top:20px;" onclick="prepareStart('${new Date().toISOString().split('T')[0]}', '${pass.id}')">Starta passet nu 🔥</button>
+    `;
 }
 
 function openEditProgramModal(idx) {
@@ -228,8 +237,6 @@ function openEditProgramModal(idx) {
 function addExerciseToPass(pIdx) { const exId = document.getElementById("add-ex-select").value; if(!exId) return; const ex = masterExercises.find(e => e.id == exId); programData.routine[pIdx].exercises.push({ name: ex.name, target: ex.target }); openEditProgramModal(pIdx); }
 function removeExFromPass(pIdx, eIdx) { programData.routine[pIdx].exercises.splice(eIdx, 1); openEditProgramModal(pIdx); }
 function saveProgramEdit(idx) { programData.routine[idx].name = document.getElementById("edit-pass-name").value; saveAll(); closeModal(); renderProgramView(idx); showProgramDetails(idx); }
-function openCreateProgramModal() { const body = document.getElementById("modal-body"); body.innerHTML = `<h3>Nytt Pass</h3><input type="text" id="new-pass-name" class="log-input"><button class="mode-btn blue" onclick="saveNewProgram()">Spara</button>`; openModal(); }
-function saveNewProgram() { const name = document.getElementById("new-pass-name").value; if(!name) return; programData.routine.push({ id: "pass-"+Date.now(), name, exercises: [] }); saveAll(); renderProgramView(); closeModal(); }
 
 // --- AKTIVT PASS ---
 function getExerciseHistory(name) {
@@ -258,71 +265,42 @@ function renderActiveWorkout(skipScroll = false) {
     document.getElementById("active-title").textContent = activeDraft.workout.name;
     const list = document.getElementById("exercise-list");
     list.innerHTML = "";
-
     if(!activeDraft.isStarted) {
         list.innerHTML = `<button class="mode-btn green" onclick="actuallyStartWorkout()">STARTA TRÄNINGSPASSET 🔥</button>`;
         showView("workout-view", skipScroll);
         return;
     }
-
     activeDraft.workout.exercises.forEach((ex, i) => {
         const exerciseData = activeDraft.data[i];
         const isDone = exerciseData.completed;
         const div = document.createElement("div");
         div.className = `card glass ${isDone ? 'exercise-done-card' : ''}`;
-        
-        let setsHtml = `<div style="margin-top:10px;">
-            <div style="display:grid; grid-template-columns: 35px 1fr 1fr 30px; gap:8px; margin-bottom:5px; opacity:0.5;">
-                <span></span><small style="text-align:center; font-size:9px;">KG</small><small style="text-align:center; font-size:9px;">REPS</small><span></span>
-            </div>`;
-
+        let setsHtml = `<div style="margin-top:10px;"><div style="display:grid; grid-template-columns: 35px 1fr 1fr 30px; gap:8px; margin-bottom:5px; opacity:0.5;"><span></span><small style="text-align:center; font-size:9px;">KG</small><small style="text-align:center; font-size:9px;">REPS</small><span></span></div>`;
         exerciseData.sets_data.forEach((set, sIdx) => {
-            setsHtml += `
-            <div style="display:grid; grid-template-columns: 35px 1fr 1fr 30px; gap:8px; margin-bottom:8px; align-items:center;">
-                <span style="font-size:12px; font-weight:800; color:var(--primary)">#${sIdx + 1}</span>
-                <input type="number" class="log-input" style="margin:0; padding:8px;" value="${set.weight}" onchange="updateSetData(${i}, ${sIdx}, this.value, 'w')">
-                <input type="number" class="log-input" style="margin:0; padding:8px;" value="${set.reps}" onchange="updateSetData(${i}, ${sIdx}, this.value, 'r')">
-                <button onclick="removeSetFromExercise(${i}, ${sIdx})" style="background:none; border:none; color:var(--danger);">×</button>
-            </div>`;
+            setsHtml += `<div style="display:grid; grid-template-columns: 35px 1fr 1fr 30px; gap:8px; margin-bottom:8px; align-items:center;"><span style="font-size:12px; font-weight:800; color:var(--primary)">#${sIdx + 1}</span><input type="number" class="log-input" style="margin:0; padding:8px;" value="${set.weight}" onchange="updateSetData(${i}, ${sIdx}, this.value, 'w')"><input type="number" class="log-input" style="margin:0; padding:8px;" value="${set.reps}" onchange="updateSetData(${i}, ${sIdx}, this.value, 'r')"><button onclick="removeSetFromExercise(${i}, ${sIdx})" style="background:none; border:none; color:var(--danger);">×</button></div>`;
         });
-
-        setsHtml += `
-            <button class="mode-btn glass-border" style="padding:8px; font-size:11px; border-style:dashed;" onclick="addSetToExercise(${i})">+ Lägg till set</button>
-            
-            <button class="done-toggle-btn ${isDone ? 'is-completed' : ''}" onclick="toggleExerciseDone(${i})">
-                ${isDone ? '<span>KLAR ✓</span>' : '<span>MARKERA SOM KLAR</span>'}
-            </button>
-        </div>`;
-
-        div.innerHTML = `
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-            <strong style="${isDone ? 'text-decoration:line-through; opacity:0.5;' : ''}">${ex.name}</strong>
-            <button onclick="removeActiveExercise(${i})" style="color:var(--danger); background:none; border:none;">✖</button>
-        </div>
-        ${setsHtml}`;
+        setsHtml += `<button class="mode-btn glass-border" style="padding:8px; font-size:11px; border-style:dashed;" onclick="addSetToExercise(${i})">+ Lägg till set</button><button class="done-toggle-btn ${isDone ? 'is-completed' : ''}" onclick="toggleExerciseDone(${i})">${isDone ? '<span>KLAR ✓</span>' : '<span>MARKERA SOM KLAR</span>'}</button></div>`;
+        div.innerHTML = `<div style="display:flex; justify-content:space-between; align-items:center;"><strong style="${isDone ? 'text-decoration:line-through; opacity:0.5;' : ''}">${ex.name}</strong><button onclick="removeActiveExercise(${i})" style="color:var(--danger); background:none; border:none;">✖</button></div>${setsHtml}`;
         list.appendChild(div);
     });
-
     const addBtn = document.createElement("button");
     addBtn.className = "mode-btn glass-border";
     addBtn.innerHTML = "➕ Lägg till övning";
     addBtn.onclick = openAddExerciseToWorkoutModal;
     list.appendChild(addBtn);
-
     showView("workout-view", skipScroll);
 }
 
 function actuallyStartWorkout() { activeDraft.isStarted = true; localStorage.setItem("activeWorkoutDraft", JSON.stringify(activeDraft)); renderActiveWorkout(); startTimer(); }
 function toggleExerciseDone(i) { activeDraft.data[i].completed = !activeDraft.data[i].completed; localStorage.setItem("activeWorkoutDraft", JSON.stringify(activeDraft)); renderActiveWorkout(true); }
 function updateSetData(exIdx, setIdx, val, type) { if(type === 'w') activeDraft.data[exIdx].sets_data[setIdx].weight = val; else activeDraft.data[exIdx].sets_data[setIdx].reps = val; localStorage.setItem("activeWorkoutDraft", JSON.stringify(activeDraft)); }
-function addSetToExercise(exIdx) { const last = activeDraft.data[exIdx].sets_data[activeDraft.data[exIdx].sets_data.length-1]; activeDraft.data[exIdx].sets_data.push({ weight: last.weight, reps: last.reps }); renderActiveWorkout(true); }
+function addSetToExercise(exIdx) { const last = activeDraft.data[exIdx].sets_data[activeDraft.data[exIdx].sets_data.length-1]; activeDraft.data[exIdx].sets_data.push({ weight: last ? last.weight : "", reps: last ? last.reps : "" }); renderActiveWorkout(true); }
 function removeSetFromExercise(exIdx, sIdx) { activeDraft.data[exIdx].sets_data.splice(sIdx, 1); renderActiveWorkout(true); }
 function removeActiveExercise(i) { if(confirm("Ta bort?")) { activeDraft.workout.exercises.splice(i, 1); activeDraft.data.splice(i, 1); renderActiveWorkout(true); } }
 
 function openAddExerciseToWorkoutModal() {
     const body = document.getElementById("modal-body");
-    body.innerHTML = `<h3>Välj Övning</h3><div style="max-height:300px; overflow-y:auto;">
-    ${masterExercises.map(ex => `<div class="card glass" style="padding:10px; margin-bottom:5px;" onclick="addExToActive(${ex.id})">${ex.name}</div>`).join("")}</div>`;
+    body.innerHTML = `<h3>Välj Övning</h3><div style="max-height:300px; overflow-y:auto;">${masterExercises.map(ex => `<div class="card glass" style="padding:10px; margin-bottom:5px;" onclick="addExToActive(${ex.id})">${ex.name}</div>`).join("")}</div>`;
     openModal();
 }
 function addExToActive(id) {
@@ -333,7 +311,6 @@ function addExToActive(id) {
     closeModal(); renderActiveWorkout(true);
 }
 
-// --- STANDARD ---
 document.getElementById("global-home").onclick = () => location.reload();
 document.getElementById("calendar-mode").onclick = renderCalendar;
 document.getElementById("view-exercises-btn").onclick = () => { showView("exercises-view"); filterExercises(currentExerciseCategory); };
