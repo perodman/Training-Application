@@ -41,7 +41,6 @@ function showView(id) {
     const target = document.getElementById(id);
     if(!target) return;
     
-    // Om vyn redan visas, animera inte om den (för att undvika blink vid t.ex. månadsskifte)
     if (target.classList.contains("hidden")) {
         document.querySelectorAll(".view").forEach(v => v.classList.add("hidden"));
         target.classList.remove("hidden");
@@ -187,7 +186,6 @@ function renderCalendar() {
     const grid = document.getElementById("calendar-grid");
     const label = document.getElementById("month-label");
     
-    // Förbered grid utan att trigga showView om vi redan är i kalendern
     grid.innerHTML = "";
     const year = currentViewDate.getFullYear();
     const month = currentViewDate.getMonth();
@@ -285,7 +283,6 @@ function renderProgramView(activeIdx = null) {
         div.className = `prog-card ${activeIdx === i ? 'active' : ''}`;
         div.innerHTML = `<div style="font-size:24px;">${['⚡','🔥','🏆','💎'][i % 4]}</div><h4>${pass.name}</h4><div style="font-size:10px; color:var(--primary); margin-top:5px; font-weight:800;">${pass.exercises.length} ÖVNINGAR</div>`;
         div.onclick = () => { 
-            // Uppdatera bara korten och detaljerna utan showView
             document.querySelectorAll(".prog-card").forEach(c => c.classList.remove("active"));
             div.classList.add("active");
             showProgramDetails(i); 
@@ -301,7 +298,6 @@ function showProgramDetails(idx) {
     const list = document.getElementById("program-exercise-list");
     detailsArea.classList.remove("hidden");
     
-    // Innehållsförändring
     list.innerHTML = `
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; padding-bottom:10px; border-bottom:1px solid var(--glass-border);">
             <h3 style="margin:0; text-align:left; font-size:18px;">${pass.name}</h3>
@@ -420,7 +416,7 @@ function startWorkout(workout, data = null, date = null) {
     secondsElapsed = (activeDraft && activeDraft.secondsElapsed) ? activeDraft.secondsElapsed : 0;
     
     activeDraft = { 
-        workout: JSON.parse(JSON.stringify(workout)), // Deep copy för att kunna ändra i passet under tiden
+        workout: JSON.parse(JSON.stringify(workout)), 
         data: data || workout.exercises.map(()=>({weight:"", reps:"", sets:3})), 
         date: date || new Date().toISOString().split('T')[0],
         secondsElapsed: secondsElapsed
@@ -459,7 +455,6 @@ function renderActiveWorkout() {
         list.appendChild(div);
     });
 
-    // Knapp för att lägga till övning under pågående pass
     const addBtn = document.createElement("button");
     addBtn.className = "mode-btn glass-border";
     addBtn.style.marginTop = "10px";
@@ -470,20 +465,51 @@ function renderActiveWorkout() {
     showView("workout-view");
 }
 
+// NY FUNKTION: Förbättrad övningsväljare i modalen
 function openAddExerciseToWorkoutModal() {
-    const body = document.getElementById("modal-body");
-    body.innerHTML = `
-        <h3>Lägg till övning</h3>
-        <select id="active-add-ex" class="log-input">
-            ${masterExercises.map(ex => `<option value="${ex.id}">${ex.name}</option>`).join("")}
-        </select>
-        <button class="mode-btn blue" onclick="addExerciseToActiveWorkout()">Lägg till i passet</button>
-    `;
+    renderExercisePicker("Ben");
     openModal();
 }
 
-function addExerciseToActiveWorkout() {
-    const exId = document.getElementById("active-add-ex").value;
+function renderExercisePicker(category) {
+    const body = document.getElementById("modal-body");
+    const categories = ["Ben", "Bröst", "Rygg", "Axlar", "Armar", "Bål"];
+    
+    let html = `<h3>Välj Övning</h3>`;
+    
+    // Mini-kategorimeny
+    html += `<div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:5px; margin-bottom:15px;">`;
+    categories.forEach(cat => {
+        const isActive = cat === category;
+        html += `<button onclick="renderExercisePicker('${cat}')" 
+            style="padding:8px 5px; font-size:10px; border-radius:8px; border:1px solid ${isActive ? 'var(--primary)' : 'rgba(255,255,255,0.1)'}; 
+            background:${isActive ? 'rgba(56,189,248,0.1)' : 'none'}; color:${isActive ? 'var(--primary)' : 'white'}; cursor:pointer;">
+            ${cat}
+        </button>`;
+    });
+    html += `</div>`;
+    
+    // Lista på övningar i vald kategori
+    html += `<div style="max-height:300px; overflow-y:auto; padding-right:5px;">`;
+    const filtered = masterExercises.filter(ex => category === "Armar" ? (ex.target === "Biceps" || ex.target === "Triceps") : ex.target === category);
+    
+    if (filtered.length === 0) {
+        html += `<p style="font-size:12px; color:var(--text-light); text-align:center; padding:20px;">Inga övningar i denna kategori än.</p>`;
+    }
+
+    filtered.forEach(ex => {
+        html += `
+        <div class="card glass" style="padding:12px; margin-bottom:8px; cursor:pointer; display:flex; justify-content:space-between; align-items:center;" onclick="confirmAddExerciseToActive(${ex.id})">
+            <span style="font-size:14px; font-weight:600;">${ex.name}</span>
+            <span style="color:var(--primary); font-size:18px;">+</span>
+        </div>`;
+    });
+    html += `</div>`;
+    
+    body.innerHTML = html;
+}
+
+function confirmAddExerciseToActive(exId) {
     const ex = masterExercises.find(e => e.id == exId);
     activeDraft.workout.exercises.push({ name: ex.name, target: ex.target });
     activeDraft.data.push({ weight: "", reps: "", sets: 3 });
@@ -559,7 +585,6 @@ document.getElementById("save-workout-btn").onclick = () => {
         }))
     };
     
-    // Fråga om att spara som nytt program om det var ett fritt pass
     if (activeDraft.workout.id.startsWith("free-")) {
         if (confirm("Vill du spara detta som ett nytt träningsprogram?")) {
             const newName = prompt("Namnge passet:", "Mitt nya pass");
