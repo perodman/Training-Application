@@ -202,7 +202,7 @@ function renderCalendar() {
         const cell = document.createElement("div");
         cell.className = "calendar-cell";
         const hasWorkouts = workoutHistory.filter(w => w.date === dateStr);
-        const isOngoing = activeDraft && activeDraft.date === dateStr;
+        const isOngoing = activeDraft && activeDraft.date === dateStr && activeDraft.isStarted;
         const dayOfWeek = new Date(year, month, d).getDay();
         const isAutoDay = [1, 3, 5].includes(dayOfWeek);
         const override = calendarOverrides[dateStr];
@@ -412,25 +412,42 @@ function saveNewProgram() {
 }
 
 // --- AKTIVT PASS ---
-function startWorkout(workout, data = null, date = null) {
+function startWorkout(workout, data = null, date = null, isImmediateStart = false) {
     secondsElapsed = (activeDraft && activeDraft.secondsElapsed) ? activeDraft.secondsElapsed : 0;
     
     activeDraft = { 
         workout: JSON.parse(JSON.stringify(workout)), 
         data: data || workout.exercises.map(()=>({weight:"", reps:"", sets:3})), 
         date: date || new Date().toISOString().split('T')[0],
-        secondsElapsed: secondsElapsed
+        secondsElapsed: secondsElapsed,
+        isStarted: isImmediateStart || (activeDraft ? activeDraft.isStarted : false)
     };
     
     renderActiveWorkout();
     updateTimerDisplay();
-    startTimer();
+    if(activeDraft.isStarted) startTimer();
+    else pauseTimer();
 }
 
 function renderActiveWorkout() {
     document.getElementById("active-title").textContent = activeDraft.workout.name;
     const list = document.getElementById("exercise-list");
     list.innerHTML = "";
+
+    // Om passet inte är startat än, visa en startknapp
+    if(!activeDraft.isStarted) {
+        list.innerHTML = `
+            <div class="card glass" style="text-align:center; padding:40px 20px;">
+                <h3 style="margin-bottom:10px;">Redo att träna?</h3>
+                <p style="color:var(--text-light); font-size:14px; margin-bottom:30px;">Klicka på knappen nedan för att dra igång klockan och börja logga ditt pass.</p>
+                <button class="mode-btn green" style="width:100%; padding:20px; font-size:18px;" onclick="actuallyStartWorkout()">STARTA TRÄNINGSPASSET 🔥</button>
+            </div>
+        `;
+        document.getElementById("workout-timer").textContent = "00:00:00";
+        showView("workout-view");
+        return;
+    }
+
     activeDraft.workout.exercises.forEach((ex, i) => {
         const val = activeDraft.data[i];
         const div = document.createElement("div");
@@ -465,7 +482,13 @@ function renderActiveWorkout() {
     showView("workout-view");
 }
 
-// NY FUNKTION: Förbättrad övningsväljare i modalen
+function actuallyStartWorkout() {
+    activeDraft.isStarted = true;
+    localStorage.setItem("activeWorkoutDraft", JSON.stringify(activeDraft));
+    renderActiveWorkout();
+    startTimer();
+}
+
 function openAddExerciseToWorkoutModal() {
     renderExercisePicker("Ben");
     openModal();
@@ -477,7 +500,6 @@ function renderExercisePicker(category) {
     
     let html = `<h3>Välj Övning</h3>`;
     
-    // Mini-kategorimeny
     html += `<div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:5px; margin-bottom:15px;">`;
     categories.forEach(cat => {
         const isActive = cat === category;
@@ -489,14 +511,9 @@ function renderExercisePicker(category) {
     });
     html += `</div>`;
     
-    // Lista på övningar i vald kategori
-    html += `<div style="max-height:300px; overflow-y:auto; padding-right:5px;">`;
+    html += `<div style="max-height:250px; overflow-y:auto; padding-right:5px; margin-bottom:15px;">`;
     const filtered = masterExercises.filter(ex => category === "Armar" ? (ex.target === "Biceps" || ex.target === "Triceps") : ex.target === category);
     
-    if (filtered.length === 0) {
-        html += `<p style="font-size:12px; color:var(--text-light); text-align:center; padding:20px;">Inga övningar i denna kategori än.</p>`;
-    }
-
     filtered.forEach(ex => {
         html += `
         <div class="card glass" style="padding:12px; margin-bottom:8px; cursor:pointer; display:flex; justify-content:space-between; align-items:center;" onclick="confirmAddExerciseToActive(${ex.id})">
@@ -505,8 +522,18 @@ function renderExercisePicker(category) {
         </div>`;
     });
     html += `</div>`;
+
+    // Ny knapp för att skapa övning direkt
+    html += `
+        <div class="separator" style="margin:15px 0;"></div>
+        <button class="mode-btn glass-border" style="font-size:13px;" onclick="openCreateExerciseModal(handleInstantExerciseCreated)">+ Skapa ny övning som inte finns</button>
+    `;
     
     body.innerHTML = html;
+}
+
+function handleInstantExerciseCreated(newEx) {
+    confirmAddExerciseToActive(newEx.id);
 }
 
 function confirmAddExerciseToActive(exId) {
@@ -551,7 +578,7 @@ document.getElementById("global-home").onclick = () => {
 document.getElementById("start-new-btn").onclick = renderCalendar;
 document.getElementById("start-free-btn").onclick = () => {
     const freePass = { id: "free-" + Date.now(), name: "Fritt Pass", exercises: [] };
-    startWorkout(freePass);
+    startWorkout(freePass, null, null, false); // false = Vänta på startknapp
 };
 document.getElementById("calendar-mode").onclick = renderCalendar;
 document.getElementById("view-exercises-btn").onclick = () => { showView("exercises-view"); filterExercises(currentExerciseCategory); };
@@ -570,6 +597,14 @@ function renderHome() {
 }
 
 document.getElementById("save-workout-btn").onclick = () => {
+    if(!activeDraft.isStarted) {
+        if(confirm("Du har inte startat passet än. Vill du bara avbryta och ta bort utkastet?")) {
+            localStorage.removeItem("activeWorkoutDraft");
+            location.reload();
+        }
+        return;
+    }
+
     pauseTimer();
     const finalTime = document.getElementById("workout-timer").textContent;
     
@@ -628,7 +663,7 @@ function renderStats() {
 
 function changeMonth(off) { currentViewDate.setMonth(currentViewDate.getMonth() + off); renderCalendar(); }
 function setOverride(date, val) { calendarOverrides[date] = val; saveAll(); closeModal(); renderCalendar(); }
-function prepareStart(date, id) { const p = programData.routine.find(x => x.id === id); closeModal(); startWorkout(p, null, date); }
+function prepareStart(date, id) { const p = programData.routine.find(x => x.id === id); closeModal(); startWorkout(p, null, date, false); }
 
 function deleteLoggedWorkout(date, idx) {
     if(confirm("Radera passet?")) {
@@ -650,5 +685,5 @@ function editLoggedWorkout(date, idx) {
     localStorage.removeItem("activeWorkoutDraft");
     activeDraft = null;
     closeModal();
-    startWorkout(workoutObj, dataObj, date);
+    startWorkout(workoutObj, dataObj, date, true); // true = Starta timern direkt vid redigering
 }
