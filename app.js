@@ -242,7 +242,6 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
             w.exercises.forEach(ex => {
                 html += `<div style="font-size:12px; margin-bottom:5px; border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:3px;">
                     <span style="color:var(--text-light)">${ex.name}:</span><br>`;
-                // Hantera både gammalt format och nytt set-format för visning
                 if(ex.sets_data) {
                     ex.sets_data.forEach((s, sIdx) => {
                         html += `<span style="color:var(--primary); font-weight:700;">Set ${sIdx+1}: ${s.weight}kg x ${s.reps}</span><br>`;
@@ -431,16 +430,13 @@ function saveNewProgram() {
 
 // --- LOGIK FÖR HISTORIK ---
 function getExerciseHistory(exerciseName) {
-    // Sök baklänges i historiken för att hitta senaste körda set för just denna övning
     for (let i = workoutHistory.length - 1; i >= 0; i--) {
         const workout = workoutHistory[i];
         const exMatch = workout.exercises.find(e => e.name === exerciseName);
         if (exMatch) {
-            // Om det är gammalt format (en rad för alla set)
             if (!exMatch.sets_data) {
                 return Array(parseInt(exMatch.sets || 3)).fill({ weight: exMatch.weight, reps: exMatch.reps });
             }
-            // Om det är nya formatet
             return exMatch.sets_data;
         }
     }
@@ -451,15 +447,13 @@ function getExerciseHistory(exerciseName) {
 function startWorkout(workout, data = null, date = null, isImmediateStart = false) {
     secondsElapsed = (activeDraft && activeDraft.secondsElapsed) ? activeDraft.secondsElapsed : 0;
     
-    // Om inget data skickas med (nytt pass), skapa initial data-struktur baserat på historik
     if(!data) {
         data = workout.exercises.map(ex => {
             const history = getExerciseHistory(ex.name);
             if (history) {
-                return { sets_data: JSON.parse(JSON.stringify(history)) };
+                return { sets_data: JSON.parse(JSON.stringify(history)), isCompleted: false };
             }
-            // Default om ingen historik finns
-            return { sets_data: [{ weight: "", reps: "" }, { weight: "", reps: "" }, { weight: "", reps: "" }] };
+            return { sets_data: [{ weight: "", reps: "" }, { weight: "", reps: "" }, { weight: "", reps: "" }], isCompleted: false };
         });
     }
 
@@ -496,8 +490,9 @@ function renderActiveWorkout() {
 
     activeDraft.workout.exercises.forEach((ex, i) => {
         const exerciseData = activeDraft.data[i];
+        const isDone = exerciseData.isCompleted;
         const div = document.createElement("div");
-        div.className = "card glass";
+        div.className = "card glass" + (isDone ? " exercise-done" : "");
         
         let setsHtml = `<div style="margin-top:10px;">
             <div style="display:grid; grid-template-columns: 35px 1fr 1fr 30px; gap:8px; margin-bottom:5px; align-items:center;">
@@ -519,6 +514,9 @@ function renderActiveWorkout() {
 
         setsHtml += `
             <button class="mode-btn glass-border" style="padding:8px; font-size:11px; margin-top:5px; border-style:dashed;" onclick="addSetToExercise(${i})">+ Lägg till set</button>
+            <button class="mode-btn ${isDone ? 'blue' : 'green'}" style="padding:10px; font-size:13px; margin-top:10px;" onclick="toggleExerciseDone(${i})">
+                ${isDone ? 'Ångra Klar ↩️' : 'Marker som klar ✅'}
+            </button>
         </div>`;
 
         div.innerHTML = `
@@ -554,17 +552,29 @@ function updateSetData(exIdx, setIdx) {
 }
 
 function addSetToExercise(exIdx) {
+    const scrollPos = window.scrollY; // Spara position
     const lastSet = activeDraft.data[exIdx].sets_data[activeDraft.data[exIdx].sets_data.length - 1];
     const newWeight = lastSet ? lastSet.weight : "";
     const newReps = lastSet ? lastSet.reps : "";
     activeDraft.data[exIdx].sets_data.push({ weight: newWeight, reps: newReps });
     renderActiveWorkout();
+    window.scrollTo(0, scrollPos); // Återställ position
     localStorage.setItem("activeWorkoutDraft", JSON.stringify(activeDraft));
 }
 
 function removeSetFromExercise(exIdx, setIdx) {
+    const scrollPos = window.scrollY; // Spara position
     activeDraft.data[exIdx].sets_data.splice(setIdx, 1);
     renderActiveWorkout();
+    window.scrollTo(0, scrollPos); // Återställ position
+    localStorage.setItem("activeWorkoutDraft", JSON.stringify(activeDraft));
+}
+
+function toggleExerciseDone(exIdx) {
+    const scrollPos = window.scrollY; // Spara position
+    activeDraft.data[exIdx].isCompleted = !activeDraft.data[exIdx].isCompleted;
+    renderActiveWorkout();
+    window.scrollTo(0, scrollPos); // Återställ position
     localStorage.setItem("activeWorkoutDraft", JSON.stringify(activeDraft));
 }
 
@@ -627,9 +637,9 @@ function confirmAddExerciseToActive(exId) {
     
     const history = getExerciseHistory(ex.name);
     if(history) {
-        activeDraft.data.push({ sets_data: JSON.parse(JSON.stringify(history)) });
+        activeDraft.data.push({ sets_data: JSON.parse(JSON.stringify(history)), isCompleted: false });
     } else {
-        activeDraft.data.push({ sets_data: [{ weight: "", reps: "" }, { weight: "", reps: "" }, { weight: "", reps: "" }] });
+        activeDraft.data.push({ sets_data: [{ weight: "", reps: "" }, { weight: "", reps: "" }, { weight: "", reps: "" }], isCompleted: false });
     }
     
     localStorage.setItem("activeWorkoutDraft", JSON.stringify(activeDraft));
@@ -660,7 +670,6 @@ document.getElementById("global-home").onclick = () => {
 }
 document.getElementById("start-new-btn").onclick = renderCalendar;
 
-// Händelsehanterare för startsidans knappar (Fritt pass-knappen är borttagen från HTML men logiken lämnas för säkerhet)
 const freeBtn = document.getElementById("start-free-btn");
 if(freeBtn) freeBtn.onclick = () => startFreeWorkoutOnDate(null);
 
@@ -700,7 +709,7 @@ document.getElementById("save-workout-btn").onclick = () => {
         exercises: activeDraft.workout.exercises.map((ex, i) => {
             return {
                 name: ex.name,
-                sets_data: activeDraft.data[i].sets_data // Spara den nya detaljerade datan
+                sets_data: activeDraft.data[i].sets_data 
             };
         })
     };
@@ -766,10 +775,9 @@ function editLoggedWorkout(date, idx) {
     const item = filtered[idx];
     const workoutObj = { id: "edit-" + Date.now(), name: item.programName, exercises: item.exercises.map(ex => ({ name: ex.name })) };
     
-    // Konvertera data till nya formatet om det behövs
     const dataObj = item.exercises.map(ex => {
-        if(ex.sets_data) return { sets_data: ex.sets_data };
-        return { sets_data: Array(parseInt(ex.sets || 1)).fill({ weight: ex.weight, reps: ex.reps }) };
+        if(ex.sets_data) return { sets_data: ex.sets_data, isCompleted: true };
+        return { sets_data: Array(parseInt(ex.sets || 1)).fill({ weight: ex.weight, reps: ex.reps }), isCompleted: true };
     });
 
     workoutHistory = workoutHistory.filter(w => w !== item);
