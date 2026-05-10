@@ -11,26 +11,29 @@
     <div class="global-header">
         <div id="global-home" class="circle-ctrl"> 🏠 </div>
     </div>
+
     <div class="app-container">
+        <!-- HEMVY -->
         <div id="home-view" class="view">
             <div class="hero-section">
                 <h1 class="main-title">LIFT</h1>
                 <p class="subtitle">Elevate Your Strength</p>
             </div>
-            <div id="draft-alert" class="hidden" style="margin-bottom: 20px;">
+            <div id="draft-alert" class="hidden">
                 <button id="resume-workout-btn" class="mode-btn orange">Fortsätt träningen    ⏱️    </button>
             </div>
             <div class="menu-grid">
                 <button id="start-new-btn" class="mode-btn blue main-action">Starta Träningspass    🔥    </button>
                 <button id="view-exercises-btn" class="mode-btn glass">  🏋️    Övningar</button>
                 <button id="view-programs-btn" class="mode-btn glass">  📋    Träningsprogram</button>
-                <button id="calendar-mode" class="mode-btn glass">  📅    Dagbok och Schemaläggning</button>
+                <button id="calendar-mode" class="mode-btn glass">  📅    Dagbok & Schema</button>
                 <button id="stats-mode" class="mode-btn glass">  📊    Statistik</button>
             </div>
         </div>
 
+        <!-- KALENDERVY -->
         <div id="calendar-view" class="view hidden">
-            <h2 class="section-title modern-header">Träningsschema</h2>
+            <h2 class="section-title modern-header">Schema</h2>
             <div class="calendar-nav">
                 <button onclick="changeMonth(-1)" class="nav-arrow"> ❮ </button>
                 <h2 id="month-label"></h2>
@@ -44,6 +47,7 @@
             </div>
         </div>
 
+        <!-- ÖVNINGSVY -->
         <div id="exercises-view" class="view hidden">
             <h2 class="section-title modern-header">Muskelgrupper</h2>
             <div id="category-menu" class="category-grid">
@@ -62,6 +66,7 @@
             <div id="exercise-results"></div>
         </div>
 
+        <!-- PROGRAMVY (Här är ikonerna och listan återställd) -->
         <div id="programs-view" class="view hidden">
             <h2 class="section-title modern-header">Träningsprogram</h2>
             <div id="pass-selector-list" class="program-modern-grid"></div>
@@ -72,11 +77,15 @@
             <button id="add-custom-pass-btn" class="mode-btn glass-border" style="margin-top:20px;">+ Skapa Nytt Pass</button>
         </div>
 
+        <!-- AKTIVT PASS (Här är reordering och timer) -->
         <div id="workout-view" class="view hidden">
             <h2 id="active-title" class="section-title modern-header"></h2>
             <div class="card glass">
                 <div id="workout-timer" class="timer-display">00:00:00</div>
-                <button id="timer-toggle-btn" class="mode-btn glass-border">Pausa ⏸️</button>
+                <div style="display:flex; gap:10px;">
+                    <button id="timer-toggle-btn" class="mode-btn glass-border" style="flex:1;">Pausa ⏸️</button>
+                    <button onclick="openChangeWorkoutInActive()" class="mode-btn glass-border" style="flex:1;">Byt pass 🔄</button>
+                </div>
             </div>
             <div id="exercise-list"></div>
             <div class="workout-footer">
@@ -86,12 +95,14 @@
         </div>
     </div>
 
+    <!-- MODAL FÖR ALLT -->
     <div id="workout-modal" class="modal hidden">
         <div class="modal-content">
             <div id="modal-body"></div>
             <button class="mode-btn glass-border" onclick="closeModal()" style="margin-top:20px;">Stäng</button>
         </div>
     </div>
+
     <script src="app.js"></script>
 </body>
 </html>
