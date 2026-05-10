@@ -5,6 +5,7 @@ let activeDraft = JSON.parse(localStorage.getItem("activeWorkoutDraft") || "null
 let calendarOverrides = JSON.parse(localStorage.getItem("calendarOverrides") || "{}");
 let currentViewDate = new Date();
 let currentExerciseCategory = "Ben";
+let isSelectingDateForFreePass = false; // Ny flagga för att styra infoboxen
 
 // Timer-variabler
 let timerInterval = null;
@@ -41,6 +42,14 @@ function showView(id) {
     const target = document.getElementById(id);
     if(!target) return;
     
+    // Hantera infoboxen i kalendern
+    const infoBox = document.getElementById("calendar-info-box");
+    if (id === "calendar-view" && isSelectingDateForFreePass) {
+        infoBox.classList.remove("hidden");
+    } else {
+        infoBox.classList.add("hidden");
+    }
+
     if (target.classList.contains("hidden")) {
         document.querySelectorAll(".view").forEach(v => v.classList.add("hidden"));
         target.classList.remove("hidden");
@@ -116,7 +125,7 @@ function openCreateExerciseModal(callback = null) {
         const name = document.getElementById("new-ex-name").value.trim();
         const target = document.getElementById("new-ex-cat").value;
         if(!name) return alert("Ange ett namn!");
-        const newEx = { id: Date.now(), name, target, defaultSets: 3 };
+        const newEx = { id: Date.now() + Math.random(), name, target, defaultSets: 3 };
         masterExercises.push(newEx);
         saveAll();
         if(callback) callback(newEx);
@@ -216,7 +225,10 @@ function renderCalendar() {
         else if (displayPass) { cell.classList.add("cell-planned"); info = displayPass.name.split(" ").pop(); }
         
         cell.innerHTML = `<span>${d}</span><span>${info}</span>`;
-        cell.onclick = () => openDayManager(dateStr, displayPass, hasWorkouts, isOngoing);
+        cell.onclick = () => {
+            isSelectingDateForFreePass = false; // Återställ flaggan vid klick
+            openDayManager(dateStr, displayPass, hasWorkouts, isOngoing);
+        };
         grid.appendChild(cell);
     }
     showView("calendar-view");
@@ -256,7 +268,6 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
             html += `<button class="mode-btn green" onclick="prepareStart('${dateStr}', '${planned.id}')">Starta ${planned.name} 🔥</button>`;
         }
         
-        // Lägg till val för Fritt Pass direkt i kalendern
         html += `<button class="mode-btn glass-border" style="border-color:var(--primary); color:var(--primary);" onclick="closeModal(); startFreeWorkoutOnDate('${dateStr}')">Starta Fritt Pass ➕</button>`;
 
         html += `<div class="separator"></div><p style="font-size:11px; text-transform:uppercase; color:var(--text-light); text-align:center;">Ändra planering:</p>`;
@@ -446,7 +457,6 @@ function renderActiveWorkout() {
     const list = document.getElementById("exercise-list");
     list.innerHTML = "";
 
-    // Om passet inte är startat än, visa STARTA-knappen under rubriken
     if(!activeDraft.isStarted) {
         list.innerHTML = `
             <div style="text-align:center; padding:20px 0;">
@@ -583,12 +593,25 @@ function removeActiveExercise(i) {
 // --- STANDARD-LOGIK ---
 document.getElementById("global-home").onclick = () => {
     pauseTimer();
+    isSelectingDateForFreePass = false;
     location.reload();
 }
-document.getElementById("start-new-btn").onclick = renderCalendar;
-document.getElementById("start-free-btn").onclick = () => startFreeWorkoutOnDate(null);
 
-document.getElementById("calendar-mode").onclick = renderCalendar;
+document.getElementById("start-new-btn").onclick = () => {
+    isSelectingDateForFreePass = false;
+    renderCalendar();
+};
+
+document.getElementById("start-free-btn").onclick = () => { 
+    isSelectingDateForFreePass = true;
+    renderCalendar(); 
+};
+
+document.getElementById("calendar-mode").onclick = () => {
+    isSelectingDateForFreePass = false;
+    renderCalendar();
+};
+
 document.getElementById("view-exercises-btn").onclick = () => { showView("exercises-view"); filterExercises(currentExerciseCategory); };
 document.getElementById("view-programs-btn").onclick = () => renderProgramView();
 document.getElementById("stats-mode").onclick = renderStats;
@@ -628,7 +651,7 @@ document.getElementById("save-workout-btn").onclick = () => {
         }))
     };
     
-    if (activeDraft.workout.id.startsWith("free-")) {
+    if (activeDraft.workout.id.toString().startsWith("free-")) {
         if (confirm("Vill du spara detta som ett nytt träningsprogram?")) {
             const newName = prompt("Namnge passet:", "Mitt nya pass");
             if (newName) {
