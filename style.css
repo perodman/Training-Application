@@ -125,6 +125,12 @@ select.log-input { font-size: 16px !important; text-align-last: center; appearan
 .chart-wrapper { display: flex; align-items: flex-end; gap: 10px; height: 150px; padding-top: 20px; }
 .chart-bar { flex: 1; background: var(--primary); border-radius: 6px 6px 0 0; position: relative; }
 
+/* Punkt 2: Roligare Spara-knapp */
+.save-draft-btn {
+    background: #64748b !important;
+    border: 1px solid rgba(255,255,255,0.1);
+}
+
 /* Ny styling för avklarad övning */
 .exercise-done {
     border-color: var(--success) !important;
@@ -140,4 +146,12 @@ select.log-input { font-size: 16px !important; text-align-last: center; appearan
 .exercise-done input {
     pointer-events: none;
     opacity: 0.5;
+}
+
+/* Punkt 1: Gråa ut knappar vid klar övning */
+.exercise-done .mode-btn.glass-border, 
+.exercise-done .reorder-btn,
+.exercise-done button[onclick*="removeSet"] {
+    opacity: 0.3 !important;
+    pointer-events: none !important;
 }
