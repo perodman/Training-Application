@@ -34,10 +34,9 @@
             <div id="calendar-info-box" class="card glass-light" style="margin-bottom: 15px; padding: 10px; text-align: center; border: 1px solid var(--primary); display: none;">
                 <p style="margin: 0; color: var(--primary); font-weight: 700; font-size: 14px;">Välj dag för träningspass</p>
             </div>
-            
             <div class="calendar-nav">
                 <button onclick="changeMonth(-1)" class="nav-arrow">   ❮   </button>
-                <h2 id="month-label" onclick="openMonthPicker()" style="cursor:pointer;"></h2>
+                <h2 id="month-label" style="cursor:pointer;"></h2>
                 <button onclick="changeMonth(1)" class="nav-arrow">   ❯   </button>
             </div>
             <div class="card calendar-card glass-light">
@@ -45,18 +44,13 @@
                     <div>Mån</div><div>Tis</div><div>Ons</div><div>Tor</div><div>Fre</div><div>Lör</div><div>Sön</div>
                 </div>
                 <div class="calendar-grid" id="calendar-grid"></div>
-                <div class="legend">
-                    <div class="legend-item"><div class="legend-color planned"></div> Planerat</div>
-                    <div class="legend-item"><div class="legend-color ongoing"></div> Pågående</div>
-                    <div class="legend-item"><div class="legend-color completed"></div> Genomfört</div>
-                </div>
             </div>
         </div>
 
         <div id="exercises-view" class="view hidden">
             <h2 class="section-title modern-header">Muskelgrupper</h2>
             <div id="category-menu" class="category-grid">
-                <button class="cat-btn glass" data-cat="Ben" onclick="filterExercises('Ben')"><span class="cat-icon">  🦵  </span> Ben</button>
+                <button class="cat-btn glass active" data-cat="Ben" onclick="filterExercises('Ben')"><span class="cat-icon">  🦵  </span> Ben</button>
                 <button class="cat-btn glass" data-cat="Bröst" onclick="filterExercises('Bröst')"><span class="cat-icon">  🏋️  </span> Bröst</button>
                 <button class="cat-btn glass" data-cat="Rygg" onclick="filterExercises('Rygg')"><span class="cat-icon">  🪵  </span> Rygg</button>
                 <button class="cat-btn glass" data-cat="Axlar" onclick="filterExercises('Axlar')"><span class="cat-icon">  👐  </span> Axlar</button>
@@ -78,29 +72,19 @@
                 <div class="separator" style="margin: 30px 0;"></div>
                 <div id="program-exercise-list" class="card glass-modern"></div>
             </div>
-            <button id="add-custom-pass-btn" class="mode-btn glass-border" style="margin-top:20px;">+ Skapa Nytt Pass</button>
-        </div>
-
-        <div id="stats-view" class="view hidden">
-            <h2 class="section-title modern-header">Statistik</h2>
-            <div class="card glass">
-                <h3 style="text-align:center; margin-bottom:20px;">Pass per månad</h3>
-                <div id="chart-container" class="chart-wrapper"></div>
-            </div>
+            <button id="add-custom-pass-btn" onclick="openCreatePassModal()" class="mode-btn glass-border" style="margin-top:20px;">+ Skapa Nytt Pass</button>
         </div>
 
         <div id="workout-view" class="view hidden">
-            <h2 id="active-title" class="section-title modern-header" style="margin-bottom:10px;"></h2>
-            <div class="card glass" style="margin-bottom: 20px; padding: 15px;">
+            <h2 id="active-title" class="section-title modern-header"></h2>
+            <div class="card glass">
                 <div id="workout-timer" class="timer-display">00:00:00</div>
-                <div style="display: flex; gap: 10px;">
-                    <button id="timer-toggle-btn" class="mode-btn glass-border" style="margin-bottom:0; padding:10px;">Pausa  ⏸️ </button>
-                </div>
+                <button id="timer-toggle-btn" class="mode-btn glass-border">Pausa  ⏸️ </button>
             </div>
             <div id="exercise-list"></div>
             <div class="workout-footer">
-                <button id="pause-workout-btn" class="mode-btn glass-border">Spara utkast</button>
-                <button id="save-workout-btn" class="mode-btn green">Avsluta pass</button>
+                <button id="pause-workout-btn" class="mode-btn glass-border" onclick="pauseWorkout()">Spara utkast</button>
+                <button id="save-workout-btn" class="mode-btn green" onclick="finishWorkout()">Avsluta pass</button>
             </div>
         </div>
     </div>
