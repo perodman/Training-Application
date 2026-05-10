@@ -182,11 +182,19 @@ function deleteMasterExercise(id) {
 }
 
 // --- KALENDER ---
-function renderCalendar() {
+function renderCalendar(isFromStartBtn = false) {
     const grid = document.getElementById("calendar-grid");
     const label = document.getElementById("month-label");
     
     grid.innerHTML = "";
+    
+    // Punkt 4: Notis om val av dag
+    if(isFromStartBtn === true) {
+        grid.innerHTML = `<div style="grid-column: span 7; background:rgba(34, 211, 238, 0.1); padding:12px; border-radius:12px; margin-bottom:15px; font-size:13px; text-align:center; color:var(--primary); border:1px solid var(--primary);">
+            Välj vilken dag du vill starta eller schemalägga ett pass i kalendern nedan 📅
+        </div>`;
+    }
+
     const year = currentViewDate.getFullYear();
     const month = currentViewDate.getMonth();
     const monthText = currentViewDate.toLocaleString('sv-SE', { month: 'long', year: 'numeric' });
@@ -244,10 +252,11 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
                     <span style="color:var(--text-light)">${ex.name}:</span><br>`;
                 if(ex.sets_data) {
                     ex.sets_data.forEach((s, sIdx) => {
-                        html += `<span style="color:var(--primary); font-weight:700;">Set ${sIdx+1}: ${s.weight}kg x ${s.reps}</span><br>`;
+                        // Punkt 3: Nytt format för historik
+                        html += `<span style="color:var(--primary); font-weight:700;">Set ${sIdx+1}: ${s.weight} kg x ${s.reps} reps</span><br>`;
                     });
                 } else {
-                    html += `<span style="color:var(--primary); font-weight:700;">${ex.weight} kg x ${ex.reps} x ${ex.sets} set</span>`;
+                    html += `<span style="color:var(--primary); font-weight:700;">Set: ${ex.weight} kg x ${ex.reps} reps x ${ex.sets} set</span>`;
                 }
                 html += `</div>`;
             });
@@ -282,7 +291,7 @@ function startFreeWorkoutOnDate(date) {
 
 function openMonthPicker() {
     const body = document.getElementById("modal-body");
-    let html = `<h3>Välj månad</h3><div style="displaygrid; grid-template-columns: 1fr 1fr; gap:10px;">`;
+    let html = `<h3>Välj månad</h3><div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">`;
     const months = ["Januari", "Februari", "Mars", "April", "Maj", "Juni", "Juli", "Augusti", "September", "Oktober", "November", "December"];
     months.forEach((m, i) => { html += `<button class="mode-btn glass-border" style="font-size:14px;" onclick="selectMonth(${i})">${m}</button>`; });
     body.innerHTML = html + `</div>`;
@@ -474,9 +483,12 @@ function startWorkout(workout, data = null, date = null, isImmediateStart = fals
 function renderActiveWorkout() {
     document.getElementById("active-title").textContent = activeDraft.workout.name;
     const list = document.getElementById("exercise-list");
+    const footer = document.querySelector(".workout-footer");
     list.innerHTML = "";
 
+    // Punkt 5: Dölj fottern tills passet är startat
     if(!activeDraft.isStarted) {
+        footer.classList.add("hidden");
         list.innerHTML = `
             <div style="text-align:center; padding:20px 0;">
                 <button class="mode-btn green" style="width:100%; padding:20px; font-size:18px; box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3);" onclick="actuallyStartWorkout()">STARTA TRÄNINGSPASSET 🔥</button>
@@ -487,6 +499,13 @@ function renderActiveWorkout() {
         showView("workout-view");
         return;
     }
+
+    footer.classList.remove("hidden"); // Visa footer när passet är igång
+
+    // Punkt 2: Uppdaterad Spara-knapp med ikon
+    const pauseBtn = document.getElementById("pause-workout-btn");
+    pauseBtn.innerHTML = `Spara utkast 💾`;
+    pauseBtn.className = "mode-btn save-draft-btn";
 
     activeDraft.workout.exercises.forEach((ex, i) => {
         const exerciseData = activeDraft.data[i];
@@ -508,12 +527,12 @@ function renderActiveWorkout() {
                 <span style="font-size:12px; font-weight:800; color:var(--primary)">#${sIdx + 1}</span>
                 <input type="number" id="w-${i}-${sIdx}" class="log-input" style="margin:0; padding:8px;" placeholder="0" value="${set.weight}" onchange="updateSetData(${i}, ${sIdx})">
                 <input type="number" id="r-${i}-${sIdx}" class="log-input" style="margin:0; padding:8px;" placeholder="0" value="${set.reps}" onchange="updateSetData(${i}, ${sIdx})">
-                <button onclick="removeSetFromExercise(${i}, ${sIdx})" style="background:none; border:none; color:var(--danger); font-size:16px;">×</button>
+                <button onclick="removeSetFromExercise(${i}, ${sIdx})" style="background:none; border:none; color:var(--danger); font-size:16px;" ${isDone ? 'disabled' : ''}>×</button>
             </div>`;
         });
 
         setsHtml += `
-            <button class="mode-btn glass-border" style="padding:8px; font-size:11px; margin-top:5px; border-style:dashed;" onclick="addSetToExercise(${i})">+ Lägg till set</button>
+            <button class="mode-btn glass-border" style="padding:8px; font-size:11px; margin-top:5px; border-style:dashed;" onclick="addSetToExercise(${i})" ${isDone ? 'disabled' : ''}>+ Lägg till set</button>
             <button class="mode-btn ${isDone ? 'blue' : 'green'}" style="padding:10px; font-size:13px; margin-top:10px;" onclick="toggleExerciseDone(${i})">
                 ${isDone ? 'Ångra Klar ↩️' : 'Marker som klar ✅'}
             </button>
@@ -522,11 +541,11 @@ function renderActiveWorkout() {
         div.innerHTML = `
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
             <div style="display:flex; gap:8px;">
-                <button class="reorder-btn" onclick="moveActiveExercise(${i}, -1)">▲</button>
-                <button class="reorder-btn" onclick="moveActiveExercise(${i}, 1)">▼</button>
+                <button class="reorder-btn" onclick="moveActiveExercise(${i}, -1)" ${isDone ? 'disabled' : ''}>▲</button>
+                <button class="reorder-btn" onclick="moveActiveExercise(${i}, 1)" ${isDone ? 'disabled' : ''}>▼</button>
             </div>
             <strong style="font-size:16px;">${ex.name}</strong>
-            <button onclick="removeActiveExercise(${i})" style="color:var(--danger); background:none; border:none; font-size:20px;"> ✖ </button>
+            <button onclick="removeActiveExercise(${i})" style="color:var(--danger); background:none; border:none; font-size:20px;" ${isDone ? 'disabled' : ''}> ✖ </button>
         </div>
         ${setsHtml}`;
         
@@ -668,7 +687,8 @@ document.getElementById("global-home").onclick = () => {
     pauseTimer();
     location.reload();
 }
-document.getElementById("start-new-btn").onclick = renderCalendar;
+// Punkt 4: Skicka med argument för notis
+document.getElementById("start-new-btn").onclick = () => renderCalendar(true);
 
 const freeBtn = document.getElementById("start-free-btn");
 if(freeBtn) freeBtn.onclick = () => startFreeWorkoutOnDate(null);
