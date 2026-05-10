@@ -7,7 +7,7 @@ let currentViewDate = new Date();
 let currentExerciseCategory = "Ben";
 
 let timerInterval = null;
-let secondsElapsed = 0;
+let secondsElapsed = (activeDraft && activeDraft.secondsElapsed) ? activeDraft.secondsElapsed : 0;
 let isTimerRunning = false;
 
 // --- INIT ---
@@ -34,29 +34,19 @@ function saveAll() {
     localStorage.setItem("masterExercises", JSON.stringify(masterExercises));
     localStorage.setItem("workoutHistory", JSON.stringify(workoutHistory));
     localStorage.setItem("calendarOverrides", JSON.stringify(calendarOverrides));
+    localStorage.setItem("activeWorkoutDraft", JSON.stringify(activeDraft));
 }
 
 function showView(id) {
-    const target = document.getElementById(id);
-    if(!target) return;
-    if (target.classList.contains("hidden")) {
-        document.querySelectorAll(".view").forEach(v => v.classList.add("hidden"));
-        target.classList.remove("hidden");
-        target.style.animation = 'none';
-        target.offsetHeight; 
-        target.style.animation = null;
-    }
+    document.querySelectorAll(".view").forEach(v => v.classList.add("hidden"));
+    document.getElementById(id).classList.remove("hidden");
     window.scrollTo(0, 0);
 }
 
-function closeModal() {
-    document.getElementById("workout-modal").classList.add("hidden");
-}
+function closeModal() { document.getElementById("workout-modal").classList.add("hidden"); }
+function openModal() { document.getElementById("workout-modal").classList.remove("hidden"); }
 
-function openModal() {
-    document.getElementById("workout-modal").classList.remove("hidden");
-}
-
+// --- TIMER ---
 function updateTimerDisplay() {
     const hrs = String(Math.floor(secondsElapsed / 3600)).padStart(2, '0');
     const mins = String(Math.floor((secondsElapsed % 3600) / 60)).padStart(2, '0');
@@ -71,10 +61,7 @@ function startTimer() {
     timerInterval = setInterval(() => {
         secondsElapsed++;
         updateTimerDisplay();
-        if(activeDraft) {
-            activeDraft.secondsElapsed = secondsElapsed;
-            localStorage.setItem("activeWorkoutDraft", JSON.stringify(activeDraft));
-        }
+        if(activeDraft) activeDraft.secondsElapsed = secondsElapsed;
     }, 1000);
 }
 
@@ -89,22 +76,7 @@ document.getElementById("timer-toggle-btn").onclick = () => {
     else startTimer();
 };
 
-function filterExercises(category) {
-    currentExerciseCategory = category;
-    document.querySelectorAll(".cat-btn").forEach(b => b.classList.toggle("active", b.dataset.cat === category));
-    const results = document.getElementById("exercise-results");
-    results.innerHTML = "";
-    const filtered = masterExercises.filter(ex => category === "Armar" ? (ex.target === "Biceps" || ex.target === "Triceps") : ex.target === category);
-    filtered.forEach(ex => {
-        const div = document.createElement("div");
-        div.className = "card glass";
-        div.style.cssText = "padding:15px; display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;";
-        div.innerHTML = `<div><strong style="font-size:16px;">${ex.name}</strong><br><small style="color:var(--primary); font-weight:800; text-transform:uppercase; font-size:10px;">${ex.target}</small></div>
-        <button style="background:none; border:none; font-size:18px; cursor:pointer;" onclick="openEditExerciseModal(${ex.id})"> ⚙️ </button>`;
-        results.appendChild(div);
-    });
-}
-
+// --- KALENDER ---
 function renderCalendar() {
     const grid = document.getElementById("calendar-grid");
     const label = document.getElementById("month-label");
@@ -113,6 +85,7 @@ function renderCalendar() {
     const month = currentViewDate.getMonth();
     const monthText = currentViewDate.toLocaleString('sv-SE', { month: 'long', year: 'numeric' });
     label.textContent = monthText.charAt(0).toUpperCase() + monthText.slice(1);
+    
     const firstDay = new Date(year, month, 1).getDay();
     const offset = firstDay === 0 ? 6 : firstDay - 1;
     const daysInMonth = new Date(year, month + 1, 0).getDate();
@@ -122,24 +95,22 @@ function renderCalendar() {
         const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
         const cell = document.createElement("div");
         cell.className = "calendar-cell";
-        const hasWorkouts = workoutHistory.filter(w => w.date === dateStr);
+        
+        const completed = workoutHistory.filter(w => w.date === dateStr);
         const isOngoing = activeDraft && activeDraft.date === dateStr && activeDraft.isStarted;
-        const dayOfWeek = new Date(year, month, d).getDay();
-        const isAutoDay = [1, 3, 5].includes(dayOfWeek);
         const override = calendarOverrides[dateStr];
+        
         let displayPass = null;
-
         if (override === "free") displayPass = { name: "Fritt Pass", id: "free" };
         else if (override && override !== "none") displayPass = programData.routine.find(p => p.id === override);
-        else if (isAutoDay && override !== "none") displayPass = programData.routine[d % programData.routine.length];
         
         let info = "";
-        if (hasWorkouts.length > 0) { cell.classList.add("cell-completed"); info = "✓"; }
+        if (completed.length > 0) { cell.classList.add("cell-completed"); info = "✓"; }
         else if (isOngoing) { cell.classList.add("cell-ongoing"); info = "⏱️"; }
         else if (displayPass) { cell.classList.add("cell-planned"); info = displayPass.name.split(" ").pop(); }
         
         cell.innerHTML = `<span>${d}</span><span>${info}</span>`;
-        cell.onclick = () => openDayManager(dateStr, displayPass, hasWorkouts, isOngoing);
+        cell.onclick = () => openDayManager(dateStr, displayPass, completed, isOngoing);
         grid.appendChild(cell);
     }
     showView("calendar-view");
@@ -150,37 +121,29 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
     let html = `<h3>${dateStr}</h3>`;
     
     if (completed.length > 0) {
-        completed.forEach((w, idx) => {
-            const timeStr = w.totalTime ? `⏱️ ${w.totalTime}` : "";
+        completed.forEach(w => {
             html += `<div class="card glass" style="border-left:4px solid var(--success); text-align:left; margin-bottom:10px;">
-                <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <strong>${w.programName}</strong>
-                    <div style="font-size:10px; color:var(--text-light)">${timeStr}</div>
-                </div>
+                <strong>${w.programName}</strong><br><small>⏱️ ${w.totalTime || "Klar"}</small>
             </div>`;
         });
     } else if (isOngoing) {
         html += `<button class="mode-btn orange" onclick="closeModal(); startWorkout(activeDraft.workout, activeDraft.data, activeDraft.date)">Fortsätt pågående pass</button>`;
     } else {
-        html += `<p style="text-align:center;">Planerat: <strong id="planned-display-name">${planned ? planned.name : 'Vila'}</strong></p>`;
-        if(planned) {
-            html += `<button class="mode-btn green" id="start-planned-btn" onclick="prepareStart('${dateStr}', '${planned.id}')">Starta ${planned.name} 🔥</button>`;
+        html += `<p style="text-align:center;">Planerat: <strong id="planned-name">${planned ? planned.name : 'Vila'}</strong></p>`;
+        
+        // Startknapp visas endast om ett pass (inkl fritt) är valt och inget annat pågår
+        if(planned && !activeDraft) {
+            html += `<button class="mode-btn green" id="modal-start-btn" onclick="prepareStart('${dateStr}', '${planned.id}')">Starta ${planned.name} 🔥</button>`;
+        } else if (activeDraft) {
+            html += `<p style="color:var(--warning); font-size:11px; text-align:center;">Avsluta pågående pass för att starta nytt.</p>`;
         }
-        
-        html += `<div class="separator"></div><p style="font-size:11px; text-transform:uppercase; color:var(--text-light); text-align:center;">Ändra planering:</p>`;
-        
-        // Kompakt rutnät för knappar
-        html += `<div class="plan-grid">`;
-        programData.routine.forEach(p => {
-            const isSelected = planned && p.id === planned.id;
-            html += `<button class="mode-btn mini glass-border ${isSelected ? 'btn-selected' : ''}" onclick="setOverride('${dateStr}', '${p.id}', this)">${p.name}</button>`;
-        });
-        // Lägg till Fritt Pass
-        const isFreeSelected = planned && planned.id === 'free';
-        html += `<button class="mode-btn mini glass-border ${isFreeSelected ? 'btn-selected' : ''}" onclick="setOverride('${dateStr}', 'free', this)">Fritt Pass</button>`;
-        // Vila
-        html += `<button class="mode-btn mini glass-border" style="color:var(--danger);" onclick="setOverride('${dateStr}', 'none', this)">Vila</button>`;
-        html += `</div>`;
+
+        html += `<div class="separator"></div><p style="font-size:11px; text-transform:uppercase; color:var(--text-light); text-align:center;">Ändra planering:</p>
+        <div class="plan-grid">
+            ${programData.routine.map(p => `<button class="mode-btn mini glass-border ${planned && planned.id === p.id ? 'btn-selected' : ''}" onclick="setOverride('${dateStr}', '${p.id}', this)">${p.name}</button>`).join("")}
+            <button class="mode-btn mini glass-border ${planned && planned.id === 'free' ? 'btn-selected' : ''}" onclick="setOverride('${dateStr}', 'free', this)">Fritt Pass</button>
+            <button class="mode-btn mini glass-border" style="color:var(--danger);" onclick="setOverride('${dateStr}', 'none', this)">Vila</button>
+        </div>`;
     }
     body.innerHTML = html;
     openModal();
@@ -189,99 +152,152 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
 function setOverride(date, val, btn) {
     calendarOverrides[date] = val;
     saveAll();
-    
-    // Visuell feedback i modalen utan att stänga den
-    const container = btn.parentElement;
-    container.querySelectorAll('button').forEach(b => b.classList.remove('btn-selected'));
+    const grid = btn.parentElement;
+    grid.querySelectorAll('button').forEach(b => b.classList.remove('btn-selected'));
     if(val !== 'none') btn.classList.add('btn-selected');
-
-    // Uppdatera texten i modalen
-    const display = document.getElementById('planned-display-name');
-    let newName = "Vila";
-    if(val === 'free') newName = "Fritt Pass";
-    else if(val !== 'none') newName = programData.routine.find(p => p.id === val).name;
-    display.innerText = newName;
-
-    // Uppdatera startknappen om den finns
-    const startBtn = document.getElementById('start-planned-btn');
-    if(startBtn) {
-        if(val === 'none') startBtn.classList.add('hidden');
-        else {
-            startBtn.classList.remove('hidden');
-            startBtn.innerText = `Starta ${newName} 🔥`;
-            startBtn.onclick = () => prepareStart(date, val);
-        }
-    }
     
-    renderCalendar(); // Uppdatera underliggande kalendervy
+    const display = document.getElementById('planned-name');
+    let name = "Vila";
+    if(val === 'free') name = "Fritt Pass";
+    else if(val !== 'none') name = programData.routine.find(p => p.id === val).name;
+    display.innerText = name;
+    
+    renderCalendar();
 }
 
+// --- TRÄNINGSFLÖDE ---
 function prepareStart(date, id) {
     let p;
     if(id === 'free') p = { id: "free-" + Date.now(), name: "Fritt Pass", exercises: [] };
     else p = programData.routine.find(x => x.id === id);
-    closeModal(); 
+    closeModal();
     startWorkout(p, null, date, false);
 }
 
-function startWorkout(workout, data = null, date = null, isImmediateStart = false) {
-    secondsElapsed = (activeDraft && activeDraft.secondsElapsed) ? activeDraft.secondsElapsed : 0;
-    activeDraft = { 
-        workout: JSON.parse(JSON.stringify(workout)), 
-        data: data || workout.exercises.map(()=>({weight:"", reps:"", sets:3})), 
-        date: date || new Date().toISOString().split('T')[0],
-        secondsElapsed: secondsElapsed,
-        isStarted: isImmediateStart || (activeDraft ? activeDraft.isStarted : false)
-    };
+function startWorkout(workout, data = null, date = null, isImmediate = false) {
+    if(!activeDraft || activeDraft.workout.id === workout.id) {
+        activeDraft = activeDraft || {
+            workout: JSON.parse(JSON.stringify(workout)),
+            data: data || workout.exercises.map(() => ({ weight: "", reps: "", sets: 3 })),
+            date: date || new Date().toISOString().split('T')[0],
+            secondsElapsed: secondsElapsed,
+            isStarted: isImmediate
+        };
+    }
     renderActiveWorkout();
-    updateTimerDisplay();
-    if(activeDraft.isStarted) startTimer();
-    else pauseTimer();
 }
 
 function renderActiveWorkout() {
     document.getElementById("active-title").textContent = activeDraft.workout.name;
     const list = document.getElementById("exercise-list");
     list.innerHTML = "";
+    
     if(!activeDraft.isStarted) {
-        list.innerHTML = `<div style="text-align:center; padding:20px 0;"><button class="mode-btn green" style="width:100%; padding:20px; font-size:18px;" onclick="actuallyStartWorkout()">STARTA TRÄNINGSPASSET 🔥</button></div>`;
+        list.innerHTML = `<button class="mode-btn green" onclick="actuallyStart()">STARTA TRÄNINGSPASSET 🔥</button>`;
         showView("workout-view");
         return;
     }
+
     activeDraft.workout.exercises.forEach((ex, i) => {
         const val = activeDraft.data[i];
         const div = document.createElement("div");
         div.className = "card glass";
-        div.innerHTML = `<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;"><strong>${ex.name}</strong></div>
-        <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:10px;">
-            <input type="number" id="w-${i}" class="log-input" placeholder="kg" value="${val.weight}" onchange="updateDraftData(${i})">
-            <input type="number" id="r-${i}" class="log-input" placeholder="reps" value="${val.reps}" onchange="updateDraftData(${i})">
-            <input type="number" id="s-${i}" class="log-input" placeholder="set" value="${val.sets}" onchange="updateDraftData(${i})">
+        div.innerHTML = `<strong>${ex.name}</strong>
+        <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:10px; margin-top:10px;">
+            <input type="number" class="log-input" placeholder="kg" value="${val.weight}" onchange="updateVal(${i}, 'weight', this.value)">
+            <input type="number" class="log-input" placeholder="reps" value="${val.reps}" onchange="updateVal(${i}, 'reps', this.value)">
+            <input type="number" class="log-input" placeholder="set" value="${val.sets}" onchange="updateVal(${i}, 'sets', this.value)">
         </div>`;
         list.appendChild(div);
     });
+
+    // Lägg till knappar för att Spara och Avsluta längst ner
+    const footer = document.createElement("div");
+    footer.innerHTML = `
+        <button class="mode-btn blue" onclick="saveDraft()">Spara utkast 💾</button>
+        <button class="mode-btn green" onclick="finishWorkout()">Avsluta pass ✅</button>
+    `;
+    list.appendChild(footer);
+    
+    updateTimerDisplay();
+    startTimer();
     showView("workout-view");
 }
 
-function actuallyStartWorkout() {
+function actuallyStart() {
     activeDraft.isStarted = true;
-    localStorage.setItem("activeWorkoutDraft", JSON.stringify(activeDraft));
+    saveAll();
     renderActiveWorkout();
-    startTimer();
 }
 
-document.getElementById("global-home").onclick = () => { pauseTimer(); location.reload(); }
+function updateVal(idx, key, val) {
+    activeDraft.data[idx][key] = val;
+    saveAll();
+}
+
+function saveDraft() {
+    saveAll();
+    alert("Utkast sparat!");
+    location.reload();
+}
+
+function finishWorkout() {
+    if(!confirm("Vill du avsluta och spara passet?")) return;
+    pauseTimer();
+    const historyItem = {
+        date: activeDraft.date,
+        programName: activeDraft.workout.name,
+        totalTime: document.getElementById("workout-timer").textContent,
+        exercises: activeDraft.data
+    };
+    workoutHistory.push(historyItem);
+    activeDraft = null;
+    secondsElapsed = 0;
+    saveAll();
+    renderHome();
+}
+
+// --- PROGRAM-VY ---
+function renderProgramView() {
+    const list = document.getElementById("program-list");
+    list.innerHTML = "";
+    programData.routine.forEach((p, idx) => {
+        const card = document.createElement("div");
+        card.className = "card glass";
+        card.innerHTML = `<strong>${p.name}</strong><br><small>${p.exercises.length} övningar</small>`;
+        card.onclick = () => {
+            const body = document.getElementById("modal-body");
+            body.innerHTML = `<h3>${p.name}</h3>` + p.exercises.map(ex => `<div class="edit-item-row">${ex.name}</div>`).join("");
+            openModal();
+        };
+        list.appendChild(card);
+    });
+    showView("programs-view");
+}
+
+// --- NAVIGATION ---
+document.getElementById("global-home").onclick = () => location.reload();
 document.getElementById("start-new-btn").onclick = renderCalendar;
-document.getElementById("start-free-btn").onclick = renderCalendar; // Ändrat: Går nu till kalender
+document.getElementById("start-free-btn").onclick = renderCalendar;
 document.getElementById("calendar-mode").onclick = renderCalendar;
-document.getElementById("view-exercises-btn").onclick = () => { showView("exercises-view"); filterExercises(currentExerciseCategory); };
-document.getElementById("view-programs-btn").onclick = () => renderProgramView();
+document.getElementById("view-exercises-btn").onclick = () => showView("exercises-view");
+document.getElementById("view-programs-btn").onclick = renderProgramView;
 
 function renderHome() {
     showView("home-view");
+    const alert = document.getElementById("draft-alert");
+    const startBtn = document.getElementById("start-new-btn");
+    const freeBtn = document.getElementById("start-free-btn");
+
     if(activeDraft) {
-        document.getElementById("draft-alert").classList.remove("hidden");
-        document.getElementById("resume-workout-btn").onclick = () => startWorkout(activeDraft.workout, activeDraft.data, activeDraft.date);
+        alert.classList.remove("hidden");
+        startBtn.classList.add("hidden"); // Döljer "Starta träningspass" om pass pågår
+        freeBtn.classList.add("hidden");  // Döljer "Fritt pass" om pass pågår
+        document.getElementById("resume-workout-btn").onclick = () => renderActiveWorkout();
+    } else {
+        alert.classList.add("hidden");
+        startBtn.classList.remove("hidden");
+        freeBtn.classList.remove("hidden");
     }
 }
 
