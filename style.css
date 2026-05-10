@@ -131,20 +131,32 @@ select.log-input { font-size: 16px !important; text-align-last: center; appearan
 }
 .drag-handle:active { cursor: grabbing; }
 
-/* Det kortet som blir kvar under de andra medan du drar */
+/* Det genomskinliga kortet som markerar destinationen */
 .sortable-ghost {
-    opacity: 0.3;
+    opacity: 0.1;
     background: var(--primary) !important;
+    transform: scale(0.95);
+    transition: all 0.2s ease;
 }
 
 /* Det kortet du faktiskt håller i (medan det rör sig) */
 .sortable-chosen {
     border: 2px solid var(--primary);
-    box-shadow: 0 10px 20px rgba(0,0,0,0.4);
-    transform: scale(1.02);
+    box-shadow: 0 15px 30px rgba(0,0,0,0.5);
+    background: rgba(15, 23, 42, 0.95) !important; /* Lite mörkare för att "poppa" */
+    z-index: 9999;
 }
 
-/* Förstärk känslan av att kortet lyfts */
+/* Kortet i rörelse */
 .sortable-drag {
     cursor: grabbing;
+    opacity: 0.9;
+    transform: rotate(2deg) scale(1.05); /* En liten lutning gör att det känns som det hänger i fingret */
+}
+
+/* Hindrar att man råkar markera text medan man drar på mobil */
+.active-workout-item, .edit-item-row {
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: none; /* KRITISKT för att drag-and-drop ska fungera direkt */
 }
