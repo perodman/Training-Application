@@ -18,17 +18,14 @@ body { font-family: 'Inter', sans-serif; background: #0f172a; color: var(--text)
 .app-container { max-width: 500px; margin: auto; padding: 80px 20px 20px; }
 .hidden { display: none !important; }
 
-/* Animations */
 .view { animation: fadeIn 0.4s ease-out; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-/* Typography */
 .main-title { font-family: 'Montserrat', sans-serif; font-size: 56px; font-weight: 900; text-align: center; margin: 0; letter-spacing: -2px; }
 .subtitle { text-align: center; color: var(--primary); font-weight: 700; text-transform: uppercase; font-size: 11px; letter-spacing: 4px; margin-bottom: 40px; }
 .modern-header { font-family: 'Montserrat', sans-serif; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; background: linear-gradient(to right, #fff, var(--primary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 1.6rem; }
 .section-title { text-align: center; margin-bottom: 25px; }
 
-/* Cards & Buttons */
 .glass { background: var(--card); backdrop-filter: blur(12px); border: 1px solid var(--glass-border); border-radius: 24px; }
 .glass-light { background: var(--card-light); border: 1px solid rgba(255,255,255,0.2); border-radius: 24px; }
 .card { padding: 20px; margin-bottom: 15px; }
@@ -40,7 +37,7 @@ body { font-family: 'Inter', sans-serif; background: #0f172a; color: var(--text)
 .orange { background: var(--warning); color: white; }
 .glass-border { background: transparent; border: 2px solid var(--glass-border); color: white; }
 
-/* Program Cards (Återställd Design) */
+/* Program Cards */
 .program-modern-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
 .prog-card { 
     background: linear-gradient(135deg, rgba(34, 211, 238, 0.12), rgba(129, 140, 248, 0.12)); 
@@ -55,13 +52,12 @@ body { font-family: 'Inter', sans-serif; background: #0f172a; color: var(--text)
 .prog-card.active { 
     border-color: var(--primary); 
     background: linear-gradient(135deg, rgba(34, 211, 238, 0.25), rgba(129, 140, 248, 0.25)); 
-    box-shadow: 0 8px 25px rgba(34, 211, 238, 0.2);
 }
-.prog-icon { font-size: 32px; margin-bottom: 12px; display: block; filter: drop-shadow(0 2px 5px rgba(0,0,0,0.3)); }
+.prog-icon { font-size: 32px; margin-bottom: 12px; display: block; }
 .prog-card h4 { margin: 0; font-size: 1.1rem; font-weight: 800; color: white; }
 .prog-card small { color: var(--primary); font-weight: 600; font-size: 11px; text-transform: uppercase; margin-top: 5px; display: block; }
 
-/* Klar-knapp i övningskort */
+/* Klar-knapp */
 .exercise-done-card { background: rgba(16, 185, 129, 0.08) !important; border: 1px solid rgba(16, 185, 129, 0.3) !important; }
 .done-toggle-btn {
     width: 100%;
@@ -87,17 +83,17 @@ body { font-family: 'Inter', sans-serif; background: #0f172a; color: var(--text)
     box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
 }
 
-/* Kalender */
 .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
 .calendar-cell { aspect-ratio: 1; border-radius: 12px; background: rgba(255,255,255,0.05); display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 13px; cursor: pointer; border: 1px solid transparent; }
 .cell-completed { background: var(--success) !important; }
 .cell-ongoing { border: 2px solid var(--warning) !important; color: var(--warning); }
 .cell-planned { border: 1px solid var(--primary) !important; color: var(--primary); }
 
-/* Övrigt */
 .separator { height: 1px; background: linear-gradient(90deg, transparent, var(--glass-border), transparent); margin: 25px 0; }
 .circle-ctrl { background: var(--card); border: 1px solid var(--glass-border); width: 45px; height: 45px; border-radius: 15px; display: flex; align-items: center; justify-content: center; position: fixed; top: 20px; right: 20px; z-index: 1000; cursor: pointer; }
 .timer-display { font-family: 'Montserrat', sans-serif; font-size: 2rem; font-weight: 900; text-align: center; margin: 10px 0; color: var(--primary); }
 .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px); display: flex; align-items: center; justify-content: center; z-index: 9999; padding: 20px; }
 .modal-content { padding: 25px; border-radius: 28px; width: 100%; max-width: 420px; background: #1e293b; border: 1px solid var(--glass-border); overflow-y: auto; max-height: 85vh; }
 .log-input { width: 100%; padding: 12px; border-radius: 12px; border: 1px solid var(--glass-border); background: rgba(0,0,0,0.2); color: white; text-align: center; font-weight: 700; margin-bottom: 10px; }
+.edit-item-row { display: flex; justify-content: space-between; align-items: center; padding: 10px; background: rgba(255,255,255,0.05); border-radius: 10px; margin-bottom: 5px; }
+.add-inline-btn { background: var(--primary); border: none; width: 30px; height: 30px; border-radius: 8px; font-weight: 900; cursor: pointer; }
