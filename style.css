@@ -19,7 +19,7 @@ body { font-family: 'Inter', sans-serif; background: #0f172a; color: var(--text)
 
 .hidden { display: none !important; }
 
-/* 1. Micro-interactions & Vy-övergångar */
+/* Vy-övergångar */
 .view {
     animation: fadeIn 0.4s ease-out;
 }
@@ -34,7 +34,7 @@ body { font-family: 'Inter', sans-serif; background: #0f172a; color: var(--text)
     filter: brightness(1.1);
 }
 
-/* 2. Timer Styling */
+/* Timer Styling */
 .timer-display {
     font-family: 'Montserrat', sans-serif;
     font-size: 2rem;
@@ -45,7 +45,7 @@ body { font-family: 'Inter', sans-serif; background: #0f172a; color: var(--text)
     text-shadow: 0 0 15px rgba(34, 211, 238, 0.3);
 }
 
-/* 3. Modern Månadslabel (utan blå linje) */
+/* Månadslabel */
 #month-label {
     font-size: 1.1rem;
     font-weight: 700;
@@ -58,7 +58,20 @@ body { font-family: 'Inter', sans-serif; background: #0f172a; color: var(--text)
     text-decoration: none !important;
 }
 
-/* 4. Modern Menytext */
+/* Kalendernotis ovanför kalendern */
+.calendar-hint {
+    background: rgba(34, 211, 238, 0.1);
+    padding: 15px;
+    border-radius: 16px;
+    margin-bottom: 20px;
+    font-size: 13px;
+    text-align: center;
+    color: var(--primary);
+    border: 1px solid rgba(34, 211, 238, 0.3);
+    font-weight: 600;
+}
+
+/* Menytext */
 .menu-grid .mode-btn {
     font-family: 'Inter', sans-serif;
     font-weight: 800;
@@ -87,11 +100,23 @@ body { font-family: 'Inter', sans-serif; background: #0f172a; color: var(--text)
 .prog-card.active { border-color: var(--primary); background: linear-gradient(135deg, rgba(34, 211, 238, 0.25) 0%, rgba(129, 140, 248, 0.25) 100%); box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
 .prog-card h4 { margin: 10px 0 0; font-size: 1.1rem; font-weight: 800; }
 .glass-modern { background: rgba(30, 41, 59, 0.7); border: 1px solid var(--glass-border); border-radius: 24px; box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1); backdrop-filter: blur(5px); }
+
 .mode-btn { width: 100%; padding: 20px; border-radius: 18px; border: none; color: white; font-weight: 700; cursor: pointer; margin-bottom: 12px; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 1.05rem; font-family: 'Inter', sans-serif; }
 .blue { background: var(--primary); color: #0f172a; }
 .green { background: var(--success); }
 .orange { background: var(--warning); }
 .glass-border { background: transparent; border: 2px solid var(--glass-border); color: white; }
+
+/* Justering för Plus-tecken (+) och ikoner för bättre kontrast */
+.mode-btn.glass-border, 
+.add-inline-btn, 
+button[onclick*="addSet"],
+button[onclick*="openAddExercise"] {
+    color: var(--primary) !important;
+    border-color: rgba(34, 211, 238, 0.4) !important;
+    font-weight: 800;
+}
+
 .btn-disabled { opacity: 0.8; cursor: not-allowed; pointer-events: none; background: rgba(255,255,255,0.05) !important; color: rgba(255,255,255,0.3) !important; }
 .calendar-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
 .nav-arrow { background: var(--card); border: 1px solid var(--glass-border); color: white; padding: 10px 15px; border-radius: 12px; cursor: pointer; }
@@ -125,13 +150,11 @@ select.log-input { font-size: 16px !important; text-align-last: center; appearan
 .chart-wrapper { display: flex; align-items: flex-end; gap: 10px; height: 150px; padding-top: 20px; }
 .chart-bar { flex: 1; background: var(--primary); border-radius: 6px 6px 0 0; position: relative; }
 
-/* Punkt 2: Roligare Spara-knapp */
 .save-draft-btn {
     background: #64748b !important;
     border: 1px solid rgba(255,255,255,0.1);
 }
 
-/* Ny styling för avklarad övning */
 .exercise-done {
     border-color: var(--success) !important;
     background: rgba(16, 185, 129, 0.1) !important;
@@ -148,7 +171,6 @@ select.log-input { font-size: 16px !important; text-align-last: center; appearan
     opacity: 0.5;
 }
 
-/* Punkt 1: Gråa ut knappar vid klar övning */
 .exercise-done .mode-btn.glass-border, 
 .exercise-done .reorder-btn,
 .exercise-done button[onclick*="removeSet"] {
