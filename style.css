@@ -19,7 +19,7 @@ body { font-family: 'Inter', sans-serif; background: #0f172a; color: var(--text)
 
 .hidden { display: none !important; }
 
-/* Vy-övergångar */
+/* 1. Micro-interactions & Vy-övergångar */
 .view {
     animation: fadeIn 0.4s ease-out;
 }
@@ -34,7 +34,7 @@ body { font-family: 'Inter', sans-serif; background: #0f172a; color: var(--text)
     filter: brightness(1.1);
 }
 
-/* Timer Styling */
+/* 2. Timer Styling */
 .timer-display {
     font-family: 'Montserrat', sans-serif;
     font-size: 2rem;
@@ -45,7 +45,7 @@ body { font-family: 'Inter', sans-serif; background: #0f172a; color: var(--text)
     text-shadow: 0 0 15px rgba(34, 211, 238, 0.3);
 }
 
-/* Månadslabel */
+/* 3. Modern Månadslabel (utan blå linje) */
 #month-label {
     font-size: 1.1rem;
     font-weight: 700;
@@ -58,20 +58,7 @@ body { font-family: 'Inter', sans-serif; background: #0f172a; color: var(--text)
     text-decoration: none !important;
 }
 
-/* Kalendernotis ovanför kalendern */
-.calendar-hint {
-    background: rgba(34, 211, 238, 0.1);
-    padding: 15px;
-    border-radius: 16px;
-    margin-bottom: 20px;
-    font-size: 13px;
-    text-align: center;
-    color: var(--primary);
-    border: 1px solid rgba(34, 211, 238, 0.3);
-    font-weight: 600;
-}
-
-/* Menytext */
+/* 4. Modern Menytext */
 .menu-grid .mode-btn {
     font-family: 'Inter', sans-serif;
     font-weight: 800;
@@ -100,23 +87,11 @@ body { font-family: 'Inter', sans-serif; background: #0f172a; color: var(--text)
 .prog-card.active { border-color: var(--primary); background: linear-gradient(135deg, rgba(34, 211, 238, 0.25) 0%, rgba(129, 140, 248, 0.25) 100%); box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
 .prog-card h4 { margin: 10px 0 0; font-size: 1.1rem; font-weight: 800; }
 .glass-modern { background: rgba(30, 41, 59, 0.7); border: 1px solid var(--glass-border); border-radius: 24px; box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1); backdrop-filter: blur(5px); }
-
 .mode-btn { width: 100%; padding: 20px; border-radius: 18px; border: none; color: white; font-weight: 700; cursor: pointer; margin-bottom: 12px; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 1.05rem; font-family: 'Inter', sans-serif; }
 .blue { background: var(--primary); color: #0f172a; }
 .green { background: var(--success); }
 .orange { background: var(--warning); }
 .glass-border { background: transparent; border: 2px solid var(--glass-border); color: white; }
-
-/* Justering för Plus-tecken (+) och ikoner för bättre kontrast */
-.mode-btn.glass-border, 
-.add-inline-btn, 
-button[onclick*="addSet"],
-button[onclick*="openAddExercise"] {
-    color: var(--primary) !important;
-    border-color: rgba(34, 211, 238, 0.4) !important;
-    font-weight: 800;
-}
-
 .btn-disabled { opacity: 0.8; cursor: not-allowed; pointer-events: none; background: rgba(255,255,255,0.05) !important; color: rgba(255,255,255,0.3) !important; }
 .calendar-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
 .nav-arrow { background: var(--card); border: 1px solid var(--glass-border); color: white; padding: 10px 15px; border-radius: 12px; cursor: pointer; }
@@ -144,7 +119,10 @@ button[onclick*="openAddExercise"] {
 .log-input { width: 100%; padding: 12px; border-radius: 12px; border: 1px solid var(--glass-border); background: rgba(0,0,0,0.2); color: white; text-align: center; font-weight: 700; margin: 5px 0 15px; font-size: 16px !important; }
 select.log-input { font-size: 16px !important; text-align-last: center; appearance: none; }
 .edit-item-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; background: linear-gradient(90deg, rgba(255,255,255,0.03), rgba(255,255,255,0.07)); border: 1px solid var(--glass-border); padding: 12px; border-radius: 16px; }
-.add-inline-btn { position: absolute; right: 0; background: var(--primary); border: none; color: #0f172a; width: 32px; height: 32px; border-radius: 10px; font-weight: 900; cursor: pointer; }
+
+/* Plus-knapp i övningsbank (Svart/Grå text färg) */
+.add-inline-btn { position: absolute; right: 0; background: var(--primary); border: none; color: #333; width: 32px; height: 32px; border-radius: 10px; font-weight: 900; cursor: pointer; font-size: 20px; }
+
 .reorder-btn { background: rgba(34, 211, 238, 0.1); border: 1px solid rgba(34, 211, 238, 0.2); color: var(--primary); border-radius: 8px; width: 32px; height: 32px; cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center; }
 .reorder-btn:active { background: var(--primary); color: #000; }
 .chart-wrapper { display: flex; align-items: flex-end; gap: 10px; height: 150px; padding-top: 20px; }
@@ -176,4 +154,25 @@ select.log-input { font-size: 16px !important; text-align-last: center; appearan
 .exercise-done button[onclick*="removeSet"] {
     opacity: 0.3 !important;
     pointer-events: none !important;
+}
+
+/* Ny struktur för Ändra Planering-rutnätet */
+.plan-override-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.plan-override-btn {
+    padding: 12px 5px !important;
+    font-size: 12px !important;
+    margin-bottom: 0 !important;
+    border-radius: 12px !important;
+}
+
+.plan-override-btn.active-choice {
+    border-color: var(--primary) !important;
+    background: rgba(34, 211, 238, 0.2) !important;
+    box-shadow: 0 0 10px rgba(34, 211, 238, 0.2);
 }
