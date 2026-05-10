@@ -115,9 +115,9 @@ body { font-family: 'Inter', sans-serif; background: #0f172a; color: var(--text)
 .chart-wrapper { display: flex; align-items: flex-end; gap: 10px; height: 150px; padding-top: 20px; }
 .chart-bar { flex: 1; background: var(--primary); border-radius: 6px 6px 0 0; position: relative; }
 
-/* Nya stilar för set-rader */
-.set-row { display: grid; grid-template-columns: 30px 1fr 1fr 40px; gap: 8px; align-items: center; margin-bottom: 8px; background: rgba(255,255,255,0.03); padding: 8px; border-radius: 12px; }
+/* Set-baserad loggning design */
+.set-row { display: grid; grid-template-columns: 35px 1fr 1fr 40px; gap: 8px; align-items: center; margin-bottom: 10px; background: rgba(255,255,255,0.03); padding: 8px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); }
 .set-label { font-size: 12px; font-weight: 800; color: var(--text-light); text-align: center; }
 .set-input { width: 100%; padding: 8px; border-radius: 8px; border: 1px solid var(--glass-border); background: rgba(0,0,0,0.3); color: white; text-align: center; font-weight: 700; font-size: 14px; }
-.add-set-btn { width: 100%; padding: 8px; margin-top: 10px; border-radius: 10px; background: rgba(34, 211, 238, 0.1); border: 1px dashed var(--primary); color: var(--primary); font-weight: 700; font-size: 12px; cursor: pointer; }
-.remove-set-btn { background: none; border: none; color: var(--danger); font-size: 14px; cursor: pointer; padding: 0; }
+.add-set-btn { width: 100%; padding: 8px; margin-top: 5px; border-radius: 10px; background: rgba(34, 211, 238, 0.1); border: 1px dashed var(--primary); color: var(--primary); font-weight: 700; font-size: 12px; cursor: pointer; }
+.remove-set-btn { background: none; border: none; color: var(--danger); font-size: 16px; cursor: pointer; padding: 0; }
