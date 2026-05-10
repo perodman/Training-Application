@@ -357,11 +357,13 @@ function openEditProgramModal(idx) {
 
     const el = document.getElementById('edit-pass-exercises-sortable');
     Sortable.create(el, {
-        animation: 250,
+        animation: 300,
         ghostClass: 'sortable-ghost',
         chosenClass: 'sortable-chosen',
         dragClass: 'sortable-drag',
         forceFallback: true,
+        fallbackTolerance: 3, // Tillåter lite fingerrörelse innan drag startar
+        swapThreshold: 0.65, // Gör att kortet byter plats tidigare
         onEnd: function() {
             const newOrder = [];
             el.querySelectorAll('.edit-item-row').forEach(row => {
@@ -465,7 +467,7 @@ function renderActiveWorkout() {
         div.setAttribute("data-index", i);
         div.innerHTML = `
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-            <div style="display:flex; align-items:center; color:var(--primary); font-size:20px; cursor:grab;" class="drag-handle">☰</div>
+            <div style="display:flex; align-items:center; color:var(--primary); font-size:20px; padding: 10px; margin: -10px; cursor:grab;" class="drag-handle">☰</div>
             <strong style="font-size:16px;">${ex.name}</strong>
             <button onclick="removeActiveExercise(${i})" style="color:var(--danger); background:none; border:none; font-size:20px;"> ✖ </button>
         </div>
@@ -483,11 +485,15 @@ function renderActiveWorkout() {
     list.appendChild(sortContainer);
 
     Sortable.create(sortContainer, {
-        animation: 250,
+        animation: 300,
         handle: '.drag-handle',
         ghostClass: 'sortable-ghost',
         chosenClass: 'sortable-chosen',
+        dragClass: 'sortable-drag',
         forceFallback: true,
+        fallbackTolerance: 3,
+        swapThreshold: 0.65,
+        invertSwap: true,
         onEnd: function() {
             const newExOrder = [];
             const newDataOrder = [];
@@ -555,7 +561,7 @@ function handleInstantExerciseCreated(newEx) {
 }
 
 function confirmAddExerciseToActive(exId) {
-    const ex = masterExercises.find(e => e.id == id);
+    const ex = masterExercises.find(e => e.id == exId);
     activeDraft.workout.exercises.push({ name: ex.name, target: ex.target });
     activeDraft.data.push({ weight: "", reps: "", sets: 3 });
     localStorage.setItem("activeWorkoutDraft", JSON.stringify(activeDraft));
