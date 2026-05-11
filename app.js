@@ -16,16 +16,34 @@ fetch("program.json")
 .then(r => r.json())
 .then(json => {
     const savedProgram = JSON.parse(localStorage.getItem("myCustomProgram"));
+    
+    // Initialisera masterExercises om den är tom, och lägg till animation-referenser
     if (masterExercises.length === 0) {
         json.routine.forEach(p => {
             p.exercises.forEach(ex => {
                 if (!masterExercises.find(m => m.name === ex.name)) {
-                    masterExercises.push({ ...ex, id: Date.now() + Math.random() });
+                    // Mappa specifika animationer vid första skapandet
+                    let animFile = "";
+                    if (ex.name === "Deadlift") animFile = "Gemini_Generated_Image_sqtn3ksqtn3ksqtn.mp4";
+                    if (ex.name === "Bench Press Barbell") animFile = "Skärmbild 2026-05-11 124104.mp4";
+                    
+                    masterExercises.push({ 
+                        ...ex, 
+                        id: Date.now() + Math.random(),
+                        animation: animFile 
+                    });
                 }
             });
         });
         localStorage.setItem("masterExercises", JSON.stringify(masterExercises));
+    } else {
+        // Säkerställ att specifika animationer finns på befintliga övningar om de saknas
+        masterExercises.forEach(ex => {
+            if (ex.name === "Deadlift") ex.animation = "Gemini_Generated_Image_sqtn3ksqtn3ksqtn.mp4";
+            if (ex.name === "Bench Press Barbell") ex.animation = "Skärmbild 2026-05-11 124104.mp4";
+        });
     }
+    
     programData = savedProgram || json;
     renderHome();
 });
@@ -53,6 +71,9 @@ function showView(id) {
 
 function closeModal() {
     document.getElementById("workout-modal").classList.add("hidden");
+    // Stoppa eventuell video som spelar när modalen stängs
+    const video = document.querySelector("#modal-body video");
+    if(video) video.pause();
 }
 
 function openModal() {
@@ -116,7 +137,7 @@ function openCreateExerciseModal(callback = null) {
         const name = document.getElementById("new-ex-name").value.trim();
         const target = document.getElementById("new-ex-cat").value;
         if(!name) return alert("Ange ett namn!");
-        const newEx = { id: Date.now(), name, target, defaultSets: 3 };
+        const newEx = { id: Date.now(), name, target, defaultSets: 3, animation: "" };
         masterExercises.push(newEx);
         saveAll();
         if(callback) callback(newEx);
@@ -134,11 +155,50 @@ function filterExercises(category) {
     filtered.forEach(ex => {
         const div = document.createElement("div");
         div.className = "card glass";
-        div.style.cssText = "padding:15px; display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;";
+        div.style.cssText = "padding:15px; display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; cursor:pointer;";
+        
+        // Gör hela kortet klickbart för att visa animation, förutom inställningsknappen
+        div.onclick = (e) => {
+            if(e.target.tagName !== 'BUTTON') {
+                showExerciseAnimation(ex.id);
+            }
+        };
+
         div.innerHTML = `<div><strong style="font-size:16px;">${ex.name}</strong><br><small style="color:var(--primary); font-weight:800; text-transform:uppercase; font-size:10px;">${ex.target}</small></div>
-        <button style="background:none; border:none; font-size:18px; cursor:pointer;" onclick="openEditExerciseModal(${ex.id})">  ⚙️  </button>`;
+        <button style="background:none; border:none; font-size:18px; cursor:pointer;" onclick="openEditExerciseModal(${ex.id})"> ⚙️ </button>`;
         results.appendChild(div);
     });
+}
+
+function showExerciseAnimation(id) {
+    const ex = masterExercises.find(e => e.id == id);
+    if(!ex) return;
+    
+    const body = document.getElementById("modal-body");
+    let videoHtml = "";
+    
+    if(ex.animation) {
+        videoHtml = `
+            <div style="border-radius:16px; overflow:hidden; background:#000; margin-bottom:15px; border:1px solid var(--glass-border);">
+                <video src="${ex.animation}" autoplay loop muted playsinline style="width:100%; display:block;"></video>
+            </div>
+        `;
+    } else {
+        videoHtml = `
+            <div style="padding:40px 20px; text-align:center; background:rgba(255,255,255,0.05); border-radius:16px; margin-bottom:15px; color:var(--text-light); font-size:14px;">
+                Ingen videoanimation tillgänglig för denna övning. 🎥
+            </div>
+        `;
+    }
+
+    body.innerHTML = `
+        <h3>${ex.name}</h3>
+        ${videoHtml}
+        <div style="text-align:left; color:var(--text-light); font-size:14px; padding:10px;">
+            <p><strong>Muskelgrupp:</strong> ${ex.target}</p>
+        </div>
+    `;
+    openModal();
 }
 
 function openEditExerciseModal(id) {
@@ -150,6 +210,8 @@ function openEditExerciseModal(id) {
         <div style="text-align:left;">
             <label style="font-size:12px; color:var(--text-light); margin-left:10px;">NAMN PÅ ÖVNING</label>
             <input type="text" id="edit-ex-name" class="log-input" value="${ex.name}">
+            <label style="font-size:12px; color:var(--text-light); margin-left:10px;">ANIMATIONSFIL (.mp4)</label>
+            <input type="text" id="edit-ex-anim" class="log-input" value="${ex.animation || ''}" placeholder="t.ex. video.mp4">
             <label style="font-size:12px; color:var(--text-light); margin-left:10px;">KATEGORI</label>
             <select id="edit-ex-cat" class="log-input">
                 <option value="Ben" ${ex.target==='Ben'?'selected':''}>Ben</option>
@@ -171,6 +233,7 @@ function updateExercise(id) {
     const ex = masterExercises.find(e => e.id == id);
     ex.name = document.getElementById("edit-ex-name").value;
     ex.target = document.getElementById("edit-ex-cat").value;
+    ex.animation = document.getElementById("edit-ex-anim").value;
     saveAll(); closeModal(); filterExercises(currentExerciseCategory);
 }
 
@@ -188,9 +251,8 @@ function renderCalendar(isFromStartBtn = false) {
     const infoBox = document.getElementById("calendar-info-box");
     
     grid.innerHTML = "";
-    infoBox.innerHTML = ""; // Rensa info-boxen vid omladdning
+    infoBox.innerHTML = ""; 
     
-    // Punkt 1: Notis om val av dag placeras i infoBox (mellan rubrik och kalender)
     if(isFromStartBtn === true) {
         infoBox.innerHTML = `<div style="background:rgba(34, 211, 238, 0.1); padding:12px; border-radius:12px; margin-bottom:15px; font-size:13px; text-align:center; color:var(--primary); border:1px solid var(--primary);">
             Välj vilken dag du vill starta eller schemalägga ett pass i kalendern nedan 📅
@@ -272,10 +334,8 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
             html += `<button class="mode-btn green" onclick="prepareStart('${dateStr}', '${planned.id}')">Starta ${planned.name} 🔥</button>`;
         }
         
-        // Punkt 2: Ändrat färg på plustecknet till turkos
         html += `<button class="mode-btn glass-border" style="border-color:var(--primary); color:var(--primary);" onclick="closeModal(); startFreeWorkoutOnDate('${dateStr}')"><span style="color:var(--primary)">+</span> Starta Fritt Pass</button>`;
 
-        // Punkt 3: Ny snyggare rutnätsstruktur för Ändra Planering
         html += `<div class="separator"></div><p style="font-size:11px; text-transform:uppercase; color:var(--text-light); text-align:center;">Ändra planering:</p>`;
         html += `<div class="plan-override-grid">`;
         programData.routine.forEach(p => {
@@ -289,12 +349,10 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
     openModal();
 }
 
-// Punkt 3: Uppdatera planering utan att stänga popup
 function setOverrideSilent(date, val) {
     calendarOverrides[date] = val;
     saveAll();
     
-    // Visuell feedback i popupen
     document.querySelectorAll('.plan-override-btn').forEach(b => b.classList.remove('active-choice'));
     if(val !== 'none') {
         const activeBtn = document.getElementById(`btn-ovr-${val}`);
@@ -305,11 +363,8 @@ function setOverrideSilent(date, val) {
         document.getElementById('current-planned-label').textContent = "Vila";
     }
     
-    // Uppdatera kalendern i bakgrunden
-    const year = currentViewDate.getFullYear();
-    const month = currentViewDate.getMonth();
     renderCalendar(false); 
-    openModal(); // Håll kvar modalen
+    openModal(); 
 }
 
 function startFreeWorkoutOnDate(date) {
@@ -539,6 +594,16 @@ function renderActiveWorkout() {
         const div = document.createElement("div");
         div.className = "card glass" + (isDone ? " exercise-done" : "");
         
+        // Hitta animation för övningen i masterExercises
+        const masterEx = masterExercises.find(me => me.name === ex.name);
+        let videoTag = "";
+        if(masterEx && masterEx.animation) {
+            videoTag = `
+            <div style="border-radius:12px; overflow:hidden; margin:10px 0; background:#000; border:1px solid var(--glass-border);">
+                <video src="${masterEx.animation}" autoplay loop muted playsinline style="width:100%; display:block;"></video>
+            </div>`;
+        }
+
         let setsHtml = `<div style="margin-top:10px;">
             <div style="display:grid; grid-template-columns: 35px 1fr 1fr 30px; gap:8px; margin-bottom:5px; align-items:center;">
                 <span></span>
@@ -573,6 +638,7 @@ function renderActiveWorkout() {
             <strong style="font-size:16px;">${ex.name}</strong>
             <button onclick="removeActiveExercise(${i})" style="color:var(--danger); background:none; border:none; font-size:20px;" ${isDone ? 'disabled' : ''}> ✖ </button>
         </div>
+        ${videoTag}
         ${setsHtml}`;
         
         list.appendChild(div);
@@ -588,7 +654,6 @@ function renderActiveWorkout() {
     showView("workout-view");
 }
 
-// --- FUNKTIONER FÖR SET-HANTERING ---
 function updateSetData(exIdx, setIdx) {
     const wVal = document.getElementById(`w-${exIdx}-${setIdx}`).value;
     const rVal = document.getElementById(`r-${exIdx}-${setIdx}`).value;
