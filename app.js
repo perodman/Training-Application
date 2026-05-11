@@ -8,7 +8,7 @@ let exercises = JSON.parse(localStorage.getItem('lift_exercises')) || [
         sets: 3, 
         reps: '8-12',
         // Detta är en test-GIF från Giphy för att visa bänkpress
-        animation: 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNHJueXdleXJueXdleXJueXdleXJueXdleXJueXdleXJueXdleCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3o7TKMGpx95V5CPr96/giphy.gif' 
+        animation: 'https://media.giphy.com/media/l0HlHFRbmaZtBRhXG/giphy.gif' 
     },
     { id: 3, name: 'Marklyft', category: 'Rygg', sets: 3, reps: '5' }
 ];
