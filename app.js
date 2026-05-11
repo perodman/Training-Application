@@ -25,7 +25,7 @@ fetch("program.json")
                     // Mappa specifika animationer vid första skapandet
                     let animFile = "";
                     if (ex.name === "Deadlift") animFile = "Gemini_Generated_Image_sqtn3ksqtn3ksqtn.mp4";
-                    if (ex.name === "Bench Press Barbell") animFile = "Skärmbild 2026-05-11 124104.mp4";
+                    if (ex.name === "Barbell Bench Press") animFile = "Skärmbild 2026-05-11 124104.mp4";
                     
                     masterExercises.push({ 
                         ...ex, 
