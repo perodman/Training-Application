@@ -1,14 +1,20 @@
-// TEST-DATA: Jag har lagt till en animeringslänk på Bänkpress (id: 2)
+// UPPDATERAD DATA: Nu med dina lokala MP4-filer
 let exercises = JSON.parse(localStorage.getItem('lift_exercises')) || [
-    { id: 1, name: 'Knäböj', category: 'Ben', sets: 3, reps: '8-12' },
+    { 
+        id: 1, 
+        name: 'Knäböj', 
+        category: 'Ben', 
+        sets: 3, 
+        reps: '8-12', 
+        animation: 'Gemini_Generated_Image_sqtn3ksqtn3ksqtn.mp4' 
+    },
     { 
         id: 2, 
         name: 'Bänkpress', 
         category: 'Bröst', 
         sets: 3, 
         reps: '8-12',
-        // Detta är en test-GIF från Giphy för att visa bänkpress
-        animation: 'https://media.giphy.com/media/l0HlHFRbmaZtBRhXG/giphy.gif' 
+        animation: 'Skärmbild 2026-05-11 124104.mp4' 
     },
     { id: 3, name: 'Marklyft', category: 'Rygg', sets: 3, reps: '5' }
 ];
@@ -175,10 +181,10 @@ function renderActiveWorkout() {
         const card = document.createElement('div');
         card.className = `card glass-modern ${ex.done ? 'exercise-done' : ''}`;
         
-        // HÄR RENDERAS ANIMERINGEN OM DEN FINNS
+        // HÄR RENDERAS VIDEON (Ändrad från img till video)
         const mediaHtml = ex.animation ? `
             <div class="exercise-media">
-                <img src="${ex.animation}" alt="${ex.name} animering">
+                <video src="${ex.animation}" autoplay loop muted playsinline style="width:100%; border-radius:12px;"></video>
             </div>
         ` : '';
 
