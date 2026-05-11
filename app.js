@@ -40,7 +40,7 @@ fetch("program.json")
         // Säkerställ att specifika animationer finns på befintliga övningar om de saknas
         masterExercises.forEach(ex => {
             if (ex.name === "Deadlift") ex.animation = "Gemini_Generated_Image_sqtn3ksqtn3ksqtn.mp4";
-            if (ex.name === "Bench Press Barbell") ex.animation = "Skärmbild 2026-05-11 124104.mp4";
+            if (ex.name === "Barbell Bench Press") ex.animation = "Skärmbild 2026-05-11 124104.mp4";
         });
     }
     
