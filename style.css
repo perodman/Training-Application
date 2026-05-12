@@ -176,3 +176,10 @@ select.log-input { font-size: 16px !important; text-align-last: center; appearan
     background: rgba(34, 211, 238, 0.2) !important;
     box-shadow: 0 0 10px rgba(34, 211, 238, 0.2);
 }
+
+/* Punkt 5: Vila-knappen separat och mer neutral */
+.override-rest-btn {
+    border-color: rgba(255,255,255,0.2) !important;
+    color: var(--text-light) !important;
+    width: 100%;
+}
