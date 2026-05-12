@@ -120,6 +120,7 @@ body { font-family: 'Inter', sans-serif; background: #0f172a; color: var(--text)
 select.log-input { font-size: 16px !important; text-align-last: center; appearance: none; }
 .edit-item-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; background: linear-gradient(90deg, rgba(255,255,255,0.03), rgba(255,255,255,0.07)); border: 1px solid var(--glass-border); padding: 12px; border-radius: 16px; }
 
+/* Plus-knapp i övningsbank (Svart/Grå text färg) */
 .add-inline-btn { position: absolute; right: 0; background: var(--primary); border: none; color: #333; width: 32px; height: 32px; border-radius: 10px; font-weight: 900; cursor: pointer; font-size: 20px; }
 
 .reorder-btn { background: rgba(34, 211, 238, 0.1); border: 1px solid rgba(34, 211, 238, 0.2); color: var(--primary); border-radius: 8px; width: 32px; height: 32px; cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center; }
@@ -155,6 +156,7 @@ select.log-input { font-size: 16px !important; text-align-last: center; appearan
     pointer-events: none !important;
 }
 
+/* Ny struktur för Ändra Planering-rutnätet */
 .plan-override-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
