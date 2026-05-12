@@ -43,7 +43,6 @@ fetch("program.json")
     
     programData = savedProgram || json;
 
-    // Återställ timer om det finns ett pågående pass som var igång
     if(activeDraft && activeDraft.isStarted) {
         secondsElapsed = activeDraft.secondsElapsed || 0;
         if(activeDraft.wasTimerRunning) {
@@ -341,7 +340,6 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
         
         html += `<div id="day-manager-action-btn-container">`;
         if(planned) {
-            // Ändrat från prepareStart till att gå direkt till vyn
             html += `<button class="mode-btn green" onclick="closeModal(); startWorkoutDirectly('${dateStr}', '${planned.id}')">Starta ${planned.name} 🔥</button>`;
         }
         html += `</div>`;
@@ -600,7 +598,7 @@ function renderActiveWorkout() {
     const headerRow = document.getElementById("active-header-row");
     
     list.innerHTML = "";
-    headerRow.innerHTML = ""; // Rensa rubrikhöjd
+    headerRow.innerHTML = "";
 
     headerRow.innerHTML = `
         <h2 id="active-title" class="section-title modern-header" style="margin-bottom:0; flex-grow:1;">${activeDraft.workout.name}</h2>
@@ -608,16 +606,15 @@ function renderActiveWorkout() {
 
     if(!activeDraft.isStarted) {
         footer.classList.add("hidden");
-        timerCard.classList.add("hidden"); // Dölj klocka/timer
+        timerCard.classList.add("hidden");
         
         list.innerHTML = `
             <div style="text-align:center; padding:10px 0 20px;">
-                <button class="mode-btn green" style="width:100%; padding:20px; font-size:18px; box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3);" onclick="actuallyStartWorkout()">STARTA TRÄNINGSPASSET 🔥</button>
+                <button class="mode-btn green" style="width:100%; padding:20px; font-size:18px;" onclick="actuallyStartWorkout()">STARTA TRÄNINGSPASSET 🔥</button>
                 <p style="color:var(--text-light); font-size:13px; margin-top:10px;">Klicka på knappen ovan för att starta klockan.</p>
             </div>
         `;
         
-        // Rendera de planerade övningarna under knappen så man ser vad man ska göra
         activeDraft.workout.exercises.forEach((ex, i) => {
             const exerciseData = activeDraft.data[i];
             const div = document.createElement("div");
@@ -639,9 +636,8 @@ function renderActiveWorkout() {
         return;
     }
 
-    // Om passet ÄR startat:
     footer.classList.remove("hidden");
-    timerCard.classList.remove("hidden"); // Visa klocka/timer
+    timerCard.classList.remove("hidden");
 
     const pauseBtn = document.getElementById("pause-workout-btn");
     pauseBtn.innerHTML = `Spara utkast 💾`;
@@ -894,7 +890,6 @@ function renderHome() {
     const streak = calculateStreak();
     document.querySelector("#stat-streak .stat-value").textContent = streak;
 
-    // Om det finns ett pågående pass, ändra knappen på hemmenyn
     const mainBtn = document.querySelector(".main-action-btn");
     if(activeDraft) {
         mainBtn.onclick = () => renderActiveWorkout();
