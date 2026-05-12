@@ -395,6 +395,7 @@ function setOverrideSilent(date, val) {
 function startFreeWorkoutOnDate(date) {
     const freePass = { id: "free-" + Date.now(), name: "Fritt Pass", exercises: [] };
     startWorkout(freePass, null, date, true);
+    showView("workout-view");
 }
 
 function openMonthPicker() {
@@ -580,7 +581,7 @@ function startWorkout(workout, data = null, date = null, isImmediateStart = true
         date: date || new Date().toISOString().split('T')[0],
         secondsElapsed: secondsElapsed,
         isStarted: isImmediateStart || (activeDraft ? activeDraft.isStarted : false),
-        wasTimerRunning: false // Ändrat: Startar inte timern direkt förrän man trycker på knappen
+        wasTimerRunning: false 
     };
     
     renderActiveWorkout();
@@ -922,7 +923,13 @@ function renderStats() {
 
 function changeMonth(off) { currentViewDate.setMonth(currentViewDate.getMonth() + off); renderCalendar(); }
 function setOverride(date, val) { calendarOverrides[date] = val; saveAll(); closeModal(); renderCalendar(); }
-function prepareStart(date, id) { const p = programData.routine.find(x => x.id === id); closeModal(); startWorkout(p, null, date, true); }
+
+function prepareStart(date, id) { 
+    const p = programData.routine.find(x => x.id === id); 
+    closeModal(); 
+    startWorkout(p, null, date, true); 
+    showView("workout-view"); 
+}
 
 function deleteLoggedWorkout(date, idx) {
     const filtered = workoutHistory.filter(w => w.date === date);
@@ -982,8 +989,6 @@ function openConfirmDeleteModal(date, idx) {
     `;
     openModal();
 }
-
-// --- NYA FUNKTIONER ---
 
 function confirmDiscardActiveWorkout() {
     const body = document.getElementById("modal-body");
