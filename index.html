@@ -1,139 +1,119 @@
 <!DOCTYPE html>
 <html lang="sv">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Träningsapp</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+    <title>LIFT Tracker Pro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@800;900&family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
 </head>
 <body>
+    <div class="global-header">
+        <div id="global-home" class="circle-ctrl">  🏠  </div>
+    </div>
     <div class="app-container">
         <div id="home-view" class="view">
-            <header>
-                <h1 class="logo">TRAIN<span>AI</span></h1>
-                <p class="subtitle">Din personliga träningsresa</p>
-            </header>
-
-            <div class="stats-grid">
-                <div class="stat-card glass home-gradient-soft" id="stat-workouts">
-                    <span class="stat-value">0</span>
-                    <span class="stat-label">Pass</span>
-                </div>
-                <div class="stat-card glass home-gradient-soft" id="stat-streak">
-                    <span class="stat-value">0</span>
-                    <span class="stat-label">Dagar</span>
-                </div>
+            <div class="hero-section">
+                <h1 class="main-title">LIFT</h1>
+                <p class="subtitle">Elevate Your Strength</p>
             </div>
-
-            <button class="main-action-btn home-main-gradient" onclick="renderCalendar(true)">
-                <div class="btn-content">
-                    <span class="btn-icon">🚀</span>
-                    <div class="btn-text">
-                        <strong>Starta Träningspass</strong>
-                        <span>Välj ett pass från ditt schema</span>
-                    </div>
-                </div>
-            </button>
-
+            <div id="draft-alert" class="hidden" style="margin-bottom: 20px;">
+                <button id="resume-workout-btn" class="mode-btn orange">Fortsätt träningen    ⏱️    </button>
+            </div>
             <div class="menu-grid">
-                <button class="menu-item glass home-gradient-soft" onclick="renderCalendar()">
-                    <span class="menu-icon">📅</span>
-                    <span>Schema</span>
-                </button>
-                <button class="menu-item glass home-gradient-soft" onclick="renderProgramView()">
-                    <span class="menu-icon">📋</span>
-                    <span>Program</span>
-                </button>
-                <button class="menu-item glass home-gradient-soft" onclick="filterExercises('Ben')">
-                    <span class="menu-icon">💪</span>
-                    <span>Övningar</span>
-                </button>
-                <button class="menu-item glass home-gradient-soft" onclick="renderHistory()">
-                    <span class="menu-icon">📈</span>
-                    <span>Historik</span>
-                </button>
+                <button id="start-new-btn" class="mode-btn blue main-action">Starta Träningspass    🔥    </button>
+                <button id="view-exercises-btn" class="mode-btn glass">  🏋️    Övningar</button>
+                <button id="view-programs-btn" class="mode-btn glass">  📋    Träningsprogram</button>
+                <button id="calendar-mode" class="mode-btn glass">  📅    Dagbok och Schemaläggning</button>
+                <button id="stats-mode" class="mode-btn glass">  📊    Statistik</button>
             </div>
         </div>
 
         <div id="calendar-view" class="view hidden">
-            <div class="view-header">
-                <button class="back-btn" onclick="showView('home-view')">←</button>
-                <h2 id="month-label" onclick="openMonthPicker()" style="cursor:pointer">Maj 2024 ▾</h2>
-            </div>
+            <h2 class="section-title modern-header">Träningsschema</h2>
             <div id="calendar-info-box"></div>
-            <div class="calendar-days">
-                <span>Mån</span><span>Tis</span><span>Ons</span><span>Tor</span><span>Fre</span><span>Lör</span><span>Sön</span>
+            
+            <div class="calendar-nav">
+                <button onclick="changeMonth(-1)" class="nav-arrow">  ❮  </button>
+                <h2 id="month-label" onclick="openMonthPicker()" style="cursor:pointer;"></h2>
+                <button onclick="changeMonth(1)" class="nav-arrow">  ❯  </button>
             </div>
-            <div id="calendar-grid" class="calendar-grid"></div>
-        </div>
-
-        <div id="programs-view" class="view hidden">
-            <div class="view-header">
-                <button class="back-btn" onclick="showView('home-view')">←</button>
-                <h2>Mina Program</h2>
-                <button class="add-btn" onclick="openCreateProgramModal()">+</button>
-            </div>
-            <div id="pass-selector-list" class="pass-selector-list"></div>
-            <div id="program-details-area" class="hidden">
-                <div id="program-exercise-list" class="card glass" style="margin-top:20px;"></div>
+            <div class="card calendar-card glass-light">
+                <div class="calendar-weekdays">
+                    <div>Mån</div><div>Tis</div><div>Ons</div><div>Tor</div><div>Fre</div><div>Lör</div><div>Sön</div>
+                </div>
+                <div class="calendar-grid" id="calendar-grid"></div>
+                <div class="legend">
+                    <div class="legend-item"><div class="legend-color planned"></div> Planerat</div>
+                    <div class="legend-item"><div class="legend-color ongoing"></div> Pågående</div>
+                    <div class="legend-item"><div class="legend-color completed"></div> Genomfört</div>
+                </div>
             </div>
         </div>
 
         <div id="exercises-view" class="view hidden">
-            <div class="view-header">
-                <button class="back-btn" onclick="showView('home-view')">←</button>
-                <h2>Övningsbank</h2>
-                <button class="add-btn" onclick="openCreateExerciseModal()">+</button>
+            <h2 class="section-title modern-header">Muskelgrupper</h2>
+            <div id="category-menu" class="category-grid">
+                <button class="cat-btn glass" data-cat="Ben" onclick="filterExercises('Ben')"><span class="cat-icon"> 🦵 </span> Ben</button>
+                <button class="cat-btn glass" data-cat="Bröst" onclick="filterExercises('Bröst')"><span class="cat-icon"> 🏋️ </span> Bröst</button>
+                <button class="cat-btn glass" data-cat="Rygg" onclick="filterExercises('Rygg')"><span class="cat-icon"> 🪵 </span> Rygg</button>
+                <button class="cat-btn glass" data-cat="Axlar" onclick="filterExercises('Axlar')"><span class="cat-icon"> 👐 </span> Axlar</button>
+                <button class="cat-btn glass" data-cat="Armar" onclick="filterExercises('Armar')"><span class="cat-icon"> 💪 </span> Armar</button>
+                <button class="cat-btn glass" data-cat="Bål" onclick="filterExercises('Bål')"><span class="cat-icon"> 🧘 </span> Bål</button>
             </div>
-            <div class="category-scroll">
-                <button class="cat-btn active" data-cat="Ben" onclick="filterExercises('Ben')">Ben</button>
-                <button class="cat-btn" data-cat="Bröst" onclick="filterExercises('Bröst')">Bröst</button>
-                <button class="cat-btn" data-cat="Rygg" onclick="filterExercises('Rygg')">Rygg</button>
-                <button class="cat-btn" data-cat="Axlar" onclick="filterExercises('Axlar')">Axlar</button>
-                <button class="cat-btn" data-cat="Armar" onclick="filterExercises('Armar')">Armar</button>
-                <button class="cat-btn" data-cat="Bål" onclick="filterExercises('Bål')">Bål</button>
+            <div class="separator" style="margin: 30px 0;"></div>
+            <div style="display: flex; align-items: center; justify-content: center; position: relative; margin-bottom: 20px;">
+                <h2 class="section-title modern-header" style="margin:0;">Övningar</h2>
+                <button class="add-inline-btn" onclick="openCreateExerciseModal()">+</button>
             </div>
-            <div id="exercise-results"></div>
+            <div id="exercise-results" class="exercise-bank-list"></div>
+        </div>
+
+        <div id="programs-view" class="view hidden">
+            <h2 class="section-title modern-header">Träningsprogram</h2>
+            <div id="pass-selector-list" class="program-modern-grid"></div>
+            <div id="program-details-area" class="hidden">
+                <div class="separator" style="margin: 30px 0;"></div>
+                <div id="program-exercise-list" class="card glass-modern"></div>
+            </div>
+            <button id="add-custom-pass-btn" class="mode-btn glass-border" style="margin-top:20px;">+ Skapa Nytt Pass</button>
+        </div>
+
+        <div id="stats-view" class="view hidden">
+            <h2 class="section-title modern-header">Statistik</h2>
+            <div class="card glass">
+                <h3 style="text-align:center; margin-bottom:20px;">Pass per månad</h3>
+                <div id="chart-container" class="chart-wrapper"></div>
+            </div>
         </div>
 
         <div id="workout-view" class="view hidden">
-            <div class="view-header" style="justify-content: space-between; align-items: center;">
-                <div id="active-header-row" style="display:flex; align-items:center; width:100%; gap:10px;">
-                    <h2 id="active-title" class="section-title modern-header" style="margin-bottom:0; flex-grow:1;">Pass A</h2>
+            <div id="active-header-row" style="display: flex; align-items: center; margin-bottom: 10px;">
+                <h2 id="active-title" class="section-title modern-header" style="margin-bottom:0; flex-grow:1;"></h2>
+            </div>
+            
+            <div id="timer-card" class="card glass" style="margin-bottom: 20px; padding: 15px;">
+                <div id="workout-timer" class="timer-display">00:00:00</div>
+                <div style="display: flex; gap: 10px;">
+                    <button id="timer-toggle-btn" class="mode-btn glass-border" style="margin-bottom:0; padding:10px;">Pausa ⏸️</button>
                 </div>
             </div>
 
-            <div id="timer-card" class="timer-card glass">
-                <div id="workout-timer" class="timer-display">00:00:00</div>
-                <button id="timer-toggle-btn" class="mode-btn">Pausa ⏸️</button>
-            </div>
-
             <div id="exercise-list"></div>
-
             <div class="workout-footer">
-                <button id="pause-workout-btn" class="mode-btn">Pausa</button>
-                <button class="mode-btn blue" onclick="finishWorkout()">Avsluta Pass</button>
-            </div>
-        </div>
-
-        <div id="history-view" class="view hidden">
-            <div class="view-header">
-                <button class="back-btn" onclick="showView('home-view')">←</button>
-                <h2>Historik</h2>
-            </div>
-            <div id="history-list"></div>
-        </div>
-
-        <div id="workout-modal" class="modal hidden">
-            <div class="modal-content glass">
-                <div id="modal-body"></div>
-                <button class="close-modal-btn" onclick="closeModal()">Stäng</button>
+                <button id="pause-workout-btn" class="mode-btn glass-border">Spara utkast</button>
+                <button id="save-workout-btn" class="mode-btn green">Avsluta pass</button>
             </div>
         </div>
     </div>
+
+    <div id="workout-modal" class="modal hidden">
+        <div class="modal-content">
+            <div id="modal-body"></div>
+            <button class="mode-btn glass-border" onclick="closeModal()" style="margin-top: 20px;">Stäng</button>
+        </div>
+    </div>
+
     <script src="app.js"></script>
 </body>
 </html>
