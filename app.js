@@ -42,6 +42,13 @@ fetch("program.json")
     }
     
     programData = savedProgram || json;
+
+    // Punkt 2: Initiera timern korrekt vid start
+    if (activeDraft && activeDraft.isStarted && activeDraft.timerActive !== false) {
+        secondsElapsed = activeDraft.secondsElapsed || 0;
+        startTimer();
+    }
+
     renderHome();
 });
 
@@ -81,13 +88,21 @@ function updateTimerDisplay() {
     const hrs = String(Math.floor(secondsElapsed / 3600)).padStart(2, '0');
     const mins = String(Math.floor((secondsElapsed % 3600) / 60)).padStart(2, '0');
     const secs = String(secondsElapsed % 60).padStart(2, '0');
-    document.getElementById("workout-timer").textContent = `${hrs}:${mins}:${secs}`;
+    const timerElem = document.getElementById("workout-timer");
+    if(timerElem) timerElem.textContent = `${hrs}:${mins}:${secs}`;
 }
 
 function startTimer() {
     if (isTimerRunning) return;
     isTimerRunning = true;
-    document.getElementById("timer-toggle-btn").textContent = "Pausa ⏸️";
+    const toggleBtn = document.getElementById("timer-toggle-btn");
+    if(toggleBtn) toggleBtn.textContent = "Pausa ⏸️";
+    
+    if(activeDraft) {
+        activeDraft.timerActive = true;
+        localStorage.setItem("activeWorkoutDraft", JSON.stringify(activeDraft));
+    }
+
     timerInterval = setInterval(() => {
         secondsElapsed++;
         updateTimerDisplay();
@@ -103,6 +118,11 @@ function pauseTimer() {
     clearInterval(timerInterval);
     const toggleBtn = document.getElementById("timer-toggle-btn");
     if(toggleBtn) toggleBtn.textContent = "Fortsätt ▶️";
+    
+    if(activeDraft) {
+        activeDraft.timerActive = false;
+        localStorage.setItem("activeWorkoutDraft", JSON.stringify(activeDraft));
+    }
 }
 
 const timerToggle = document.getElementById("timer-toggle-btn");
@@ -546,6 +566,7 @@ function getExerciseHistory(exerciseName) {
 
 // --- AKTIVT PASS ---
 function startWorkout(workout, data = null, date = null, isImmediateStart = false) {
+    // Punkt 2: Behåll tiden om den redan finns i draften, annars nollställ
     secondsElapsed = (activeDraft && activeDraft.secondsElapsed) ? activeDraft.secondsElapsed : 0;
     
     if(!data) {
@@ -563,13 +584,19 @@ function startWorkout(workout, data = null, date = null, isImmediateStart = fals
         data: data, 
         date: date || new Date().toISOString().split('T')[0],
         secondsElapsed: secondsElapsed,
-        isStarted: isImmediateStart || (activeDraft ? activeDraft.isStarted : false)
+        isStarted: isImmediateStart || (activeDraft ? activeDraft.isStarted : false),
+        timerActive: isImmediateStart ? true : (activeDraft ? activeDraft.timerActive : false) // Punkt 2: Kolla om timern var igång
     };
     
     renderActiveWorkout();
     updateTimerDisplay();
-    if(activeDraft.isStarted) startTimer();
-    else pauseTimer();
+
+    // Punkt 2: Starta bara timern om passet faktiskt är startat och inte pausat
+    if(activeDraft.isStarted && activeDraft.timerActive !== false) {
+        startTimer();
+    } else {
+        pauseTimer();
+    }
 }
 
 function renderActiveWorkout() {
@@ -593,9 +620,12 @@ function renderActiveWorkout() {
 
     footer.classList.remove("hidden");
 
+    // Punkt 1: "Kasta träningspass"-knapp
     const pauseBtn = document.getElementById("pause-workout-btn");
-    pauseBtn.innerHTML = `Spara utkast 💾`;
-    pauseBtn.className = "mode-btn save-draft-btn";
+    pauseBtn.innerHTML = `Kasta pass 🗑️`; // Ändrat namn för tydlighet under aktivt pass
+    pauseBtn.className = "mode-btn";
+    pauseBtn.style.background = "var(--danger)";
+    pauseBtn.onclick = confirmDiscardActiveWorkout;
 
     activeDraft.workout.exercises.forEach((ex, i) => {
         const exerciseData = activeDraft.data[i];
@@ -603,8 +633,6 @@ function renderActiveWorkout() {
         const div = document.createElement("div");
         div.className = "card glass" + (isDone ? " exercise-done" : "");
         
-        // Animationer borttagna härifrån enligt punkt 3.
-
         let setsHtml = `<div style="margin-top:10px;">
             <div style="display:grid; grid-template-columns: 35px 1fr 1fr 30px; gap:8px; margin-bottom:5px; align-items:center;">
                 <span></span>
@@ -637,7 +665,7 @@ function renderActiveWorkout() {
                 <button class="reorder-btn" onclick="moveActiveExercise(${i}, 1)" ${isDone ? 'disabled' : ''}>▼</button>
             </div>
             <strong style="font-size:16px;">${ex.name}</strong>
-            <button onclick="removeActiveExercise(${i})" style="color:var(--danger); background:none; border:none; font-size:20px;" ${isDone ? 'disabled' : ''}> ✖ </button>
+            <button onclick="handleExerciseOptions(${i})" style="color:var(--danger); background:none; border:none; font-size:20px;" ${isDone ? 'disabled' : ''}> ✖ </button>
         </div>
         ${setsHtml}`;
         
@@ -652,6 +680,95 @@ function renderActiveWorkout() {
     list.appendChild(addBtn);
 
     showView("workout-view");
+}
+
+// Punkt 1: Funktion för att kasta passet snyggt
+function confirmDiscardActiveWorkout() {
+    const body = document.getElementById("modal-body");
+    body.innerHTML = `
+        <h3>Kasta passet?</h3>
+        <p style="text-align:center; color:var(--text-light); margin-bottom:20px;">Är du säker på att du vill kasta passet? Ingen data kommer att sparas.</p>
+        <button class="mode-btn" style="background:var(--danger); color:white; font-weight:800;" onclick="discardActiveWorkout()">Ja, kasta passet</button>
+        <button class="mode-btn glass-border" onclick="closeModal()">Avbryt</button>
+    `;
+    openModal();
+}
+
+function discardActiveWorkout() {
+    pauseTimer();
+    localStorage.removeItem("activeWorkoutDraft");
+    activeDraft = null;
+    secondsElapsed = 0;
+    location.reload();
+}
+
+// Punkt 3: Ny popup-meny för att ta bort eller byta övning
+function handleExerciseOptions(idx) {
+    const ex = activeDraft.workout.exercises[idx];
+    const body = document.getElementById("modal-body");
+    body.innerHTML = `
+        <h3>Hantera övning</h3>
+        <p style="text-align:center; font-weight:700; color:var(--primary);">${ex.name}</p>
+        <div style="margin-top:20px;">
+            <button class="mode-btn blue" onclick="openSwapExercisePicker(${idx})">Byt ut övning 🔄</button>
+            <button class="mode-btn" style="background:var(--danger); color:white;" onclick="removeActiveExercise(${idx}); closeModal();">Ta bort från passet ✖</button>
+            <button class="mode-btn glass-border" style="margin-top:10px;" onclick="closeModal()">Avbryt</button>
+        </div>
+    `;
+    openModal();
+}
+
+// Punkt 3: Väljare för att byta övning
+function openSwapExercisePicker(oldIdx) {
+    renderSwapPicker("Ben", oldIdx);
+}
+
+function renderSwapPicker(category, oldIdx) {
+    const body = document.getElementById("modal-body");
+    const categories = ["Ben", "Bröst", "Rygg", "Axlar", "Armar", "Bål"];
+    
+    let html = `<h3>Välj ny övning</h3>`;
+    html += `<div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:5px; margin-bottom:15px;">`;
+    categories.forEach(cat => {
+        const isActive = cat === category;
+        html += `<button onclick="renderSwapPicker('${cat}', ${oldIdx})" 
+            style="padding:8px 5px; font-size:10px; border-radius:8px; border:1px solid ${isActive ? 'var(--primary)' : 'rgba(255,255,255,0.1)'}; 
+            background:${isActive ? 'rgba(56,189,248,0.1)' : 'none'}; color:${isActive ? 'var(--primary)' : 'white'}; cursor:pointer;">
+            ${cat}
+        </button>`;
+    });
+    html += `</div>`;
+    
+    html += `<div style="max-height:250px; overflow-y:auto; padding-right:5px; margin-bottom:15px;">`;
+    const filtered = masterExercises.filter(ex => category === "Armar" ? (ex.target === "Biceps" || ex.target === "Triceps") : ex.target === category);
+    
+    filtered.forEach(ex => {
+        html += `
+        <div class="card glass" style="padding:12px; margin-bottom:8px; cursor:pointer; display:flex; justify-content:space-between; align-items:center;" onclick="confirmSwapExercise(${oldIdx}, ${ex.id})">
+            <span style="font-size:14px; font-weight:600;">${ex.name}</span>
+            <span style="color:var(--primary); font-size:14px;">Välj</span>
+        </div>`;
+    });
+    html += `</div>`;
+    html += `<button class="mode-btn glass-border" onclick="handleExerciseOptions(${oldIdx})">Tillbaka</button>`;
+    
+    body.innerHTML = html;
+}
+
+function confirmSwapExercise(oldIdx, newExId) {
+    const newEx = masterExercises.find(e => e.id == newExId);
+    activeDraft.workout.exercises[oldIdx] = { name: newEx.name, target: newEx.target };
+    
+    const history = getExerciseHistory(newEx.name);
+    if(history) {
+        activeDraft.data[oldIdx] = { sets_data: JSON.parse(JSON.stringify(history)), isCompleted: false };
+    } else {
+        activeDraft.data[oldIdx] = { sets_data: [{ weight: "", reps: "" }, { weight: "", reps: "" }, { weight: "", reps: "" }], isCompleted: false };
+    }
+    
+    localStorage.setItem("activeWorkoutDraft", JSON.stringify(activeDraft));
+    closeModal();
+    renderActiveWorkout();
 }
 
 function updateSetData(exIdx, setIdx) {
@@ -690,6 +807,7 @@ function toggleExerciseDone(exIdx) {
 
 function actuallyStartWorkout() {
     activeDraft.isStarted = true;
+    activeDraft.timerActive = true;
     localStorage.setItem("activeWorkoutDraft", JSON.stringify(activeDraft));
     renderActiveWorkout();
     startTimer();
@@ -766,19 +884,20 @@ function moveActiveExercise(i, dir) {
 }
 
 function removeActiveExercise(i) {
-    if(confirm("Ta bort övningen?")) {
-        activeDraft.workout.exercises.splice(i, 1);
-        activeDraft.data.splice(i, 1);
-        renderActiveWorkout();
-    }
+    activeDraft.workout.exercises.splice(i, 1);
+    activeDraft.data.splice(i, 1);
+    localStorage.setItem("activeWorkoutDraft", JSON.stringify(activeDraft));
+    renderActiveWorkout();
 }
 
 // --- STANDARD-LOGIK ---
 const homeBtn = document.getElementById("global-home");
 if(homeBtn) {
     homeBtn.onclick = () => {
-        pauseTimer();
-        location.reload();
+        // Punkt 2: Gå hem pausar inte klockan om den ska fortsätta i bakgrunden
+        // Vi sparar läget men låter setInterval ticka i bakgrunden (via localStorage sync i timer-logiken)
+        showView("home-view");
+        renderHome();
     }
 }
 
@@ -813,7 +932,6 @@ const saveWorkoutBtn = document.getElementById("save-workout-btn");
 if(saveWorkoutBtn) {
     saveWorkoutBtn.onclick = () => {
         if(!activeDraft.isStarted) {
-            // Specialdesignad confirm för att kasta pass (Punkt 1)
             const body = document.getElementById("modal-body");
             body.innerHTML = `
                 <h3>Kasta träningspass?</h3>
@@ -863,9 +981,9 @@ if(saveWorkoutBtn) {
 }
 
 const pauseWorkoutBtn = document.getElementById("pause-workout-btn");
-if(pauseWorkoutBtn) {
+// Vi använder denna för "Kasta pass" nu (se renderActiveWorkout), men behåller fallback
+if(pauseWorkoutBtn && !activeDraft?.isStarted) {
     pauseWorkoutBtn.onclick = () => { 
-        // Punkt 2: Klockan stannar inte längre när man sparar utkast
         location.reload(); 
     };
 }
@@ -889,7 +1007,6 @@ function changeMonth(off) { currentViewDate.setMonth(currentViewDate.getMonth() 
 function setOverride(date, val) { calendarOverrides[date] = val; saveAll(); closeModal(); renderCalendar(); }
 function prepareStart(date, id) { const p = programData.routine.find(x => x.id === id); closeModal(); startWorkout(p, null, date, false); }
 
-// Punkt 4: Designfull radering av genomfört pass
 function confirmDeleteWorkout(date, idx) {
     const body = document.getElementById("modal-body");
     body.innerHTML = `
@@ -920,9 +1037,17 @@ function editLoggedWorkout(date, idx) {
         return { sets_data: Array(parseInt(ex.sets || 1)).fill({ weight: ex.weight, reps: ex.reps }), isCompleted: true };
     });
 
+    // Punkt 2: Hämta befintlig tid från historiken så den inte börjar om
+    const timeParts = item.totalTime ? item.totalTime.split(":") : ["00","00","00"];
+    secondsElapsed = (parseInt(timeParts[0]) * 3600) + (parseInt(timeParts[1]) * 60) + parseInt(timeParts[2]);
+
     workoutHistory = workoutHistory.filter(w => w !== item);
     localStorage.removeItem("activeWorkoutDraft");
     activeDraft = null;
     closeModal();
+    
+    // Starta passet i redigeringsläge
     startWorkout(workoutObj, dataObj, date, true); 
+    // Punkt 2: Pausa direkt så tiden inte tickar vidare automatiskt vid redigering
+    pauseTimer();
 }
