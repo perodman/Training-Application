@@ -42,6 +42,17 @@ fetch("program.json")
     }
     
     programData = savedProgram || json;
+    
+    // Återställ timer om det finns ett utkast
+    if (activeDraft && activeDraft.isStarted && activeDraft.startTime && !activeDraft.isEditing) {
+        const now = Date.now();
+        const diff = Math.floor((now - activeDraft.startTime) / 1000);
+        secondsElapsed = diff + (activeDraft.pausedSeconds || 0);
+        startTimer();
+    } else if (activeDraft && activeDraft.secondsElapsed) {
+        secondsElapsed = activeDraft.secondsElapsed;
+    }
+
     renderHome();
 });
 
@@ -76,21 +87,37 @@ function openModal() {
     document.getElementById("workout-modal").classList.remove("hidden");
 }
 
-// --- TIMER LOGIK ---
+// --- TIMER LOGIK (UPPDATERAD) ---
 function updateTimerDisplay() {
     const hrs = String(Math.floor(secondsElapsed / 3600)).padStart(2, '0');
     const mins = String(Math.floor((secondsElapsed % 3600) / 60)).padStart(2, '0');
     const secs = String(secondsElapsed % 60).padStart(2, '0');
-    document.getElementById("workout-timer").textContent = `${hrs}:${mins}:${secs}`;
+    const display = document.getElementById("workout-timer");
+    if(display) display.textContent = `${hrs}:${mins}:${secs}`;
 }
 
 function startTimer() {
-    if (isTimerRunning) return;
+    if (isTimerRunning || (activeDraft && activeDraft.isEditing)) return;
     isTimerRunning = true;
-    document.getElementById("timer-toggle-btn").textContent = "Pausa ⏸️";
+    
+    const toggleBtn = document.getElementById("timer-toggle-btn");
+    if(toggleBtn) toggleBtn.textContent = "Pausa ⏸️";
+
+    // Om vi precis startar eller fortsätter efter paus
+    if(activeDraft && !activeDraft.startTime) {
+        activeDraft.startTime = Date.now();
+    }
+
     timerInterval = setInterval(() => {
-        secondsElapsed++;
+        if(activeDraft && activeDraft.startTime) {
+            const now = Date.now();
+            const diff = Math.floor((now - activeDraft.startTime) / 1000);
+            secondsElapsed = diff + (activeDraft.pausedSeconds || 0);
+        } else {
+            secondsElapsed++;
+        }
         updateTimerDisplay();
+        
         if(activeDraft) {
             activeDraft.secondsElapsed = secondsElapsed;
             localStorage.setItem("activeWorkoutDraft", JSON.stringify(activeDraft));
@@ -101,6 +128,14 @@ function startTimer() {
 function pauseTimer() {
     isTimerRunning = false;
     clearInterval(timerInterval);
+    
+    if(activeDraft && activeDraft.startTime) {
+        // Spara hur många sekunder vi hunnit med innan paus
+        activeDraft.pausedSeconds = secondsElapsed;
+        activeDraft.startTime = null; // Nollställ starttid så den kan sättas på nytt vid "fortsätt"
+        localStorage.setItem("activeWorkoutDraft", JSON.stringify(activeDraft));
+    }
+
     const toggleBtn = document.getElementById("timer-toggle-btn");
     if(toggleBtn) toggleBtn.textContent = "Fortsätt ▶️";
 }
@@ -538,8 +573,7 @@ function getExerciseHistory(exerciseName) {
 
 // --- AKTIVT PASS ---
 function startWorkout(workout, data = null, date = null, isImmediateStart = false) {
-    secondsElapsed = (activeDraft && activeDraft.secondsElapsed) ? activeDraft.secondsElapsed : 0;
-    
+    // Om vi inte har ett utkast än
     if(!data) {
         data = workout.exercises.map(ex => {
             const history = getExerciseHistory(ex.name);
@@ -550,17 +584,25 @@ function startWorkout(workout, data = null, date = null, isImmediateStart = fals
         });
     }
 
-    activeDraft = { 
-        workout: JSON.parse(JSON.stringify(workout)), 
-        data: data, 
-        date: date || new Date().toISOString().split('T')[0],
-        secondsElapsed: secondsElapsed,
-        isStarted: isImmediateStart || (activeDraft ? activeDraft.isStarted : false)
-    };
+    if(!activeDraft || activeDraft.workout.name !== workout.name || date !== activeDraft.date) {
+        activeDraft = { 
+            workout: JSON.parse(JSON.stringify(workout)), 
+            data: data, 
+            date: date || new Date().toISOString().split('T')[0],
+            secondsElapsed: 0,
+            pausedSeconds: 0,
+            startTime: null,
+            isStarted: isImmediateStart
+        };
+    }
     
+    // Om vi redan har sekunder sparade, se till att de följer med
+    secondsElapsed = activeDraft.secondsElapsed || 0;
+
     renderActiveWorkout();
     updateTimerDisplay();
-    if(activeDraft.isStarted) startTimer();
+    
+    if(activeDraft.isStarted && !activeDraft.isEditing) startTimer();
     else pauseTimer();
 }
 
@@ -585,9 +627,26 @@ function renderActiveWorkout() {
 
     footer.classList.remove("hidden");
 
+    // Spara utkast-knapp
     const pauseBtn = document.getElementById("pause-workout-btn");
     pauseBtn.innerHTML = `Spara utkast 💾`;
     pauseBtn.className = "mode-btn save-draft-btn";
+    pauseBtn.onclick = () => { 
+        pauseTimer();
+        location.reload(); 
+    };
+
+    // NY: Kasta träningspass-knapp
+    let discardBtn = document.getElementById("discard-workout-btn");
+    if(!discardBtn) {
+        discardBtn = document.createElement("button");
+        discardBtn.id = "discard-workout-btn";
+        discardBtn.className = "mode-btn";
+        discardBtn.style.cssText = "background:none; color:var(--danger); border:1px solid var(--danger); font-size:13px; margin-top:10px;";
+        discardBtn.textContent = "Kasta träningspass 🗑️";
+        discardBtn.onclick = discardWorkout;
+        footer.appendChild(discardBtn);
+    }
 
     activeDraft.workout.exercises.forEach((ex, i) => {
         const exerciseData = activeDraft.data[i];
@@ -636,7 +695,7 @@ function renderActiveWorkout() {
                 <button class="reorder-btn" onclick="moveActiveExercise(${i}, 1)" ${isDone ? 'disabled' : ''}>▼</button>
             </div>
             <strong style="font-size:16px;">${ex.name}</strong>
-            <button onclick="removeActiveExercise(${i})" style="color:var(--danger); background:none; border:none; font-size:20px;" ${isDone ? 'disabled' : ''}> ✖ </button>
+            <button onclick="openExerciseOptions(${i})" style="color:var(--danger); background:none; border:none; font-size:20px;" ${isDone ? 'disabled' : ''}> ✖ </button>
         </div>
         ${videoTag}
         ${setsHtml}`;
@@ -652,6 +711,58 @@ function renderActiveWorkout() {
     list.appendChild(addBtn);
 
     showView("workout-view");
+}
+
+// NY: Modal för att kasta pass
+function discardWorkout() {
+    const body = document.getElementById("modal-body");
+    body.innerHTML = `
+        <h3>Kasta träningspass?</h3>
+        <p style="text-align:center; color:var(--text-light); margin-bottom:20px;">Är du säker på att du vill kasta passet? Ingen data kommer att sparas.</p>
+        <button class="mode-btn" style="background:var(--danger); color:white;" onclick="confirmDiscard()">Ja, kasta passet 🗑️</button>
+        <button class="mode-btn glass-border" onclick="closeModal()">Avbryt</button>
+    `;
+    openModal();
+}
+
+function confirmDiscard() {
+    pauseTimer();
+    localStorage.removeItem("activeWorkoutDraft");
+    activeDraft = null;
+    location.reload();
+}
+
+// NY: Modal för att byta övning ("X")
+function openExerciseOptions(i) {
+    const ex = activeDraft.workout.exercises[i];
+    const body = document.getElementById("modal-body");
+    body.innerHTML = `
+        <h3>Hantera övning</h3>
+        <p style="text-align:center; font-weight:700; color:var(--primary); margin-bottom:20px;">${ex.name}</p>
+        <button class="mode-btn orange" onclick="replaceExerciseView(${i})">Byt ut övning 🔄</button>
+        <button class="mode-btn" style="background:var(--danger); color:white;" onclick="removeActiveExercise(${i}); closeModal();">Ta bort från passet ✖</button>
+        <button class="mode-btn glass-border" onclick="closeModal()">Avbryt</button>
+    `;
+    openModal();
+}
+
+function replaceExerciseView(i) {
+    renderExercisePicker("Ben", (newExId) => {
+        const newEx = masterExercises.find(e => e.id == newExId);
+        activeDraft.workout.exercises[i] = { name: newEx.name, target: newEx.target };
+        
+        // Hämta historik för den nya övningen om den finns
+        const history = getExerciseHistory(newEx.name);
+        if(history) {
+            activeDraft.data[i] = { sets_data: JSON.parse(JSON.stringify(history)), isCompleted: false };
+        } else {
+            activeDraft.data[i] = { sets_data: [{ weight: "", reps: "" }, { weight: "", reps: "" }, { weight: "", reps: "" }], isCompleted: false };
+        }
+        
+        localStorage.setItem("activeWorkoutDraft", JSON.stringify(activeDraft));
+        closeModal();
+        renderActiveWorkout();
+    });
 }
 
 function updateSetData(exIdx, setIdx) {
@@ -690,6 +801,8 @@ function toggleExerciseDone(exIdx) {
 
 function actuallyStartWorkout() {
     activeDraft.isStarted = true;
+    activeDraft.startTime = Date.now();
+    activeDraft.pausedSeconds = 0;
     localStorage.setItem("activeWorkoutDraft", JSON.stringify(activeDraft));
     renderActiveWorkout();
     startTimer();
@@ -700,7 +813,8 @@ function openAddExerciseToWorkoutModal() {
     openModal();
 }
 
-function renderExercisePicker(category) {
+// Uppdaterad renderExercisePicker för att stödja både "Lägg till" och "Byt ut"
+function renderExercisePicker(category, onSelectCallback = null) {
     const body = document.getElementById("modal-body");
     const categories = ["Ben", "Bröst", "Rygg", "Axlar", "Armar", "Bål"];
     
@@ -709,7 +823,7 @@ function renderExercisePicker(category) {
     html += `<div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:5px; margin-bottom:15px;">`;
     categories.forEach(cat => {
         const isActive = cat === category;
-        html += `<button onclick="renderExercisePicker('${cat}')" 
+        html += `<button onclick="renderExercisePicker('${cat}', ${onSelectCallback ? onSelectCallback.toString() : 'null'})" 
             style="padding:8px 5px; font-size:10px; border-radius:8px; border:1px solid ${isActive ? 'var(--primary)' : 'rgba(255,255,255,0.1)'}; 
             background:${isActive ? 'rgba(56,189,248,0.1)' : 'none'}; color:${isActive ? 'var(--primary)' : 'white'}; cursor:pointer;">
             ${cat}
@@ -721,8 +835,9 @@ function renderExercisePicker(category) {
     const filtered = masterExercises.filter(ex => category === "Armar" ? (ex.target === "Biceps" || ex.target === "Triceps") : ex.target === category);
     
     filtered.forEach(ex => {
+        const action = onSelectCallback ? `(${onSelectCallback})(${ex.id})` : `confirmAddExerciseToActive(${ex.id})`;
         html += `
-        <div class="card glass" style="padding:12px; margin-bottom:8px; cursor:pointer; display:flex; justify-content:space-between; align-items:center;" onclick="confirmAddExerciseToActive(${ex.id})">
+        <div class="card glass" style="padding:12px; margin-bottom:8px; cursor:pointer; display:flex; justify-content:space-between; align-items:center;" onclick="${action}">
             <span style="font-size:14px; font-weight:600;">${ex.name}</span>
             <span style="color:var(--primary); font-size:18px;">+</span>
         </div>`;
@@ -766,18 +881,15 @@ function moveActiveExercise(i, dir) {
 }
 
 function removeActiveExercise(i) {
-    if(confirm("Ta bort övningen?")) {
-        activeDraft.workout.exercises.splice(i, 1);
-        activeDraft.data.splice(i, 1);
-        renderActiveWorkout();
-    }
+    activeDraft.workout.exercises.splice(i, 1);
+    activeDraft.data.splice(i, 1);
+    renderActiveWorkout();
 }
 
 // --- STANDARD-LOGIK ---
 const homeBtn = document.getElementById("global-home");
 if(homeBtn) {
     homeBtn.onclick = () => {
-        pauseTimer();
         location.reload();
     }
 }
@@ -813,10 +925,7 @@ const saveWorkoutBtn = document.getElementById("save-workout-btn");
 if(saveWorkoutBtn) {
     saveWorkoutBtn.onclick = () => {
         if(!activeDraft.isStarted) {
-            if(confirm("Du har inte startat passet än. Vill du bara avbryta och ta bort utkastet?")) {
-                localStorage.removeItem("activeWorkoutDraft");
-                location.reload();
-            }
+            discardWorkout();
             return;
         }
 
@@ -857,14 +966,6 @@ if(saveWorkoutBtn) {
     };
 }
 
-const pauseWorkoutBtn = document.getElementById("pause-workout-btn");
-if(pauseWorkoutBtn) {
-    pauseWorkoutBtn.onclick = () => { 
-        pauseTimer();
-        location.reload(); 
-    };
-}
-
 function renderStats() {
     const container = document.getElementById("chart-container");
     container.innerHTML = "";
@@ -895,6 +996,7 @@ function deleteLoggedWorkout(date, idx) {
     }
 }
 
+// UPPDATERAD: Redigering startar ingen ny klocka
 function editLoggedWorkout(date, idx) {
     const filtered = workoutHistory.filter(w => w.date === date);
     const item = filtered[idx];
@@ -905,9 +1007,27 @@ function editLoggedWorkout(date, idx) {
         return { sets_data: Array(parseInt(ex.sets || 1)).fill({ weight: ex.weight, reps: ex.reps }), isCompleted: true };
     });
 
+    // Spara undan den ursprungliga tiden i draften så den behålls
+    const oldTime = item.totalTime || "00:00:00";
+    const parts = oldTime.split(':');
+    const oldSeconds = (parseInt(parts[0]) * 3600) + (parseInt(parts[1]) * 60) + parseInt(parts[2]);
+
     workoutHistory = workoutHistory.filter(w => w !== item);
     localStorage.removeItem("activeWorkoutDraft");
-    activeDraft = null;
+    
+    activeDraft = {
+        workout: workoutObj,
+        data: dataObj,
+        date: date,
+        secondsElapsed: oldSeconds,
+        pausedSeconds: oldSeconds,
+        startTime: null,
+        isStarted: true,
+        isEditing: true // Markör så att timern inte startar automatiskt
+    };
+    
+    secondsElapsed = oldSeconds;
     closeModal();
-    startWorkout(workoutObj, dataObj, date, true); 
+    renderActiveWorkout();
+    updateTimerDisplay();
 }
