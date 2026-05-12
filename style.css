@@ -2,11 +2,9 @@
     --bg: #0f172a;
     --card-bg: rgba(30, 41, 59, 0.7);
     --primary: #38bdf8;
-    --primary-gradient: linear-gradient(135deg, #38bdf8 0%, #0ea5e9 100%);
     --secondary: #64748b;
     --accent: #f43f5e;
     --success: #10b981;
-    --success-gradient: linear-gradient(135deg, #10b981 0%, #059669 100%);
     --warning: #f59e0b;
     --danger: #ef4444;
     --text: #f8fafc;
@@ -55,23 +53,36 @@ header { margin-bottom: 30px; text-align: left; }
 .stat-card {
     padding: 20px;
     text-align: center;
-    background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%);
 }
 .stat-value { display: block; font-size: 24px; font-weight: 800; color: var(--primary); }
 .stat-label { font-size: 12px; color: var(--text-light); text-transform: uppercase; letter-spacing: 1px; }
 
-/* Main Action Button - Med Gradient */
+/* Designjusteringar för Hemmenyn */
+.home-gradient-soft {
+    background: linear-gradient(145deg, rgba(30, 41, 59, 0.8) 0%, rgba(15, 23, 42, 0.8) 100%) !important;
+    border-radius: 22px !important;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+
+.home-main-gradient {
+    background: linear-gradient(135deg, #38bdf8 0%, #0ea5e9 100%) !important;
+    border-radius: 22px !important;
+    box-shadow: 0 8px 20px rgba(14, 165, 233, 0.3) !important;
+    border: none !important;
+}
+
+/* Main Action Button */
 .main-action-btn {
     width: 100%;
     padding: 24px;
     border-radius: 20px;
     border: 1px solid rgba(255,255,255,0.1);
-    background: var(--primary-gradient);
+    background: var(--primary);
     color: #000;
     cursor: pointer;
     margin-bottom: 25px;
-    transition: transform 0.2s, box-shadow 0.2s;
-    box-shadow: 0 10px 25px -5px rgba(56, 189, 248, 0.4);
+    transition: transform 0.2s;
 }
 .main-action-btn:active { transform: scale(0.98); }
 .btn-content { display: flex; align-items: center; gap: 15px; text-align: left; }
@@ -92,8 +103,6 @@ header { margin-bottom: 30px; text-align: left; }
     align-items: center;
     gap: 10px;
     font-weight: 600;
-    border: 1px solid var(--glass-border);
-    background: linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.03) 100%);
     cursor: pointer;
     transition: all 0.2s;
 }
@@ -190,8 +199,8 @@ header { margin-bottom: 30px; text-align: left; }
     background: var(--secondary);
     color: var(--text);
 }
-.mode-btn.blue { background: var(--primary-gradient); color: #000; box-shadow: 0 4px 15px rgba(56, 189, 248, 0.2); }
-.mode-btn.green { background: var(--success-gradient); color: #000; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.2); }
+.mode-btn.blue { background: var(--primary); color: #000; }
+.mode-btn.green { background: var(--success); color: #000; }
 .mode-btn.orange { background: var(--warning); color: #000; }
 .mode-btn.glass-border { background: transparent; border: 1px solid var(--glass-border); color: var(--text); }
 .mode-btn:active { transform: scale(0.97); }
