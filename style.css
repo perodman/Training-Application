@@ -174,3 +174,11 @@ select.log-input { font-size: 16px !important; text-align-last: center; appearan
     background: rgba(34, 211, 238, 0.2) !important;
     box-shadow: 0 0 10px rgba(34, 211, 238, 0.2);
 }
+
+/* Markering för valt pass i kalender-modalen */
+.plan-override-btn.active-choice {
+    background: rgba(56, 189, 248, 0.2) !important;
+    border-color: var(--primary) !important;
+    color: var(--primary) !important;
+    box-shadow: 0 0 10px rgba(56, 189, 248, 0.2);
+}
