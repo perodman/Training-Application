@@ -585,61 +585,23 @@ function startWorkout(workout, data = null, date = null, isImmediateStart = fals
 }
 
 function renderActiveWorkout() {
-    if (!activeDraft || !activeDraft.workout) return;
-
     document.getElementById("active-title").textContent = activeDraft.workout.name;
     const list = document.getElementById("exercise-list");
     const footer = document.querySelector(".workout-footer");
     list.innerHTML = "";
 
-    // Om passet inte är startat, trigga klockan och ändra status direkt
-    // Vi kollar även att vyn är laddad för att undvika problem med händelseloopar
-    if (!activeDraft.isStarted) {
-        activeDraft.isStarted = true;
-        if (typeof actuallyStartWorkout === "function") {
-            actuallyStartWorkout();
-        }
-    }
-
-    footer.classList.remove("hidden");
-
-    const pauseBtn = document.getElementById("pause-workout-btn");
-    if (pauseBtn) {
-        pauseBtn.innerHTML = `Spara utkast 💾`;
-    }
-
-    // Rendera övningarna
-    activeDraft.workout.exercises.forEach((ex, idx) => {
-        const div = document.createElement("div");
-        div.className = "exercise-card";
-        
-        let setsHTML = "";
-        ex.sets.forEach((set, sIdx) => {
-            const isDone = set.done;
-            setsHTML += `
-                <div class="set-row ${isDone ? 'done' : ''}">
-                    <span>Set ${sIdx + 1}</span>
-                    <input type="number" placeholder="kg" value="${set.weight || ''}" onchange="updateSet(${idx}, ${sIdx}, 'weight', this.value)">
-                    <input type="number" placeholder="reps" value="${set.reps || ''}" onchange="updateSet(${idx}, ${sIdx}, 'reps', this.value)">
-                    <button class="check-btn" onclick="toggleSet(${idx}, ${sIdx})">
-                        ${isDone ? '✅' : '✔️'}
-                    </button>
-                </div>
-            `;
-        });
-
-        div.innerHTML = `
-            <div class="exercise-header">
-                <strong>${ex.name}</strong>
+    if(!activeDraft.isStarted) {
+        footer.classList.add("hidden");
+        list.innerHTML = `
+            <div style="text-align:center; padding:20px 0;">
+                <button class="mode-btn green" style="width:100%; padding:20px; font-size:18px; box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3);" onclick="actuallyStartWorkout()">STARTA TRÄNINGSPASSET 🔥</button>
             </div>
-            ${setsHTML}
-            <button class="add-set-btn" onclick="addSetToActive(${idx})">+ Lägg till set</button>
+            <p style="color:var(--text-light); font-size:13px; text-align:center; margin-top:10px;">Klicka på knappen ovan för att starta klockan.</p>
         `;
-        list.appendChild(div);
-    });
-
-    showView("workout-view");
-}
+        document.getElementById("workout-timer").textContent = "00:00:00";
+        showView("workout-view");
+        return;
+    }
 
     footer.classList.remove("hidden");
 
