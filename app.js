@@ -585,22 +585,30 @@ function startWorkout(workout, data = null, date = null, isImmediateStart = fals
 }
 
 function renderActiveWorkout() {
+    if (!activeDraft || !activeDraft.workout) return;
+
     document.getElementById("active-title").textContent = activeDraft.workout.name;
     const list = document.getElementById("exercise-list");
     const footer = document.querySelector(".workout-footer");
     list.innerHTML = "";
 
-    // Om passet inte är startat än, kör igång det direkt istället för att visa startknappen
+    // Om passet inte är startat, trigga klockan och ändra status direkt
+    // Vi kollar även att vyn är laddad för att undvika problem med händelseloopar
     if (!activeDraft.isStarted) {
-        actuallyStartWorkout();
+        activeDraft.isStarted = true;
+        if (typeof actuallyStartWorkout === "function") {
+            actuallyStartWorkout();
+        }
     }
 
     footer.classList.remove("hidden");
 
     const pauseBtn = document.getElementById("pause-workout-btn");
-    pauseBtn.innerHTML = `Spara utkast 💾`;
+    if (pauseBtn) {
+        pauseBtn.innerHTML = `Spara utkast 💾`;
+    }
 
-    // Rendera listan med övningar direkt
+    // Rendera övningarna
     activeDraft.workout.exercises.forEach((ex, idx) => {
         const div = document.createElement("div");
         div.className = "exercise-card";
