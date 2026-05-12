@@ -590,18 +590,48 @@ function renderActiveWorkout() {
     const footer = document.querySelector(".workout-footer");
     list.innerHTML = "";
 
-    if(!activeDraft.isStarted) {
-        footer.classList.add("hidden");
-        list.innerHTML = `
-            <div style="text-align:center; padding:20px 0;">
-                <button class="mode-btn green" style="width:100%; padding:20px; font-size:18px; box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3);" onclick="actuallyStartWorkout()">STARTA TRÄNINGSPASSET 🔥</button>
-            </div>
-            <p style="color:var(--text-light); font-size:13px; text-align:center; margin-top:10px;">Klicka på knappen ovan för att starta klockan.</p>
-        `;
-        document.getElementById("workout-timer").textContent = "00:00:00";
-        showView("workout-view");
-        return;
+    // Om passet inte är startat än, kör igång det direkt istället för att visa startknappen
+    if (!activeDraft.isStarted) {
+        actuallyStartWorkout();
     }
+
+    footer.classList.remove("hidden");
+
+    const pauseBtn = document.getElementById("pause-workout-btn");
+    pauseBtn.innerHTML = `Spara utkast 💾`;
+
+    // Rendera listan med övningar direkt
+    activeDraft.workout.exercises.forEach((ex, idx) => {
+        const div = document.createElement("div");
+        div.className = "exercise-card";
+        
+        let setsHTML = "";
+        ex.sets.forEach((set, sIdx) => {
+            const isDone = set.done;
+            setsHTML += `
+                <div class="set-row ${isDone ? 'done' : ''}">
+                    <span>Set ${sIdx + 1}</span>
+                    <input type="number" placeholder="kg" value="${set.weight || ''}" onchange="updateSet(${idx}, ${sIdx}, 'weight', this.value)">
+                    <input type="number" placeholder="reps" value="${set.reps || ''}" onchange="updateSet(${idx}, ${sIdx}, 'reps', this.value)">
+                    <button class="check-btn" onclick="toggleSet(${idx}, ${sIdx})">
+                        ${isDone ? '✅' : '✔️'}
+                    </button>
+                </div>
+            `;
+        });
+
+        div.innerHTML = `
+            <div class="exercise-header">
+                <strong>${ex.name}</strong>
+            </div>
+            ${setsHTML}
+            <button class="add-set-btn" onclick="addSetToActive(${idx})">+ Lägg till set</button>
+        `;
+        list.appendChild(div);
+    });
+
+    showView("workout-view");
+}
 
     footer.classList.remove("hidden");
 
