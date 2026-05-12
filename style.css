@@ -176,32 +176,3 @@ select.log-input { font-size: 16px !important; text-align-last: center; appearan
     color: var(--text-light) !important;
     width: 100%;
 }
-
-/* Nya stilar för Punkt 2 */
-.workout-header-main {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 15px;
-    padding: 0 5px;
-}
-
-.workout-header-main h2 {
-    margin: 0;
-    font-size: 24px;
-    font-weight: 900;
-}
-
-.header-trash-btn {
-    background: rgba(239, 68, 68, 0.1);
-    border: 1px solid rgba(239, 68, 68, 0.2);
-    color: var(--danger);
-    width: 40px;
-    height: 40px;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    font-size: 18px;
-}
