@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="sv">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LIFT Tracker Pro</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@800;900&family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
@@ -11,28 +11,30 @@
     <div class="global-header">
         <div id="global-home" class="circle-ctrl">🏠</div>
     </div>
+
     <div class="app-container">
         <div id="home-view" class="view">
             <div class="hero-section">
                 <h1 class="main-title">LIFT</h1>
                 <p class="subtitle">Elevate Your Strength</p>
             </div>
-            <div id="draft-alert" class="hidden" style="margin-bottom: 20px;">
+
+            <div id="draft-alert" class="hidden" style="margin-bottom:20px;">
                 <button id="resume-workout-btn" class="mode-btn orange">Fortsätt träningen ⏱️</button>
             </div>
+
             <div class="menu-grid">
-                <button id="start-new-btn" class="mode-btn blue main-action">Starta Träningspass 🔥</button>
-                <button id="view-exercises-btn" class="mode-btn glass">🏋️ Övningar</button>
-                <button id="view-programs-btn" class="mode-btn glass">📋 Träningsprogram</button>
-                <button id="calendar-mode" class="mode-btn glass">📅 Dagbok och Schemaläggning</button>
-                <button id="stats-mode" class="mode-btn glass">📊 Statistik</button>
+                <button id="start-new-btn" class="mode-btn blue">Starta Träningspass 🔥</button>
+                <button id="view-exercises-btn" class="mode-btn glass-border">🏋️ Övningar</button>
+                <button id="view-programs-btn" class="mode-btn glass-border">📋 Träningsprogram</button>
+                <button id="calendar-mode" class="mode-btn glass-border">📅 Dagbok och Schemaläggning</button>
+                <button id="stats-mode" class="mode-btn glass-border">📊 Statistik</button>
             </div>
         </div>
 
         <div id="calendar-view" class="view hidden">
             <h2 class="section-title modern-header">Träningsschema</h2>
             <div id="calendar-info-box"></div>
-            
             <div class="calendar-nav">
                 <button onclick="changeMonth(-1)" class="nav-arrow">❮</button>
                 <h2 id="month-label" onclick="openMonthPicker()" style="cursor:pointer;"></h2>
@@ -61,11 +63,14 @@
                 <button class="cat-btn glass" data-cat="Armar" onclick="filterExercises('Armar')"><span class="cat-icon">💪</span> Armar</button>
                 <button class="cat-btn glass" data-cat="Bål" onclick="filterExercises('Bål')"><span class="cat-icon">🧘</span> Bål</button>
             </div>
+
             <div class="separator" style="margin: 30px 0;"></div>
+
             <div style="display: flex; align-items: center; justify-content: center; position: relative; margin-bottom: 20px;">
                 <h2 class="section-title modern-header" style="margin:0;">Övningar</h2>
                 <button class="add-inline-btn" onclick="openCreateExerciseModal()">+</button>
             </div>
+
             <div id="exercise-results" class="exercise-bank-list"></div>
         </div>
 
@@ -98,6 +103,7 @@
             </div>
 
             <div id="exercise-list"></div>
+
             <div class="workout-footer">
                 <button id="save-workout-btn" class="mode-btn green">Avsluta pass</button>
             </div>
