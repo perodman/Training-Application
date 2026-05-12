@@ -1,948 +1,913 @@
-let exercises = JSON.parse(localStorage.getItem("exercises")) || [];
-let workoutPrograms = JSON.parse(localStorage.getItem("workoutPrograms")) || [];
-let workoutHistory = JSON.parse(localStorage.getItem("workoutHistory")) || [];
-let activeDraft = JSON.parse(localStorage.getItem("activeDraft")) || null;
+let programData;
+let masterExercises = JSON.parse(localStorage.getItem("masterExercises") || "[]");
+let workoutHistory = JSON.parse(localStorage.getItem("workoutHistory") || "[]");
+let activeDraft = JSON.parse(localStorage.getItem("activeWorkoutDraft") || "null");
+let calendarOverrides = JSON.parse(localStorage.getItem("calendarOverrides") || "{}");
+let currentViewDate = new Date();
+let currentExerciseCategory = "Ben";
+
+// Timer-variabler
 let timerInterval = null;
 let secondsElapsed = 0;
 let isTimerRunning = false;
 
-let currentMonth = new Date().getMonth();
-let currentYear = new Date().getFullYear();
-let selectedCategory = null;
+// --- INIT ---
+fetch("program.json")
+.then(r => r.json())
+.then(json => {
+    const savedProgram = JSON.parse(localStorage.getItem("myCustomProgram"));
+    
+    if (masterExercises.length === 0) {
+        json.routine.forEach(p => {
+            p.exercises.forEach(ex => {
+                if (!masterExercises.find(m => m.name === ex.name)) {
+                    let animFile = "";
+                    if (ex.name === "Deadlift") animFile = "Gemini_Generated_Image_sqtn3ksqtn3ksqtn.mp4";
+                    if (ex.name === "Barbell Bench Press") animFile = "Skärmbild 2026-05-11 124104.mp4";
+                    
+                    masterExercises.push({ 
+                        ...ex, 
+                        id: Date.now() + Math.random(),
+                        animation: animFile 
+                    });
+                }
+            });
+        });
+        localStorage.setItem("masterExercises", JSON.stringify(masterExercises));
+    } else {
+        masterExercises.forEach(ex => {
+            if (ex.name === "Deadlift") ex.animation = "Gemini_Generated_Image_sqtn3ksqtn3ksqtn.mp4";
+            if (ex.name === "Barbell Bench Press") ex.animation = "Skärmbild 2026-05-11 124104.mp4";
+        });
+    }
+    
+    programData = savedProgram || json;
+    renderHome();
+});
 
-function saveData() {
-    localStorage.setItem("exercises", JSON.stringify(exercises));
-    localStorage.setItem("workoutPrograms", JSON.stringify(workoutPrograms));
+function saveAll() {
+    localStorage.setItem("myCustomProgram", JSON.stringify(programData));
+    localStorage.setItem("masterExercises", JSON.stringify(masterExercises));
     localStorage.setItem("workoutHistory", JSON.stringify(workoutHistory));
-    localStorage.setItem("activeDraft", JSON.stringify(activeDraft));
+    localStorage.setItem("calendarOverrides", JSON.stringify(calendarOverrides));
 }
 
-function showView(viewId) {
-    document.querySelectorAll(".view").forEach(v => v.classList.add("hidden"));
-    document.getElementById(viewId).classList.remove("hidden");
+function showView(id) {
+    const target = document.getElementById(id);
+    if(!target) return;
+    
+    if (target.classList.contains("hidden")) {
+        document.querySelectorAll(".view").forEach(v => v.classList.add("hidden"));
+        target.classList.remove("hidden");
+        target.style.animation = 'none';
+        target.offsetHeight; 
+        target.style.animation = null;
+    }
+    window.scrollTo(0, 0);
 }
 
-document.getElementById("global-home").onclick = () => {
-    if(activeDraft && activeDraft.isStarted) {
-        if(confirm("Du har ett pågående pass. Vill du gå tillbaka till hemskärmen? (Passet sparas som utkast)")) {
-            saveData();
-            renderHome();
-        }
-    } else {
-        renderHome();
-    }
-};
+function closeModal() {
+    document.getElementById("workout-modal").classList.add("hidden");
+    const video = document.querySelector("#modal-body video");
+    if(video) video.pause();
+}
 
-document.getElementById("start-new-btn").onclick = () => {
-    openWorkoutSelector();
-};
+function openModal() {
+    document.getElementById("workout-modal").classList.remove("hidden");
+}
 
-document.getElementById("view-exercises-btn").onclick = () => {
-    selectedCategory = null;
-    renderExercises();
-};
-
-document.getElementById("view-programs-btn").onclick = () => {
-    renderPrograms();
-};
-
-document.getElementById("calendar-mode").onclick = () => {
-    renderCalendar();
-};
-
-document.getElementById("stats-mode").onclick = () => {
-    renderStats();
-};
-
-document.getElementById("add-custom-pass-btn").onclick = () => {
-    openCreateProgramModal();
-};
-
-document.getElementById("save-workout-btn").onclick = () => {
-    saveWorkout();
-};
-
-document.getElementById("timer-toggle-btn").onclick = () => {
-    toggleTimer();
-};
-
-function toggleTimer() {
-    if(!activeDraft) return;
-    
-    if(activeDraft.lockedTime) return;
-    
-    if(isTimerRunning) {
-        pauseTimer();
-        document.getElementById("timer-toggle-btn").innerHTML = "Starta ▶️";
-        activeDraft.timerActive = false;
-    } else {
-        startTimer();
-        document.getElementById("timer-toggle-btn").innerHTML = "Pausa ⏸️";
-        activeDraft.timerActive = true;
-    }
-    saveData();
+// --- TIMER LOGIK ---
+function updateTimerDisplay() {
+    const hrs = String(Math.floor(secondsElapsed / 3600)).padStart(2, '0');
+    const mins = String(Math.floor((secondsElapsed % 3600) / 60)).padStart(2, '0');
+    const secs = String(secondsElapsed % 60).padStart(2, '0');
+    document.getElementById("workout-timer").textContent = `${hrs}:${mins}:${secs}`;
 }
 
 function startTimer() {
     if (isTimerRunning) return;
-    if (activeDraft && activeDraft.lockedTime) return;
-    
     isTimerRunning = true;
+    document.getElementById("timer-toggle-btn").textContent = "Pausa ⏸️";
     timerInterval = setInterval(() => {
         secondsElapsed++;
+        updateTimerDisplay();
         if(activeDraft) {
             activeDraft.secondsElapsed = secondsElapsed;
+            localStorage.setItem("activeWorkoutDraft", JSON.stringify(activeDraft));
         }
-        updateTimerDisplay();
     }, 1000);
 }
 
 function pauseTimer() {
     isTimerRunning = false;
     clearInterval(timerInterval);
-}
-
-function updateTimerDisplay() {
-    const h = String(Math.floor(secondsElapsed / 3600)).padStart(2, '0');
-    const m = String(Math.floor((secondsElapsed % 3600) / 60)).padStart(2, '0');
-    const s = String(secondsElapsed % 60).padStart(2, '0');
-    const display = document.getElementById("workout-timer");
-    if(display) {
-        display.textContent = `${h}:${m}:${s}`;
-    }
-}
-
-function startWorkout(workout, data = null, date = null, isImmediateStart = false, lockedTime = null) {
-    if(lockedTime) {
-        const timeParts = lockedTime.split(":");
-        secondsElapsed = (parseInt(timeParts[0]) * 3600) + (parseInt(timeParts[1]) * 60) + parseInt(timeParts[2]);
-    } else if(!activeDraft || !activeDraft.secondsElapsed) {
-        secondsElapsed = (activeDraft && activeDraft.secondsElapsed) ? activeDraft.secondsElapsed : 0;
-    }
-    
-    if(!data) {
-        data = workout.exercises.map(ex => {
-            const history = getExerciseHistory(ex.name);
-            if (history) {
-                return { sets_JSON.parse(JSON.stringify(history)), isCompleted: false };
-            }
-            return { sets_[{ weight: "", reps: "" }, { weight: "", reps: "" }, { weight: "", reps: "" }], isCompleted: false };
-        });
-    }
-
-    activeDraft = { 
-        workout: JSON.parse(JSON.stringify(workout)), 
-        data, 
-        date: date || new Date().toISOString().split('T')[0],
-        secondsElapsed: secondsElapsed,
-        isStarted: isImmediateStart || (activeDraft ? activeDraft.isStarted : false),
-        timerActive: isImmediateStart ? true : (activeDraft ? activeDraft.timerActive : false),
-        lockedTime: lockedTime || null
-    };
-    
-    renderActiveWorkout();
-    updateTimerDisplay();
-
-    if(activeDraft.isStarted && activeDraft.timerActive !== false && !lockedTime) {
-        startTimer();
-    } else {
-        pauseTimer();
-    }
-}
-
-function actuallyStartWorkout() {
-    if(!activeDraft) return;
-    activeDraft.isStarted = true;
-    activeDraft.timerActive = true;
-    saveData();
-    startTimer();
-    renderActiveWorkout();
-}
-
-function renderActiveWorkout() {
-    if(!activeDraft) return;
-    
-    showView("workout-view");
-    document.getElementById("active-title").textContent = activeDraft.workout.name;
-    
-    const list = document.getElementById("exercise-list");
-    const footer = document.querySelector(".workout-footer");
-    
-    if(!activeDraft.isStarted) {
-        footer.classList.add("hidden");
-        
-        list.innerHTML = "";
-        
-        activeDraft.workout.exercises.forEach((ex, exIdx) => {
-            const card = document.createElement("div");
-            card.className = "exercise-card";
-            
-            const exData = activeDraft.data[exIdx];
-            const allChecked = exData.sets_data.every(set => set.checked);
-            const checkmark = allChecked ? ' ✅' : '';
-            
-            card.innerHTML = `
-                <h3>
-                    <span>${ex.name}${checkmark}</span>
-                    <button class="add-inline-btn" onclick="addSet(${exIdx})" style="width:32px; height:32px; font-size:20px;">+</button>
-                </h3>
-                <div id="sets-container-${exIdx}"></div>
-            `;
-            
-            list.appendChild(card);
-            
-            const container = document.getElementById(`sets-container-${exIdx}`);
-            exData.sets_data.forEach((set, setIdx) => {
-                const row = document.createElement("div");
-                row.className = "set-row";
-                row.innerHTML = `
-                    <input type="number" placeholder="Vikt (kg)" value="${set.weight}" onchange="updateSet(${exIdx}, ${setIdx}, 'weight', this.value)">
-                    <input type="number" placeholder="Reps" value="${set.reps}" onchange="updateSet(${exIdx}, ${setIdx}, 'reps', this.value)">
-                    <button class="check-btn ${set.checked ? 'checked' : ''}" onclick="toggleSetCheck(${exIdx}, ${setIdx})">${set.checked ? '✓' : ''}</button>
-                `;
-                container.appendChild(row);
-            });
-        });
-        
-        const startBtnWrapper = document.createElement("div");
-        startBtnWrapper.style.cssText = "text-align:center; padding:30px 0 20px 0;";
-        startBtnWrapper.innerHTML = `
-            <button class="mode-btn green" style="width:100%; padding:20px; font-size:18px; box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3);" onclick="actuallyStartWorkout()">STARTA TRÄNINGSPASSET 🔥</button>
-            <p style="color:var(--text-light); font-size:13px; text-align:center; margin-top:10px;">Klicka på knappen ovan för att starta klockan.</p>
-        `;
-        list.appendChild(startBtnWrapper);
-        
-        const discardDiv = document.createElement("div");
-        discardDiv.style.cssText = "margin-top: 10px; padding-top: 20px; border-top: 1px solid var(--glass-border);";
-        discardDiv.innerHTML = `<button class="mode-btn glass-border" style="color: var(--danger); border-color: var(--danger);" onclick="confirmDiscardActiveWorkout()">Kasta pass 🗑️</button>`;
-        list.appendChild(discardDiv);
-        
-        document.getElementById("workout-timer").textContent = "00:00:00";
-        return;
-    }
-
-    footer.classList.remove("hidden");
-    
     const toggleBtn = document.getElementById("timer-toggle-btn");
-    if(activeDraft.lockedTime) {
-        toggleBtn.classList.add("btn-disabled");
-        toggleBtn.innerHTML = "Låst 🔒";
-    } else {
-        toggleBtn.classList.remove("btn-disabled");
-        toggleBtn.innerHTML = isTimerRunning ? "Pausa ⏸️" : "Starta ▶️";
-    }
-    
-    list.innerHTML = "";
-    
-    activeDraft.workout.exercises.forEach((ex, exIdx) => {
-        const card = document.createElement("div");
-        card.className = "exercise-card";
-        
-        const exData = activeDraft.data[exIdx];
-        const allChecked = exData.sets_data.every(set => set.checked);
-        
-        const checkmark = allChecked ? ' ✅' : '';
-        
-        card.innerHTML = `
-            <h3>
-                <span>${ex.name}${checkmark}</span>
-                <button class="add-inline-btn" onclick="addSet(${exIdx})" style="width:32px; height:32px; font-size:20px;">+</button>
-            </h3>
-            <div id="sets-container-${exIdx}"></div>
-        `;
-        
-        list.appendChild(card);
-        
-        const container = document.getElementById(`sets-container-${exIdx}`);
-        exData.sets_data.forEach((set, setIdx) => {
-            const row = document.createElement("div");
-            row.className = "set-row";
-            row.innerHTML = `
-                <input type="number" placeholder="Vikt (kg)" value="${set.weight}" onchange="updateSet(${exIdx}, ${setIdx}, 'weight', this.value)">
-                <input type="number" placeholder="Reps" value="${set.reps}" onchange="updateSet(${exIdx}, ${setIdx}, 'reps', this.value)">
-                <button class="check-btn ${set.checked ? 'checked' : ''}" onclick="toggleSetCheck(${exIdx}, ${setIdx})">${set.checked ? '✓' : ''}</button>
-            `;
-            container.appendChild(row);
-        });
-    });
-    
-    const discardDiv = document.createElement("div");
-    discardDiv.style.cssText = "margin-top: 30px; padding-top: 20px; border-top: 1px solid var(--glass-border);";
-    discardDiv.innerHTML = `<button class="mode-btn glass-border" style="color: var(--danger); border-color: var(--danger);" onclick="confirmDiscardActiveWorkout()">Kasta pass 🗑️</button>`;
-    list.appendChild(discardDiv);
+    if(toggleBtn) toggleBtn.textContent = "Fortsätt ▶️";
 }
 
-function addSet(exIdx) {
-    if(!activeDraft) return;
-    activeDraft.data[exIdx].sets_data.push({ weight: "", reps: "", checked: false });
-    saveData();
-    renderActiveWorkout();
-}
-
-function updateSet(exIdx, setIdx, field, value) {
-    if(!activeDraft) return;
-    activeDraft.data[exIdx].sets_data[setIdx][field] = value;
-    saveData();
-}
-
-function toggleSetCheck(exIdx, setIdx) {
-    if(!activeDraft) return;
-    const set = activeDraft.data[exIdx].sets_data[setIdx];
-    set.checked = !set.checked;
-    saveData();
-    renderActiveWorkout();
-}
-
-function saveWorkout() {
-    if(!activeDraft) return;
-    
-    pauseTimer();
-    
-    const h = String(Math.floor(secondsElapsed / 3600)).padStart(2, '0');
-    const m = String(Math.floor((secondsElapsed % 3600) / 60)).padStart(2, '0');
-    const s = String(secondsElapsed % 60).padStart(2, '0');
-    const timeStr = `${h}:${m}:${s}`;
-    
-    const workout = {
-        id: Date.now(),
-        name: activeDraft.workout.name,
-        date: activeDraft.date,
-        exercises: activeDraft.workout.exercises.map((ex, idx) => ({
-            name: ex.name,
-            sets: activeDraft.data[idx].sets_data
-        })),
-        duration: timeStr
+const timerToggle = document.getElementById("timer-toggle-btn");
+if(timerToggle) {
+    timerToggle.onclick = () => {
+        if (isTimerRunning) pauseTimer();
+        else startTimer();
     };
-    
-    workoutHistory.push(workout);
-    activeDraft = null;
-    secondsElapsed = 0;
-    saveData();
-    
-    alert("Träningspass sparat! 🎉");
-    renderHome();
 }
 
-function confirmDiscardActiveWorkout() {
-    if(confirm("Är du säker på att du vill kasta detta träningspass?")) {
-        activeDraft = null;
-        secondsElapsed = 0;
-        pauseTimer();
-        saveData();
-        renderHome();
+// --- ÖVNINGAR & INSTÄLLNINGAR ---
+function openCreateExerciseModal(callback = null) {
+    const body = document.getElementById("modal-body");
+    body.innerHTML = `
+        <h3>Skapa Ny Övning</h3>
+        <label style="font-size:12px; color:var(--text-light); text-align:left; display:block; margin-left:10px;">NAMN</label>
+        <input type="text" id="new-ex-name" class="log-input" placeholder="T.ex. Knäböj">
+        <label style="font-size:12px; color:var(--text-light); text-align:left; display:block; margin-left:10px;">KATEGORI</label>
+        <select id="new-ex-cat" class="log-input">
+            <option value="Ben">Ben</option>
+            <option value="Bröst">Bröst</option>
+            <option value="Rygg">Rygg</option>
+            <option value="Axlar">Axlar</option>
+            <option value="Biceps">Biceps</option>
+            <option value="Triceps">Triceps</option>
+            <option value="Bål">Bål</option>
+        </select>
+        <button class="mode-btn blue" id="save-new-ex-btn">Spara Övning</button>
+    `;
+    
+    document.getElementById("save-new-ex-btn").onclick = () => {
+        const name = document.getElementById("new-ex-name").value.trim();
+        const target = document.getElementById("new-ex-cat").value;
+        if(!name) return alert("Ange ett namn!");
+        const newEx = { id: Date.now(), name, target, defaultSets: 3, animation: "" };
+        masterExercises.push(newEx);
+        saveAll();
+        if(callback) callback(newEx);
+        else { closeModal(); filterExercises(currentExerciseCategory); }
+    };
+    openModal();
+}
+
+function filterExercises(category) {
+    currentExerciseCategory = category;
+    document.querySelectorAll(".cat-btn").forEach(b => b.classList.toggle("active", b.dataset.cat === category));
+    const results = document.getElementById("exercise-results");
+    results.innerHTML = "";
+    const filtered = masterExercises.filter(ex => category === "Armar" ? (ex.target === "Biceps" || ex.target === "Triceps") : ex.target === category);
+    filtered.forEach(ex => {
+        const div = document.createElement("div");
+        div.className = "card glass";
+        div.style.cssText = "padding:15px; display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; cursor:pointer;";
+        
+        div.onclick = (e) => {
+            if(e.target.tagName !== 'BUTTON') {
+                showExerciseAnimation(ex.id);
+            }
+        };
+
+        div.innerHTML = `<div><strong style="font-size:16px;">${ex.name}</strong><br><small style="color:var(--primary); font-weight:800; text-transform:uppercase; font-size:10px;">${ex.target}</small></div>
+        <button style="background:none; border:none; font-size:18px; cursor:pointer;" onclick="openEditExerciseModal(${ex.id})"> ⚙️ </button>`;
+        results.appendChild(div);
+    });
+}
+
+function showExerciseAnimation(id) {
+    const ex = masterExercises.find(e => e.id == id);
+    if(!ex) return;
+    
+    const body = document.getElementById("modal-body");
+    let videoHtml = "";
+    
+    if(ex.animation) {
+        videoHtml = `
+            <div style="border-radius:16px; overflow:hidden; background:#000; margin-bottom:15px; border:1px solid var(--glass-border);">
+                <video src="${ex.animation}" autoplay loop muted playsinline style="width:100%; display:block;"></video>
+            </div>
+        `;
+    } else {
+        videoHtml = `
+            <div style="padding:40px 20px; text-align:center; background:rgba(255,255,255,0.05); border-radius:16px; margin-bottom:15px; color:var(--text-light); font-size:14px;">
+                Ingen videoanimation tillgänglig för denna övning. 🎥
+            </div>
+        `;
+    }
+
+    body.innerHTML = `
+        <h3>${ex.name}</h3>
+        ${videoHtml}
+        <div style="text-align:left; color:var(--text-light); font-size:14px; padding:10px;">
+            <p><strong>Muskelgrupp:</strong> ${ex.target}</p>
+        </div>
+    `;
+    openModal();
+}
+
+function openEditExerciseModal(id) {
+    const ex = masterExercises.find(e => e.id == id);
+    if(!ex) return;
+    const body = document.getElementById("modal-body");
+    body.innerHTML = `
+        <h3>Redigera Övning</h3>
+        <div style="text-align:left;">
+            <label style="font-size:12px; color:var(--text-light); margin-left:10px;">NAMN PÅ ÖVNING</label>
+            <input type="text" id="edit-ex-name" class="log-input" value="${ex.name}">
+            <label style="font-size:12px; color:var(--text-light); margin-left:10px;">ANIMATIONSFIL (.mp4)</label>
+            <input type="text" id="edit-ex-anim" class="log-input" value="${ex.animation || ''}" placeholder="t.ex. video.mp4">
+            <label style="font-size:12px; color:var(--text-light); margin-left:10px;">KATEGORI</label>
+            <select id="edit-ex-cat" class="log-input">
+                <option value="Ben" ${ex.target==='Ben'?'selected':''}>Ben</option>
+                <option value="Bröst" ${ex.target==='Bröst'?'selected':''}>Bröst</option>
+                <option value="Rygg" ${ex.target==='Rygg'?'selected':''}>Rygg</option>
+                <option value="Axlar" ${ex.target==='Axlar'?'selected':''}>Axlar</option>
+                <option value="Biceps" ${ex.target==='Biceps'?'selected':''}>Biceps</option>
+                <option value="Triceps" ${ex.target==='Triceps'?'selected':''}>Triceps</option>
+                <option value="Bål" ${ex.target==='Bål'?'selected':''}>Bål</option>
+            </select>
+        </div>
+        <button class="mode-btn blue" style="margin-top:20px;" onclick="updateExercise(${id})">Uppdatera</button>
+        <button class="mode-btn" style="color:var(--danger); background:none; font-size:14px;" onclick="deleteMasterExercise(${id})">Radera övning permanent</button>
+    `;
+    openModal();
+}
+
+function updateExercise(id) {
+    const ex = masterExercises.find(e => e.id == id);
+    ex.name = document.getElementById("edit-ex-name").value;
+    ex.target = document.getElementById("edit-ex-cat").value;
+    ex.animation = document.getElementById("edit-ex-anim").value;
+    saveAll(); closeModal(); filterExercises(currentExerciseCategory);
+}
+
+function deleteMasterExercise(id) {
+    if(confirm("Vill du radera denna övning permanent?")) {
+        masterExercises = masterExercises.filter(e => e.id != id);
+        saveAll(); closeModal(); filterExercises(currentExerciseCategory);
     }
 }
 
+// --- KALENDER ---
+function renderCalendar(isFromStartBtn = false) {
+    const grid = document.getElementById("calendar-grid");
+    const label = document.getElementById("month-label");
+    const infoBox = document.getElementById("calendar-info-box");
+    
+    grid.innerHTML = "";
+    infoBox.innerHTML = ""; 
+    
+    if(isFromStartBtn === true) {
+        infoBox.innerHTML = `<div style="background:rgba(34, 211, 238, 0.1); padding:12px; border-radius:12px; margin-bottom:15px; font-size:13px; text-align:center; color:var(--primary); border:1px solid var(--primary);">
+            Välj vilken dag du vill starta eller schemalägga ett pass i kalendern nedan 📅
+        </div>`;
+    }
+
+    const year = currentViewDate.getFullYear();
+    const month = currentViewDate.getMonth();
+    const monthText = currentViewDate.toLocaleString('sv-SE', { month: 'long', year: 'numeric' });
+    label.textContent = monthText.charAt(0).toUpperCase() + monthText.slice(1);
+    
+    const firstDay = new Date(year, month, 1).getDay();
+    const offset = firstDay === 0 ? 6 : firstDay - 1;
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+    for (let i = 0; i < offset; i++) grid.innerHTML += `<div></div>`;
+    for (let d = 1; d <= daysInMonth; d++) {
+        const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+        const cell = document.createElement("div");
+        cell.className = "calendar-cell";
+        const hasWorkouts = workoutHistory.filter(w => w.date === dateStr);
+        const isOngoing = activeDraft && activeDraft.date === dateStr && activeDraft.isStarted;
+        const dayOfWeek = new Date(year, month, d).getDay();
+        const isAutoDay = [1, 3, 5].includes(dayOfWeek);
+        const override = calendarOverrides[dateStr];
+        let displayPass = null;
+        if (override && override !== "none") displayPass = programData.routine.find(p => p.id === override);
+        else if (isAutoDay && override !== "none") displayPass = programData.routine[d % programData.routine.length];
+        
+        let info = "";
+        if (hasWorkouts.length > 0) { cell.classList.add("cell-completed"); info = "✓"; }
+        else if (isOngoing) { cell.classList.add("cell-ongoing"); info = "⏱️"; }
+        else if (displayPass) { cell.classList.add("cell-planned"); info = displayPass.name.split(" ").pop(); }
+        
+        cell.innerHTML = `<span>${d}</span><span>${info}</span>`;
+        cell.onclick = () => openDayManager(dateStr, displayPass, hasWorkouts, isOngoing);
+        grid.appendChild(cell);
+    }
+    showView("calendar-view");
+}
+
+function openDayManager(dateStr, planned, completed, isOngoing) {
+    const body = document.getElementById("modal-body");
+    let html = `<h3>${dateStr}</h3>`;
+    
+    if (completed.length > 0) {
+        completed.forEach((w, idx) => {
+            const timeStr = w.totalTime ? `⏱️ ${w.totalTime}` : "";
+            html += `<div class="card glass" style="border-left:4px solid var(--success); text-align:left; margin-bottom:10px;">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <strong>${w.programName}</strong>
+                    <div style="font-size:10px; color:var(--text-light)">${timeStr}</div>
+                    <div>
+                        <button onclick="editLoggedWorkout('${dateStr}', ${idx})" style="background:none; border:none; color:var(--primary); cursor:pointer; font-size:16px; margin-right:10px;"> ✏️ </button>
+                        <button onclick="deleteLoggedWorkout('${dateStr}', ${idx})" style="background:none; border:none; color:var(--danger); cursor:pointer; font-size:16px;"> ✖ </button>
+                    </div>
+                </div>
+                <div style="margin-top:10px;">`;
+            w.exercises.forEach(ex => {
+                html += `<div style="font-size:12px; margin-bottom:5px; border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:3px;">
+                    <span style="color:var(--text-light)">${ex.name}:</span><br>`;
+                if(ex.sets_data) {
+                    ex.sets_data.forEach((s, sIdx) => {
+                        html += `<span style="color:var(--primary); font-weight:700;">Set ${sIdx+1}: ${s.weight} kg x ${s.reps} reps</span><br>`;
+                    });
+                } else {
+                    html += `<span style="color:var(--primary); font-weight:700;">Set: ${ex.weight} kg x ${ex.reps} reps x ${ex.sets} set</span>`;
+                }
+                html += `</div>`;
+            });
+            html += `</div></div>`;
+        });
+    } else if (isOngoing) {
+        html += `<button class="mode-btn orange" onclick="closeModal(); startWorkout(activeDraft.workout, activeDraft.data, activeDraft.date)">Fortsätt pågående pass</button>`;
+    } else {
+        html += `<p style="text-align:center;">Planerat: <strong id="current-planned-label">${planned ? planned.name : 'Vila'}</strong></p>`;
+        
+        if(planned) {
+            html += `<button class="mode-btn green" onclick="prepareStart('${dateStr}', '${planned.id}')">Starta ${planned.name} 🔥</button>`;
+        }
+        
+        html += `<button class="mode-btn glass-border" style="border-color:var(--primary); color:var(--primary);" onclick="closeModal(); startFreeWorkoutOnDate('${dateStr}')"><span style="color:var(--primary)">+</span> Starta Fritt Pass</button>`;
+
+        html += `<div class="separator"></div><p style="font-size:11px; text-transform:uppercase; color:var(--text-light); text-align:center;">Ändra planering:</p>`;
+        html += `<div class="plan-override-grid">`;
+        programData.routine.forEach(p => {
+            const isSelected = planned && p.id === planned.id;
+            html += `<button class="mode-btn glass-border plan-override-btn ${isSelected ? 'active-choice' : ''}" id="btn-ovr-${p.id}" onclick="setOverrideSilent('${dateStr}', '${p.id}')">${p.name}</button>`;
+        });
+        html += `<button class="mode-btn glass-border plan-override-btn" style="color:var(--danger); border-color:var(--danger);" onclick="setOverrideSilent('${dateStr}', 'none')">Vila</button>`;
+        html += `</div>`;
+    }
+    body.innerHTML = html;
+    openModal();
+}
+
+function setOverrideSilent(date, val) {
+    calendarOverrides[date] = val;
+    saveAll();
+    
+    document.querySelectorAll('.plan-override-btn').forEach(b => b.classList.remove('active-choice'));
+    if(val !== 'none') {
+        const activeBtn = document.getElementById(`btn-ovr-${val}`);
+        if(activeBtn) activeBtn.classList.add('active-choice');
+        const p = programData.routine.find(x => x.id === val);
+        const label = document.getElementById('current-planned-label');
+        if(label) label.textContent = p.name;
+    } else {
+        const label = document.getElementById('current-planned-label');
+        if(label) label.textContent = "Vila";
+    }
+    
+    renderCalendar(false); 
+    openModal(); 
+}
+
+function startFreeWorkoutOnDate(date) {
+    const freePass = { id: "free-" + Date.now(), name: "Fritt Pass", exercises: [] };
+    startWorkout(freePass, null, date, false);
+}
+
+function openMonthPicker() {
+    const body = document.getElementById("modal-body");
+    let html = `<h3>Välj månad</h3><div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">`;
+    const months = ["Januari", "Februari", "Mars", "April", "Maj", "Juni", "Juli", "Augusti", "September", "Oktober", "November", "December"];
+    months.forEach((m, i) => { html += `<button class="mode-btn glass-border" style="font-size:14px;" onclick="selectMonth(${i})">${m}</button>`; });
+    body.innerHTML = html + `</div>`;
+    openModal();
+}
+
+function selectMonth(m) { currentViewDate.setMonth(m); closeModal(); renderCalendar(); }
+
+// --- PROGRAM & REDIGERING ---
+function renderProgramView(activeIdx = null) {
+    const selector = document.getElementById("pass-selector-list");
+    selector.innerHTML = "";
+    programData.routine.forEach((pass, i) => {
+        const div = document.createElement("div");
+        div.className = `prog-card ${activeIdx === i ? 'active' : ''}`;
+        div.innerHTML = `<div style="font-size:24px;">${['⚡','🔥','🏆','💎'][i % 4]}</div><h4>${pass.name}</h4><div style="font-size:10px; color:var(--primary); margin-top:5px; font-weight:800;">${pass.exercises.length} ÖVNINGAR</div>`;
+        div.onclick = () => { 
+            document.querySelectorAll(".prog-card").forEach(c => c.classList.remove("active"));
+            div.classList.add("active");
+            showProgramDetails(i); 
+        };
+        selector.appendChild(div);
+    });
+    showView("programs-view");
+}
+
+function showProgramDetails(idx) {
+    const pass = programData.routine[idx];
+    const detailsArea = document.getElementById("program-details-area");
+    const list = document.getElementById("program-exercise-list");
+    detailsArea.classList.remove("hidden");
+    
+    list.innerHTML = `
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; padding-bottom:10px; border-bottom:1px solid var(--glass-border);">
+            <h3 style="margin:0; text-align:left; font-size:18px;">${pass.name}</h3>
+            <button class="order-btn" style="background:var(--primary); color:#0f172a; padding:8px 15px; border-radius:10px; font-weight:800; border:none; cursor:pointer; font-size:12px;" onclick="openEditProgramModal(${idx})">Redigera</button>
+        </div>
+        ${pass.exercises.map(e => `
+            <div style="display:flex; justify-content:space-between; padding:12px 0; border-bottom:1px solid rgba(255,255,255,0.03);">
+                <span style="font-weight:600;">${e.name}</span>
+                <small style="color:var(--primary); font-weight:800; text-transform:uppercase; font-size:9px;">${e.target}</small>
+            </div>
+        `).join("")}
+    `;
+}
+
+function openEditProgramModal(idx) {
+    const pass = programData.routine[idx];
+    const body = document.getElementById("modal-body");
+    body.innerHTML = `
+        <h3>Redigera ${pass.name}</h3>
+        <label style="font-size:12px; color:var(--text-light); text-align:left; display:block; margin-left:10px;">NAMN PÅ PASS</label>
+        <input type="text" id="edit-pass-name" class="log-input" value="${pass.name}">
+        
+        <div id="edit-pass-exercises">
+            ${pass.exercises.map((ex, i) => `
+                <div class="edit-item-row">
+                    <div style="display:flex; gap:8px;">
+                        <button class="reorder-btn" onclick="moveExercise(${idx}, ${i}, -1)">▲</button>
+                        <button class="reorder-btn" onclick="moveExercise(${idx}, ${i}, 1)">▼</button>
+                    </div>
+                    <span style="flex-grow:1; margin-left:15px; font-size:14px; font-weight:600;">${ex.name}</span>
+                    <button onclick="removeExFromPass(${idx}, ${i})" style="color:var(--danger); background:none; border:none; font-size:18px;"> ✖ </button>
+                </div>`).join("")}
+        </div>
+
+        <div class="separator" style="margin: 20px 0;"></div>
+        <p style="font-size:11px; text-transform:uppercase; color:var(--text-light); text-align:center;">Lägg till övning:</p>
+        <select id="add-ex-select" class="log-input">
+            <option value="">Välj från banken...</option>
+            ${masterExercises.map(ex => `<option value="${ex.id}">${ex.name} (${ex.target})</option>`).join("")}
+        </select>
+        <button class="mode-btn glass-border" style="font-size:13px; padding:10px;" onclick="addExerciseToPass(${idx})">+ Lägg till vald</button>
+        <button class="mode-btn glass-border" style="font-size:13px; padding:10px;" onclick="createNewExForPass(${idx})">+ Skapa ny övning till banken</button>
+
+        <button class="mode-btn blue" style="margin-top:20px;" onclick="saveProgramEdit(${idx})">Spara alla ändringar</button>
+        <button class="mode-btn" style="color:var(--danger); background:none; font-size:14px; margin-top:10px;" onclick="deleteEntireProgram(${idx})">Radera pass permanent</button>
+    `;
+    openModal();
+}
+
+function deleteEntireProgram(idx) {
+    if(confirm("Vill du radera hela detta pass permanent?")) {
+        programData.routine.splice(idx, 1);
+        saveAll();
+        closeModal();
+        document.getElementById("program-details-area").classList.add("hidden");
+        renderProgramView();
+    }
+}
+
+function addExerciseToPass(pIdx) {
+    const exId = document.getElementById("add-ex-select").value;
+    if(!exId) return;
+    const ex = masterExercises.find(e => e.id == exId);
+    programData.routine[pIdx].exercises.push({ name: ex.name, target: ex.target, defaultSets: 3 });
+    openEditProgramModal(pIdx);
+}
+
+function createNewExForPass(pIdx) {
+    openCreateExerciseModal((newEx) => {
+        programData.routine[pIdx].exercises.push({ name: newEx.name, target: newEx.target, defaultSets: 3 });
+        openEditProgramModal(pIdx);
+    });
+}
+
+function moveExercise(pIdx, eIdx, dir) {
+    const exercises = programData.routine[pIdx].exercises;
+    const newIdx = eIdx + dir;
+    if(newIdx < 0 || newIdx >= exercises.length) return;
+    [exercises[eIdx], exercises[newIdx]] = [exercises[newIdx], exercises[eIdx]];
+    openEditProgramModal(pIdx);
+}
+
+function removeExFromPass(pIdx, eIdx) {
+    programData.routine[pIdx].exercises.splice(eIdx, 1);
+    openEditProgramModal(pIdx);
+}
+
+function saveProgramEdit(idx) {
+    programData.routine[idx].name = document.getElementById("edit-pass-name").value;
+    saveAll(); closeModal(); renderProgramView(idx); showProgramDetails(idx);
+}
+
+function openCreateProgramModal() {
+    const body = document.getElementById("modal-body");
+    body.innerHTML = `
+        <h3>Skapa Nytt Pass</h3>
+        <label style="font-size:12px; color:var(--text-light); text-align:left; display:block; margin-left:10px;">NAMN PÅ PASS</label>
+        <input type="text" id="new-pass-name" class="log-input" placeholder="T.ex. Överkropp Deluxe">
+        <button class="mode-btn blue" onclick="saveNewProgram()">Spara och Redigera</button>
+    `;
+    openModal();
+}
+
+function saveNewProgram() {
+    const name = document.getElementById("new-pass-name").value.trim();
+    if(!name) return alert("Ange ett namn!");
+    const newPass = { id: "pass-" + Date.now(), name, exercises: [] };
+    programData.routine.push(newPass);
+    saveAll();
+    const newIdx = programData.routine.length - 1;
+    openEditProgramModal(newIdx);
+}
+
+// --- LOGIK FÖR HISTORIK ---
 function getExerciseHistory(exerciseName) {
-    for(let i = workoutHistory.length - 1; i >= 0; i--) {
-        const w = workoutHistory[i];
-        const ex = w.exercises.find(e => e.name === exerciseName);
-        if(ex) {
-            return ex.sets;
+    for (let i = workoutHistory.length - 1; i >= 0; i--) {
+        const workout = workoutHistory[i];
+        const exMatch = workout.exercises.find(e => e.name === exerciseName);
+        if (exMatch) {
+            if (!exMatch.sets_data) {
+                return Array(parseInt(exMatch.sets || 3)).fill({ weight: exMatch.weight, reps: exMatch.reps });
+            }
+            return exMatch.sets_data;
         }
     }
     return null;
 }
 
-function renderHome() {
-    showView("home-view");
-    const draftAlert = document.getElementById("draft-alert");
-    const resumeBtn = document.getElementById("resume-workout-btn");
+// --- AKTIVT PASS ---
+function startWorkout(workout, data = null, date = null, isImmediateStart = false) {
+    secondsElapsed = (activeDraft && activeDraft.secondsElapsed) ? activeDraft.secondsElapsed : 0;
     
-    if(activeDraft) {
-        draftAlert.classList.remove("hidden");
-        resumeBtn.onclick = () => {
-            renderActiveWorkout();
-        };
-    } else {
-        draftAlert.classList.add("hidden");
-    }
-}
-
-function openWorkoutSelector() {
-    const modal = document.getElementById("workout-modal");
-    const body = document.getElementById("modal-body");
-    
-    body.innerHTML = `<h2 class="section-title modern-header">Välj träningspass</h2>`;
-    
-    if(workoutPrograms.length === 0) {
-        body.innerHTML += `<p style="text-align:center; color:var(--text-light);">Inga träningsprogram skapade än.</p>`;
-    } else {
-        const grid = document.createElement("div");
-        grid.className = "program-modern-grid";
-        workoutPrograms.forEach(prog => {
-            const card = document.createElement("div");
-            card.className = "program-card-modern";
-            card.innerHTML = `
-                <h3>${prog.name}</h3>
-                <p>${prog.exercises.length} övningar</p>
-            `;
-            card.onclick = () => {
-                startWorkout(prog, null, null, false);
-                closeModal();
-            };
-            grid.appendChild(card);
-        });
-        body.appendChild(grid);
-    }
-    
-    modal.classList.remove("hidden");
-}
-
-function closeModal() {
-    document.getElementById("workout-modal").classList.add("hidden");
-}
-
-function renderExercises() {
-    showView("exercises-view");
-    
-    document.querySelectorAll(".cat-btn").forEach(btn => {
-        btn.classList.remove("active");
-        if(btn.dataset.cat === selectedCategory) {
-            btn.classList.add("active");
-        }
-    });
-    
-    const results = document.getElementById("exercise-results");
-    results.innerHTML = "";
-    
-    const filtered = selectedCategory ? exercises.filter(e => e.category === selectedCategory) : exercises;
-    
-    if(filtered.length === 0) {
-        results.innerHTML = `<p style="text-align:center; color:var(--text-light);">Inga övningar hittades.</p>`;
-        return;
-    }
-    
-    filtered.forEach(ex => {
-        const item = document.createElement("div");
-        item.className = "exercise-item";
-        item.innerHTML = `
-            <div>
-                <h4>${ex.name}</h4>
-                <p>${ex.category}</p>
-            </div>
-            <button class="add-inline-btn" onclick="event.stopPropagation(); deleteExercise('${ex.name}')">🗑️</button>
-        `;
-        results.appendChild(item);
-    });
-}
-
-function filterExercises(cat) {
-    if(selectedCategory === cat) {
-        selectedCategory = null;
-    } else {
-        selectedCategory = cat;
-    }
-    renderExercises();
-}
-
-function openCreateExerciseModal() {
-    const modal = document.getElementById("workout-modal");
-    const body = document.getElementById("modal-body");
-    
-    body.innerHTML = `
-        <h2 class="section-title modern-header">Skapa ny övning</h2>
-        <input id="new-ex-name" type="text" placeholder="Övningens namn" style="width:100%; padding:12px; border-radius:12px; border:1px solid var(--glass-border); background:rgba(255,255,255,0.05); color:white; margin-bottom:15px; font-size:16px;">
-        <select id="new-ex-cat" style="width:100%; padding:12px; border-radius:12px; border:1px solid var(--glass-border); background:rgba(255,255,255,0.05); color:white; margin-bottom:15px; font-size:16px;">
-            <option value="">Välj kategori</option>
-            <option value="Ben">Ben</option>
-            <option value="Bröst">Bröst</option>
-            <option value="Rygg">Rygg</option>
-            <option value="Axlar">Axlar</option>
-            <option value="Armar">Armar</option>
-            <option value="Bål">Bål</option>
-        </select>
-        <button class="mode-btn green" onclick="createExercise()">Skapa</button>
-    `;
-    
-    modal.classList.remove("hidden");
-}
-
-function createExercise() {
-    const name = document.getElementById("new-ex-name").value.trim();
-    const cat = document.getElementById("new-ex-cat").value;
-    
-    if(!name || !cat) {
-        alert("Fyll i både namn och kategori");
-        return;
-    }
-    
-    if(exercises.find(e => e.name === name)) {
-        alert("En övning med det namnet finns redan");
-        return;
-    }
-    
-    exercises.push({ name, category: cat });
-    saveData();
-    closeModal();
-    renderExercises();
-}
-
-function deleteExercise(name) {
-    if(confirm(`Ta bort övningen "${name}"?`)) {
-        exercises = exercises.filter(e => e.name !== name);
-        saveData();
-        renderExercises();
-    }
-}
-
-function renderPrograms() {
-    showView("programs-view");
-    const list = document.getElementById("pass-selector-list");
-    const detailsArea = document.getElementById("program-details-area");
-    
-    list.innerHTML = "";
-    detailsArea.classList.add("hidden");
-    
-    if(workoutPrograms.length === 0) {
-        list.innerHTML = `<p style="text-align:center; color:var(--text-light);">Inga träningsprogram än.</p>`;
-        return;
-    }
-    
-    workoutPrograms.forEach((prog, idx) => {
-        const card = document.createElement("div");
-        card.className = "program-card-modern";
-        card.innerHTML = `
-            <h3>${prog.name}</h3>
-            <p>${prog.exercises.length} övningar</p>
-            <div class="card-actions">
-                <button class="btn-edit" onclick="event.stopPropagation(); editProgram(${idx})">Redigera</button>
-                <button class="btn-delete" onclick="event.stopPropagation(); deleteProgram(${idx})">Ta bort</button>
-            </div>
-        `;
-        card.onclick = () => {
-            showProgramDetails(prog);
-        };
-        list.appendChild(card);
-    });
-}
-
-function showProgramDetails(prog) {
-    const detailsArea = document.getElementById("program-details-area");
-    const exList = document.getElementById("program-exercise-list");
-    
-    exList.innerHTML = `<h3 class="modern-header">${prog.name}</h3>`;
-    
-    if(prog.exercises.length === 0) {
-        exList.innerHTML += `<p style="color:var(--text-light);">Inga övningar i detta pass.</p>`;
-    } else {
-        prog.exercises.forEach(ex => {
-            const div = document.createElement("div");
-            div.style.cssText = "padding:10px 0; border-bottom: 1px solid var(--glass-border);";
-            div.innerHTML = `<strong>${ex.name}</strong> <span style="color:var(--text-light); font-size:13px;">(${ex.category})</span>`;
-            exList.appendChild(div);
+    if(!data) {
+        data = workout.exercises.map(ex => {
+            const history = getExerciseHistory(ex.name);
+            if (history) {
+                return { sets_data: JSON.parse(JSON.stringify(history)), isCompleted: false };
+            }
+            return { sets_data: [{ weight: "", reps: "" }, { weight: "", reps: "" }, { weight: "", reps: "" }], isCompleted: false };
         });
     }
-    
-    detailsArea.classList.remove("hidden");
-}
 
-function openCreateProgramModal() {
-    const modal = document.getElementById("workout-modal");
-    const body = document.getElementById("modal-body");
-    
-    body.innerHTML = `
-        <h2 class="section-title modern-header">Skapa träningspass</h2>
-        <input id="new-prog-name" type="text" placeholder="Passnamn" style="width:100%; padding:12px; border-radius:12px; border:1px solid var(--glass-border); background:rgba(255,255,255,0.05); color:white; margin-bottom:15px; font-size:16px;">
-        <h3 style="margin-top:20px;">Välj övningar:</h3>
-        <div id="exercise-picker" style="max-height:300px; overflow-y:auto;"></div>
-        <button class="mode-btn green" style="margin-top:20px;" onclick="createProgram()">Skapa pass</button>
-    `;
-    
-    const picker = document.getElementById("exercise-picker");
-    
-    if(exercises.length === 0) {
-        picker.innerHTML = `<p style="color:var(--text-light);">Inga övningar tillgängliga. Skapa övningar först.</p>`;
-    } else {
-        exercises.forEach((ex, idx) => {
-            const item = document.createElement("div");
-            item.style.cssText = "padding:10px; margin-bottom:8px; background:var(--card); border:1px solid var(--glass-border); border-radius:12px; cursor:pointer;";
-            item.innerHTML = `
-                <label style="display:flex; align-items:center; cursor:pointer;">
-                    <input type="checkbox" data-ex-idx="${idx}" style="margin-right:10px; width:20px; height:20px; cursor:pointer;">
-                    <span><strong>${ex.name}</strong> <span style="color:var(--text-light); font-size:13px;">(${ex.category})</span></span>
-                </label>
-            `;
-            picker.appendChild(item);
-        });
-    }
-    
-    modal.classList.remove("hidden");
-}
-
-function createProgram() {
-    const name = document.getElementById("new-prog-name").value.trim();
-    if(!name) {
-        alert("Ange ett namn för passet");
-        return;
-    }
-    
-    const checked = document.querySelectorAll("#exercise-picker input[type='checkbox']:checked");
-    if(checked.length === 0) {
-        alert("Välj minst en övning");
-        return;
-    }
-    
-    const selectedExercises = [];
-    checked.forEach(cb => {
-        const idx = parseInt(cb.dataset.exIdx);
-        selectedExercises.push(exercises[idx]);
-    });
-    
-    workoutPrograms.push({ name, exercises: selectedExercises });
-    saveData();
-    closeModal();
-    renderPrograms();
-}
-
-function editProgram(idx) {
-    const prog = workoutPrograms[idx];
-    const modal = document.getElementById("workout-modal");
-    const body = document.getElementById("modal-body");
-    
-    body.innerHTML = `
-        <h2 class="section-title modern-header">Redigera pass</h2>
-        <input id="edit-prog-name" type="text" value="${prog.name}" style="width:100%; padding:12px; border-radius:12px; border:1px solid var(--glass-border); background:rgba(255,255,255,0.05); color:white; margin-bottom:15px; font-size:16px;">
-        <h3 style="margin-top:20px;">Välj övningar:</h3>
-        <div id="exercise-picker" style="max-height:300px; overflow-y:auto;"></div>
-        <button class="mode-btn green" style="margin-top:20px;" onclick="saveEditedProgram(${idx})">Spara ändringar</button>
-    `;
-    
-    const picker = document.getElementById("exercise-picker");
-    
-    if(exercises.length === 0) {
-        picker.innerHTML = `<p style="color:var(--text-light);">Inga övningar tillgängliga.</p>`;
-    } else {
-        exercises.forEach((ex, exIdx) => {
-            const isChecked = prog.exercises.some(e => e.name === ex.name);
-            const item = document.createElement("div");
-            item.style.cssText = "padding:10px; margin-bottom:8px; background:var(--card); border:1px solid var(--glass-border); border-radius:12px; cursor:pointer;";
-            item.innerHTML = `
-                <label style="display:flex; align-items:center; cursor:pointer;">
-                    <input type="checkbox" data-ex-idx="${exIdx}" ${isChecked ? 'checked' : ''} style="margin-right:10px; width:20px; height:20px; cursor:pointer;">
-                    <span><strong>${ex.name}</strong> <span style="color:var(--text-light); font-size:13px;">(${ex.category})</span></span>
-                </label>
-            `;
-            picker.appendChild(item);
-        });
-    }
-    
-    modal.classList.remove("hidden");
-}
-
-function saveEditedProgram(idx) {
-    const name = document.getElementById("edit-prog-name").value.trim();
-    if(!name) {
-        alert("Ange ett namn för passet");
-        return;
-    }
-    
-    const checked = document.querySelectorAll("#exercise-picker input[type='checkbox']:checked");
-    if(checked.length === 0) {
-        alert("Välj minst en övning");
-        return;
-    }
-    
-    const selectedExercises = [];
-    checked.forEach(cb => {
-        const exIdx = parseInt(cb.dataset.exIdx);
-        selectedExercises.push(exercises[exIdx]);
-    });
-    
-    workoutPrograms[idx] = { name, exercises: selectedExercises };
-    saveData();
-    close Modal();
-    renderPrograms();
-}
-
-function deleteProgram(idx) {
-    if(confirm("Ta bort detta träningspass?")) {
-        workoutPrograms.splice(idx, 1);
-        saveData();
-        renderPrograms();
-    }
-}
-
-function renderCalendar() {
-    showView("calendar-view");
-    const monthLabel = document.getElementById("month-label");
-    const grid = document.getElementById("calendar-grid");
-    
-    const monthNames = ["Januari", "Februari", "Mars", "April", "Maj", "Juni", "Juli", "Augusti", "September", "Oktober", "November", "December"];
-    monthLabel.textContent = `${monthNames[currentMonth]} ${currentYear}`;
-    
-    grid.innerHTML = "";
-    
-    const firstDay = new Date(currentYear, currentMonth, 1).getDay();
-    const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
-    const prevMonthDays = new Date(currentYear, currentMonth, 0).getDate();
-    
-    const startDay = firstDay === 0 ? 6 : firstDay - 1;
-    
-    for(let i = startDay - 1; i >= 0; i--) {
-        const cell = document.createElement("div");
-        cell.className = "calendar-cell other-month";
-        cell.textContent = prevMonthDays - i;
-        grid.appendChild(cell);
-    }
-    
-    const today = new Date();
-    const isCurrentMonth = (currentMonth === today.getMonth() && currentYear === today.getFullYear());
-    
-    for(let day = 1; day <= daysInMonth; day++) {
-        const cell = document.createElement("div");
-        cell.className = "calendar-cell";
-        cell.textContent = day;
-        
-        const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-        
-        if(isCurrentMonth && day === today.getDate()) {
-            cell.classList.add("today");
-        }
-        
-        const workout = workoutHistory.find(w => w.date === dateStr);
-        if(workout) {
-            cell.classList.add("completed");
-        }
-        
-        if(activeDraft && activeDraft.date === dateStr) {
-            cell.classList.add("ongoing");
-        }
-        
-        cell.onclick = () => openDayModal(dateStr);
-        
-        grid.appendChild(cell);
-    }
-    
-    const totalCells = startDay + daysInMonth;
-    const remainingCells = (7 - (totalCells % 7)) % 7;
-    
-    for(let i = 1; i <= remainingCells; i++) {
-        const cell = document.createElement("div");
-        cell.className = "calendar-cell other-month";
-        cell.textContent = i;
-        grid.appendChild(cell);
-    }
-}
-
-function changeMonth(delta) {
-    currentMonth += delta;
-    if(currentMonth < 0) {
-        currentMonth = 11;
-        currentYear--;
-    } else if(currentMonth > 11) {
-        currentMonth = 0;
-        currentYear++;
-    }
-    renderCalendar();
-}
-
-function openDayModal(dateStr) {
-    const modal = document.getElementById("workout-modal");
-    const body = document.getElementById("modal-body");
-    
-    const workout = workoutHistory.find(w => w.date === dateStr);
-    const isDraft = activeDraft && activeDraft.date === dateStr;
-    
-    body.innerHTML = `<h2 class="section-title modern-header">${dateStr}</h2>`;
-    
-    if(workout) {
-        body.innerHTML += `
-            <div class="card glass" style="margin-bottom:15px;">
-                <h3>${workout.name}</h3>
-                <p style="color:var(--text-light); margin-bottom:15px;">Varaktighet: ${workout.duration}</p>
-        `;
-        
-        workout.exercises.forEach(ex => {
-            body.innerHTML += `<p style="margin:5px 0;"><strong>${ex.name}:</strong> ${ex.sets.length} set</p>`;
-        });
-        
-        body.innerHTML += `
-                <button class="mode-btn glass-border" style="margin-top:15px;" onclick="viewWorkoutDetails(${workout.id})">Visa detaljer</button>
-                <button class="mode-btn glass-border" style="margin-top:10px; color:var(--danger); border-color:var(--danger);" onclick="deleteWorkout(${workout.id})">Ta bort pass</button>
-            </div>
-        `;
-    } else if(isDraft) {
-        body.innerHTML += `<p style="color:var(--warning); text-align:center;">Pågående träningspass</p>`;
-        body.innerHTML += `<button class="mode-btn orange" onclick="closeModal(); renderActiveWorkout();">Fortsätt träning</button>`;
-    } else {
-        body.innerHTML += `<p style="color:var(--text-light); text-align:center;">Inget pass denna dag</p>`;
-    }
-    
-    modal.classList.remove("hidden");
-}
-
-function viewWorkoutDetails(workoutId) {
-    const workout = workoutHistory.find(w => w.id === workoutId);
-    if(!workout) return;
-    
-    const modal = document.getElementById("workout-modal");
-    const body = document.getElementById("modal-body");
-    
-    body.innerHTML = `
-        <h2 class="section-title modern-header">${workout.name}</h2>
-        <p style="text-align:center; color:var(--text-light); margin-bottom:20px;">${workout.date} • ${workout.duration}</p>
-    `;
-    
-    workout.exercises.forEach(ex => {
-        body.innerHTML += `
-            <div class="card glass" style="margin-bottom:15px;">
-                <h3 style="margin-bottom:10px;">${ex.name}</h3>
-        `;
-        
-        ex.sets.forEach((set, idx) => {
-            const checkmark = set.checked ? '✅' : '';
-            body.innerHTML += `<p style="margin:5px 0;">Set ${idx + 1}: ${set.weight}kg × ${set.reps} reps ${checkmark}</p>`;
-        });
-        
-        body.innerHTML += `</div>`;
-    });
-    
-    body.innerHTML += `<button class="mode-btn glass-border" style="margin-top:15px; color:var(--secondary); border-color:var(--secondary);" onclick="repeatWorkout(${workoutId})">Upprepa detta pass</button>`;
-    body.innerHTML += `<button class="mode-btn glass-border" style="margin-top:10px; color:var(--danger); border-color:var(--danger);" onclick="deleteWorkout(${workoutId})">Ta bort pass</button>`;
-}
-
-function repeatWorkout(workoutId) {
-    const workout = workoutHistory.find(w => w.id === workoutId);
-    if(!workout) return;
-    
-    const program = {
-        name: workout.name,
-        exercises: workout.exercises.map(ex => ({ name: ex.name, category: "" }))
+    activeDraft = { 
+        workout: JSON.parse(JSON.stringify(workout)), 
+        data: data, 
+        date: date || new Date().toISOString().split('T')[0],
+        secondsElapsed: secondsElapsed,
+        isStarted: isImmediateStart || (activeDraft ? activeDraft.isStarted : false)
     };
     
-    const data = workout.exercises.map(ex => ({
-        sets_ex.sets.map(s => ({ weight: s.weight, reps: s.reps, checked: false })),
-        isCompleted: false
-    }));
-    
-    closeModal();
-    startWorkout(program, data, new Date().toISOString().split('T')[0], false, workout.duration);
+    renderActiveWorkout();
+    updateTimerDisplay();
+    if(activeDraft.isStarted) startTimer();
+    else pauseTimer();
 }
 
-function deleteWorkout(workoutId) {
-    if(confirm("Ta bort detta träningspass permanent?")) {
-        workoutHistory = workoutHistory.filter(w => w.id !== workoutId);
-        saveData();
-        closeModal();
-        renderCalendar();
+function renderActiveWorkout() {
+    document.getElementById("active-title").textContent = activeDraft.workout.name;
+    const list = document.getElementById("exercise-list");
+    const footer = document.querySelector(".workout-footer");
+    list.innerHTML = "";
+
+    if(!activeDraft.isStarted) {
+        footer.classList.add("hidden");
+        list.innerHTML = `
+            <div style="text-align:center; padding:20px 0;">
+                <button class="mode-btn green" style="width:100%; padding:20px; font-size:18px; box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3);" onclick="actuallyStartWorkout()">STARTA TRÄNINGSPASSET 🔥</button>
+            </div>
+            <p style="color:var(--text-light); font-size:13px; text-align:center; margin-top:10px;">Klicka på knappen ovan för att starta klockan.</p>
+        `;
+        document.getElementById("workout-timer").textContent = "00:00:00";
+        showView("workout-view");
+        return;
     }
+
+    footer.classList.remove("hidden");
+
+    const pauseBtn = document.getElementById("pause-workout-btn");
+    pauseBtn.innerHTML = `Spara utkast 💾`;
+    pauseBtn.className = "mode-btn save-draft-btn";
+
+    activeDraft.workout.exercises.forEach((ex, i) => {
+        const exerciseData = activeDraft.data[i];
+        const isDone = exerciseData.isCompleted;
+        const div = document.createElement("div");
+        div.className = "card glass" + (isDone ? " exercise-done" : "");
+        
+        const masterEx = masterExercises.find(me => me.name === ex.name);
+        let videoTag = "";
+        if(masterEx && masterEx.animation) {
+            videoTag = `
+            <div style="border-radius:12px; overflow:hidden; margin:10px 0; background:#000; border:1px solid var(--glass-border);">
+                <video src="${masterEx.animation}" autoplay loop muted playsinline style="width:100%; display:block;"></video>
+            </div>`;
+        }
+
+        let setsHtml = `<div style="margin-top:10px;">
+            <div style="display:grid; grid-template-columns: 35px 1fr 1fr 30px; gap:8px; margin-bottom:5px; align-items:center;">
+                <span></span>
+                <small style="text-align:center; color:var(--text-light); font-size:9px;">KG</small>
+                <small style="text-align:center; color:var(--text-light); font-size:9px;">REPS</small>
+                <span></span>
+            </div>`;
+
+        exerciseData.sets_data.forEach((set, sIdx) => {
+            setsHtml += `
+            <div style="display:grid; grid-template-columns: 35px 1fr 1fr 30px; gap:8px; margin-bottom:8px; align-items:center;">
+                <span style="font-size:12px; font-weight:800; color:var(--primary)">#${sIdx + 1}</span>
+                <input type="number" id="w-${i}-${sIdx}" class="log-input" style="margin:0; padding:8px;" placeholder="0" value="${set.weight}" onchange="updateSetData(${i}, ${sIdx})">
+                <input type="number" id="r-${i}-${sIdx}" class="log-input" style="margin:0; padding:8px;" placeholder="0" value="${set.reps}" onchange="updateSetData(${i}, ${sIdx})">
+                <button onclick="removeSetFromExercise(${i}, ${sIdx})" style="background:none; border:none; color:var(--danger); font-size:16px;" ${isDone ? 'disabled' : ''}>×</button>
+            </div>`;
+        });
+
+        setsHtml += `
+            <button class="mode-btn glass-border" style="padding:8px; font-size:11px; margin-top:5px; border-style:dashed;" onclick="addSetToExercise(${i})" ${isDone ? 'disabled' : ''}>+ Lägg till set</button>
+            <button class="mode-btn ${isDone ? 'blue' : 'green'}" style="padding:10px; font-size:13px; margin-top:10px;" onclick="toggleExerciseDone(${i})">
+                ${isDone ? 'Ångra Klar ↩️' : 'Marker som klar ✅'}
+            </button>
+        </div>`;
+
+        div.innerHTML = `
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
+            <div style="display:flex; gap:8px;">
+                <button class="reorder-btn" onclick="moveActiveExercise(${i}, -1)" ${isDone ? 'disabled' : ''}>▲</button>
+                <button class="reorder-btn" onclick="moveActiveExercise(${i}, 1)" ${isDone ? 'disabled' : ''}>▼</button>
+            </div>
+            <strong style="font-size:16px;">${ex.name}</strong>
+            <button onclick="removeActiveExercise(${i})" style="color:var(--danger); background:none; border:none; font-size:20px;" ${isDone ? 'disabled' : ''}> ✖ </button>
+        </div>
+        ${videoTag}
+        ${setsHtml}`;
+        
+        list.appendChild(div);
+    });
+
+    const addBtn = document.createElement("button");
+    addBtn.className = "mode-btn glass-border";
+    addBtn.style.marginTop = "10px";
+    addBtn.innerHTML = "➕ Lägg till övning";
+    addBtn.onclick = openAddExerciseToWorkoutModal;
+    list.appendChild(addBtn);
+
+    showView("workout-view");
+}
+
+function updateSetData(exIdx, setIdx) {
+    const wVal = document.getElementById(`w-${exIdx}-${setIdx}`).value;
+    const rVal = document.getElementById(`r-${exIdx}-${setIdx}`).value;
+    activeDraft.data[exIdx].sets_data[setIdx] = { weight: wVal, reps: rVal };
+    localStorage.setItem("activeWorkoutDraft", JSON.stringify(activeDraft));
+}
+
+function addSetToExercise(exIdx) {
+    const scrollPos = window.scrollY;
+    const lastSet = activeDraft.data[exIdx].sets_data[activeDraft.data[exIdx].sets_data.length - 1];
+    const newWeight = lastSet ? lastSet.weight : "";
+    const newReps = lastSet ? lastSet.reps : "";
+    activeDraft.data[exIdx].sets_data.push({ weight: newWeight, reps: newReps });
+    renderActiveWorkout();
+    window.scrollTo(0, scrollPos);
+    localStorage.setItem("activeWorkoutDraft", JSON.stringify(activeDraft));
+}
+
+function removeSetFromExercise(exIdx, setIdx) {
+    const scrollPos = window.scrollY;
+    activeDraft.data[exIdx].sets_data.splice(setIdx, 1);
+    renderActiveWorkout();
+    window.scrollTo(0, scrollPos);
+    localStorage.setItem("activeWorkoutDraft", JSON.stringify(activeDraft));
+}
+
+function toggleExerciseDone(exIdx) {
+    const scrollPos = window.scrollY;
+    activeDraft.data[exIdx].isCompleted = !activeDraft.data[exIdx].isCompleted;
+    renderActiveWorkout();
+    window.scrollTo(0, scrollPos);
+    localStorage.setItem("activeWorkoutDraft", JSON.stringify(activeDraft));
+}
+
+function actuallyStartWorkout() {
+    activeDraft.isStarted = true;
+    localStorage.setItem("activeWorkoutDraft", JSON.stringify(activeDraft));
+    renderActiveWorkout();
+    startTimer();
+}
+
+function openAddExerciseToWorkoutModal() {
+    renderExercisePicker("Ben");
+    openModal();
+}
+
+function renderExercisePicker(category) {
+    const body = document.getElementById("modal-body");
+    const categories = ["Ben", "Bröst", "Rygg", "Axlar", "Armar", "Bål"];
+    
+    let html = `<h3>Välj Övning</h3>`;
+    
+    html += `<div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:5px; margin-bottom:15px;">`;
+    categories.forEach(cat => {
+        const isActive = cat === category;
+        html += `<button onclick="renderExercisePicker('${cat}')" 
+            style="padding:8px 5px; font-size:10px; border-radius:8px; border:1px solid ${isActive ? 'var(--primary)' : 'rgba(255,255,255,0.1)'}; 
+            background:${isActive ? 'rgba(56,189,248,0.1)' : 'none'}; color:${isActive ? 'var(--primary)' : 'white'}; cursor:pointer;">
+            ${cat}
+        </button>`;
+    });
+    html += `</div>`;
+    
+    html += `<div style="max-height:250px; overflow-y:auto; padding-right:5px; margin-bottom:15px;">`;
+    const filtered = masterExercises.filter(ex => category === "Armar" ? (ex.target === "Biceps" || ex.target === "Triceps") : ex.target === category);
+    
+    filtered.forEach(ex => {
+        html += `
+        <div class="card glass" style="padding:12px; margin-bottom:8px; cursor:pointer; display:flex; justify-content:space-between; align-items:center;" onclick="confirmAddExerciseToActive(${ex.id})">
+            <span style="font-size:14px; font-weight:600;">${ex.name}</span>
+            <span style="color:var(--primary); font-size:18px;">+</span>
+        </div>`;
+    });
+    html += `</div>`;
+
+    html += `
+        <div class="separator" style="margin:15px 0;"></div>
+        <button class="mode-btn glass-border" style="font-size:13px;" onclick="openCreateExerciseModal(handleInstantExerciseCreated)">+ Skapa ny övning som inte finns</button>
+    `;
+    
+    body.innerHTML = html;
+}
+
+function handleInstantExerciseCreated(newEx) {
+    confirmAddExerciseToActive(newEx.id);
+}
+
+function confirmAddExerciseToActive(exId) {
+    const ex = masterExercises.find(e => e.id == exId);
+    activeDraft.workout.exercises.push({ name: ex.name, target: ex.target });
+    
+    const history = getExerciseHistory(ex.name);
+    if(history) {
+        activeDraft.data.push({ sets_data: JSON.parse(JSON.stringify(history)), isCompleted: false });
+    } else {
+        activeDraft.data.push({ sets_data: [{ weight: "", reps: "" }, { weight: "", reps: "" }, { weight: "", reps: "" }], isCompleted: false });
+    }
+    
+    localStorage.setItem("activeWorkoutDraft", JSON.stringify(activeDraft));
+    closeModal();
+    renderActiveWorkout();
+}
+
+function moveActiveExercise(i, dir) {
+    const newIdx = i + dir;
+    if(newIdx < 0 || newIdx >= activeDraft.workout.exercises.length) return;
+    [activeDraft.workout.exercises[i], activeDraft.workout.exercises[newIdx]] = [activeDraft.workout.exercises[newIdx], activeDraft.workout.exercises[i]];
+    [activeDraft.data[i], activeDraft.data[newIdx]] = [activeDraft.data[newIdx], activeDraft.data[i]];
+    renderActiveWorkout();
+}
+
+function removeActiveExercise(i) {
+    if(confirm("Ta bort övningen?")) {
+        activeDraft.workout.exercises.splice(i, 1);
+        activeDraft.data.splice(i, 1);
+        renderActiveWorkout();
+    }
+}
+
+// --- STANDARD-LOGIK ---
+const homeBtn = document.getElementById("global-home");
+if(homeBtn) {
+    homeBtn.onclick = () => {
+        pauseTimer();
+        location.reload();
+    }
+}
+
+const startNewBtn = document.getElementById("start-new-btn");
+if(startNewBtn) startNewBtn.onclick = () => renderCalendar(true);
+
+const calMode = document.getElementById("calendar-mode");
+if(calMode) calMode.onclick = () => renderCalendar();
+
+const exBtn = document.getElementById("view-exercises-btn");
+if(exBtn) exBtn.onclick = () => { showView("exercises-view"); filterExercises(currentExerciseCategory); };
+
+const progBtn = document.getElementById("view-programs-btn");
+if(progBtn) progBtn.onclick = () => renderProgramView();
+
+const statMode = document.getElementById("stats-mode");
+if(statMode) statMode.onclick = renderStats;
+
+const addPassBtn = document.getElementById("add-custom-pass-btn");
+if(addPassBtn) addPassBtn.onclick = openCreateProgramModal;
+
+function renderHome() {
+    showView("home-view");
+    if(activeDraft) {
+        document.getElementById("draft-alert").classList.remove("hidden");
+        document.getElementById("start-new-btn").classList.add("hidden");
+        document.getElementById("resume-workout-btn").onclick = () => startWorkout(activeDraft.workout, activeDraft.data, activeDraft.date);
+    }
+}
+
+const saveWorkoutBtn = document.getElementById("save-workout-btn");
+if(saveWorkoutBtn) {
+    saveWorkoutBtn.onclick = () => {
+        if(!activeDraft.isStarted) {
+            if(confirm("Du har inte startat passet än. Vill du bara avbryta och ta bort utkastet?")) {
+                localStorage.removeItem("activeWorkoutDraft");
+                location.reload();
+            }
+            return;
+        }
+
+        pauseTimer();
+        const finalTime = document.getElementById("workout-timer").textContent;
+        
+        const log = {
+            date: activeDraft.date,
+            programName: activeDraft.workout.name,
+            totalTime: finalTime,
+            exercises: activeDraft.workout.exercises.map((ex, i) => {
+                return {
+                    name: ex.name,
+                    sets_data: activeDraft.data[i].sets_data 
+                };
+            })
+        };
+        
+        if (activeDraft.workout.id && activeDraft.workout.id.toString().startsWith("free-")) {
+            if (confirm("Vill du spara detta som ett nytt träningsprogram?")) {
+                const newName = prompt("Namnge passet:", "Mitt nya pass");
+                if (newName) {
+                    programData.routine.push({
+                        id: "pass-" + Date.now(),
+                        name: newName,
+                        exercises: JSON.parse(JSON.stringify(activeDraft.workout.exercises))
+                    });
+                }
+            }
+        }
+
+        workoutHistory.push(log);
+        saveAll();
+        localStorage.removeItem("activeWorkoutDraft");
+        activeDraft = null; 
+        secondsElapsed = 0;
+        renderCalendar();
+    };
+}
+
+const pauseWorkoutBtn = document.getElementById("pause-workout-btn");
+if(pauseWorkoutBtn) {
+    pauseWorkoutBtn.onclick = () => { 
+        pauseTimer();
+        location.reload(); 
+    };
 }
 
 function renderStats() {
-    showView("stats-view");
-    
     const container = document.getElementById("chart-container");
     container.innerHTML = "";
-    
-    const monthCounts = {};
-    
-    workoutHistory.forEach(w => {
-        const date = new Date(w.date);
-        const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
-        monthCounts[key] = (monthCounts[key] || 0) + 1;
-    });
-    
-    const sortedKeys = Object.keys(monthCounts).sort();
-    
-    if(sortedKeys.length === 0) {
-        container.innerHTML = `<p style="text-align:center; color:var(--text-light);">Ingen träningshistorik än.</p>`;
-        return;
-    }
-    
-    const maxCount = Math.max(...Object.values(monthCounts));
-    
-    const chartDiv = document.createElement("div");
-    chartDiv.style.cssText = "display:flex; align-items:flex-end; justify-content:space-around; height:250px; padding:20px 10px;";
-    
-    sortedKeys.forEach(key => {
-        const count = monthCounts[key];
-        const height = (count / maxCount) * 100;
-        
+    const months = {};
+    workoutHistory.forEach(w => { const m = w.date.substring(0, 7); months[m] = (months[m] || 0) + 1; });
+    Object.entries(months).sort().forEach(([m, val]) => {
         const bar = document.createElement("div");
-        bar.style.cssText = `
-            flex:1;
-            max-width:60px;
-            height:${height}%;
-            background:linear-gradient(180deg, var(--primary), var(--secondary));
-            border-radius:8px 8px 0 0;
-            margin:0 5px;
-            position:relative;
-            display:flex;
-            align-items:flex-end;
-            justify-content:center;
-            padding-bottom:5px;
-            color:white;
-            font-weight:700;
-            font-size:14px;
-        `;
-        bar.textContent = count;
-        
-        const label = document.createElement("div");
-        label.style.cssText = "text-align:center; font-size:11px; color:var(--text-light); margin-top:5px;";
-        label.textContent = key;
-        
-        const wrapper = document.createElement("div");
-        wrapper.style.cssText = "display:flex; flex-direction:column; align-items:center; flex:1;";
-        wrapper.appendChild(bar);
-        wrapper.appendChild(label);
-        
-        chartDiv.appendChild(wrapper);
+        bar.className = "chart-bar";
+        bar.style.height = (val * 20) + "px";
+        bar.innerHTML = `<span style="position:absolute; top:-20px; width:100%; text-align:center; font-size:10px;">${val}</span>`;
+        container.appendChild(bar);
     });
-    
-    container.appendChild(chartDiv);
+    showView("stats-view");
 }
 
-renderHome();
+function changeMonth(off) { currentViewDate.setMonth(currentViewDate.getMonth() + off); renderCalendar(); }
+function setOverride(date, val) { calendarOverrides[date] = val; saveAll(); closeModal(); renderCalendar(); }
+function prepareStart(date, id) { const p = programData.routine.find(x => x.id === id); closeModal(); startWorkout(p, null, date, false); }
 
-function openMonthPicker() {
-    const modal = document.getElementById("workout-modal");
-    const body = document.getElementById("modal-body");
+function deleteLoggedWorkout(date, idx) {
+    if(confirm("Radera passet?")) {
+        const filtered = workoutHistory.filter(w => w.date === date);
+        const item = filtered[idx];
+        workoutHistory = workoutHistory.filter(w => w !== item);
+        localStorage.removeItem("activeWorkoutDraft");
+        activeDraft = null; 
+        saveAll(); closeModal(); renderCalendar();
+    }
+}
+
+function editLoggedWorkout(date, idx) {
+    const filtered = workoutHistory.filter(w => w.date === date);
+    const item = filtered[idx];
+    const workoutObj = { id: "edit-" + Date.now(), name: item.programName, exercises: item.exercises.map(ex => ({ name: ex.name })) };
     
-    body.innerHTML = `<h2 class="section-title modern-header">Välj månad</h2>`;
-    
-    const monthNames = ["Januari", "Februari", "Mars", "April", "Maj", "Juni", "Juli", "Augusti", "September", "Oktober", "November", "December"];
-    
-    const yearDiv = document.createElement("div");
-    yearDiv.style.cssText = "display:flex; justify-content:center; align-items:center; gap:20px; margin-bottom:20px;";
-    yearDiv.innerHTML = `
-        <button class="nav-arrow" onclick="changeYear(-1)">❮</button>
-        <h3 id="year-picker-label" style="margin:0; min-width:80px; text-align:center;">${currentYear}</h3>
-        <button class="nav-arrow" onclick="changeYear(1)">❯</button>
-    `;
-    body.appendChild(yearDiv);
-    
-    const monthGrid = document.createElement("div");
-    monthGrid.style.cssText = "display:grid; grid-template-columns:repeat(3, 1fr); gap:10px;";
-    
-    monthNames.forEach((name, idx) => {
-        const btn = document.createElement("button");
-        btn.className = "mode-btn glass-border";
-        btn.style.cssText = "padding:15px; font-size:14px;";
-        btn.textContent = name;
-        
-        if(idx === currentMonth) {
-            btn.style.borderColor = "var(--primary)";
-            btn.style.background = "rgba(34, 211, 238, 0.15)";
-        }
-        
-        btn.onclick = () => {
-            currentMonth = idx;
-            closeModal();
-            renderCalendar();
-        };
-        
-        monthGrid.appendChild(btn);
+    const dataObj = item.exercises.map(ex => {
+        if(ex.sets_data) return { sets_data: ex.sets_data, isCompleted: true };
+        return { sets_data: Array(parseInt(ex.sets || 1)).fill({ weight: ex.weight, reps: ex.reps }), isCompleted: true };
     });
-    
-    body.appendChild(monthGrid);
-    modal.classList.remove("hidden");
+
+    workoutHistory = workoutHistory.filter(w => w !== item);
+    localStorage.removeItem("activeWorkoutDraft");
+    activeDraft = null;
+    closeModal();
+    startWorkout(workoutObj, dataObj, date, true); 
 }
-
-function changeYear(delta) {
-    currentYear += delta;
-    document.getElementById("year-picker-label").textContent = currentYear;
-}
-
-    
-
