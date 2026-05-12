@@ -31,6 +31,7 @@
 
         <div id="calendar-view" class="view hidden">
             <h2 class="section-title modern-header">Träningsschema</h2>
+            <!-- Behållare för informationsnotisen via JS -->
             <div id="calendar-info-box"></div>
             
             <div class="calendar-nav">
@@ -88,11 +89,9 @@
         </div>
 
         <div id="workout-view" class="view hidden">
-            <div id="active-header-row" style="display: flex; align-items: center; margin-bottom: 10px;">
-                <h2 id="active-title" class="section-title modern-header" style="margin-bottom:0; flex-grow:1;"></h2>
-            </div>
+            <h2 id="active-title" class="section-title modern-header" style="margin-bottom:10px;"></h2>
             
-            <div id="timer-card" class="card glass" style="margin-bottom: 20px; padding: 15px;">
+            <div class="card glass" style="margin-bottom: 20px; padding: 15px;">
                 <div id="workout-timer" class="timer-display">00:00:00</div>
                 <div style="display: flex; gap: 10px;">
                     <button id="timer-toggle-btn" class="mode-btn glass-border" style="margin-bottom:0; padding:10px;">Pausa ⏸️</button>
