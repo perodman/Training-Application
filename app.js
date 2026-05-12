@@ -43,7 +43,6 @@ fetch("program.json")
     
     programData = savedProgram || json;
 
-    // Återställ timer om det finns ett pågående pass som var igång
     if(activeDraft && activeDraft.isStarted) {
         secondsElapsed = activeDraft.secondsElapsed || 0;
         if(activeDraft.wasTimerRunning) {
@@ -389,7 +388,7 @@ function setOverrideSilent(date, val) {
 
 function startFreeWorkoutOnDate(date) {
     const freePass = { id: "free-" + Date.now(), name: "Fritt Pass", exercises: [] };
-    startWorkout(freePass, null, date, false);
+    startWorkout(freePass, null, date, true); // Ändrad till true för direktstart
 }
 
 function openMonthPicker() {
@@ -557,7 +556,12 @@ function getExerciseHistory(exerciseName) {
 
 // --- AKTIVT PASS ---
 function startWorkout(workout, data = null, date = null, isImmediateStart = false) {
-    secondsElapsed = (activeDraft && activeDraft.secondsElapsed) ? activeDraft.secondsElapsed : 0;
+    // Om vi inte har någon sparad tid, nollställ den
+    if(!activeDraft || !activeDraft.secondsElapsed) {
+        secondsElapsed = 0;
+    } else {
+        secondsElapsed = activeDraft.secondsElapsed;
+    }
     
     if(!data) {
         data = workout.exercises.map(ex => {
@@ -574,14 +578,14 @@ function startWorkout(workout, data = null, date = null, isImmediateStart = fals
         data: data, 
         date: date || new Date().toISOString().split('T')[0],
         secondsElapsed: secondsElapsed,
-        isStarted: isImmediateStart || (activeDraft ? activeDraft.isStarted : false),
-        wasTimerRunning: isImmediateStart || (activeDraft ? activeDraft.wasTimerRunning : false)
+        isStarted: true, // Tvinga isStarted till true för att skippa start-vyn
+        wasTimerRunning: true // Starta timern direkt
     };
     
+    localStorage.setItem("activeWorkoutDraft", JSON.stringify(activeDraft));
     renderActiveWorkout();
     updateTimerDisplay();
-    if(activeDraft.isStarted && activeDraft.wasTimerRunning) startTimer();
-    else pauseTimer();
+    startTimer(); // Kör timern direkt
 }
 
 function renderActiveWorkout() {
@@ -590,6 +594,7 @@ function renderActiveWorkout() {
     const footer = document.querySelector(".workout-footer");
     list.innerHTML = "";
 
+    // Denna if-sats körs nu aldrig vid nystart då isStarted tvingas till true
     if(!activeDraft.isStarted) {
         footer.classList.add("hidden");
         list.innerHTML = `
@@ -664,7 +669,6 @@ function renderActiveWorkout() {
     addBtn.onclick = openAddExerciseToWorkoutModal;
     list.appendChild(addBtn);
 
-    // Punkt 1: Lägg till Kassera-knappen i slutet
     const discardBtn = document.createElement("button");
     discardBtn.className = "mode-btn";
     discardBtn.style.cssText = "background:none; color:var(--danger); font-size:14px; margin-top:20px; border:1px solid rgba(239, 68, 68, 0.2);";
@@ -722,7 +726,6 @@ function openAddExerciseToWorkoutModal() {
     openModal();
 }
 
-// Punkt 3: Helper för att byta ut övning
 function openReplaceExerciseModal(index) {
     renderExercisePicker("Ben", index);
     openModal();
@@ -812,7 +815,6 @@ function removeActiveExercise(i) {
 
 // --- STANDARD-LOGIK ---
 document.getElementById("global-home").onclick = () => {
-    // Punkt 2: Gå hem ska inte pausa klockan om den är igång
     location.reload();
 }
 
@@ -883,7 +885,6 @@ document.getElementById("save-workout-btn").onclick = () => {
 };
 
 document.getElementById("pause-workout-btn").onclick = () => { 
-    // Punkt 2: Spara utkast ska inte pausa klockan
     location.reload(); 
 };
 
@@ -904,7 +905,12 @@ function renderStats() {
 
 function changeMonth(off) { currentViewDate.setMonth(currentViewDate.getMonth() + off); renderCalendar(); }
 function setOverride(date, val) { calendarOverrides[date] = val; saveAll(); closeModal(); renderCalendar(); }
-function prepareStart(date, id) { const p = programData.routine.find(x => x.id === id); closeModal(); startWorkout(p, null, date, false); }
+
+function prepareStart(date, id) { 
+    const p = programData.routine.find(x => x.id === id); 
+    closeModal(); 
+    startWorkout(p, null, date, true); // Skickar true för att starta direkt
+}
 
 function deleteLoggedWorkout(date, idx) {
     const filtered = workoutHistory.filter(w => w.date === date);
@@ -919,7 +925,6 @@ function editLoggedWorkout(date, idx) {
     const filtered = workoutHistory.filter(w => w.date === date);
     const item = filtered[idx];
     
-    // Punkt 2: Räkna ut sekunder från sparad tid (HH:MM:SS)
     let savedSeconds = 0;
     if(item.totalTime) {
         const parts = item.totalTime.split(':');
@@ -938,7 +943,6 @@ function editLoggedWorkout(date, idx) {
     activeDraft = null;
     closeModal();
     
-    // Starta passet i edit-läge: Klockan ska INTE ticka (wasTimerRunning = false)
     secondsElapsed = savedSeconds;
     activeDraft = {
         workout: workoutObj,
@@ -967,9 +971,6 @@ function openConfirmDeleteModal(date, idx) {
     openModal();
 }
 
-// --- NYA FUNKTIONER ---
-
-// Punkt 1: Snabb-kassera pågående pass
 function confirmDiscardActiveWorkout() {
     const body = document.getElementById("modal-body");
     body.innerHTML = `
