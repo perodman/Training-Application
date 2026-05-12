@@ -306,7 +306,7 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
                     <div style="font-size:10px; color:var(--text-light)">${timeStr}</div>
                     <div>
                         <button onclick="editLoggedWorkout('${dateStr}', ${idx})" style="background:none; border:none; color:var(--primary); cursor:pointer; font-size:16px; margin-right:10px;"> ✏️ </button>
-                        <button onclick="deleteLoggedWorkout('${dateStr}', ${idx})" style="background:none; border:none; color:var(--danger); cursor:pointer; font-size:16px;"> ✖ </button>
+                        <button onclick="confirmDeleteWorkout('${dateStr}', ${idx})" style="background:none; border:none; color:var(--danger); cursor:pointer; font-size:16px;"> ✖ </button>
                     </div>
                 </div>
                 <div style="margin-top:10px;">`;
@@ -329,9 +329,11 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
     } else {
         html += `<p style="text-align:center;">Planerat: <strong id="current-planned-label">${planned ? planned.name : 'Vila'}</strong></p>`;
         
+        html += `<div id="start-button-container">`;
         if(planned) {
             html += `<button class="mode-btn green" onclick="prepareStart('${dateStr}', '${planned.id}')">Starta ${planned.name} 🔥</button>`;
         }
+        html += `</div>`;
         
         html += `<button class="mode-btn glass-border" style="border-color:var(--primary); color:var(--primary);" onclick="closeModal(); startFreeWorkoutOnDate('${dateStr}')"><span style="color:var(--primary)">+</span> Starta Fritt Pass</button>`;
 
@@ -341,8 +343,10 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
             const isSelected = planned && p.id === planned.id;
             html += `<button class="mode-btn glass-border plan-override-btn ${isSelected ? 'active-choice' : ''}" id="btn-ovr-${p.id}" onclick="setOverrideSilent('${dateStr}', '${p.id}')">${p.name}</button>`;
         });
-        html += `<button class="mode-btn glass-border plan-override-btn" style="color:var(--danger); border-color:var(--danger);" onclick="setOverrideSilent('${dateStr}', 'none')">Vila</button>`;
         html += `</div>`;
+        html += `<div style="margin-top:10px;">
+            <button class="mode-btn glass-border plan-override-btn" style="width:100%; color:var(--text-light); border-color:var(--glass-border);" onclick="setOverrideSilent('${dateStr}', 'none')">Markera som vilodag</button>
+        </div>`;
     }
     body.innerHTML = html;
     openModal();
@@ -353,19 +357,23 @@ function setOverrideSilent(date, val) {
     saveAll();
     
     document.querySelectorAll('.plan-override-btn').forEach(b => b.classList.remove('active-choice'));
+    const startContainer = document.getElementById('start-button-container');
+    const label = document.getElementById('current-planned-label');
+
     if(val !== 'none') {
         const activeBtn = document.getElementById(`btn-ovr-${val}`);
         if(activeBtn) activeBtn.classList.add('active-choice');
         const p = programData.routine.find(x => x.id === val);
-        const label = document.getElementById('current-planned-label');
         if(label) label.textContent = p.name;
+        if(startContainer) {
+            startContainer.innerHTML = `<button class="mode-btn green" onclick="prepareStart('${date}', '${p.id}')">Starta ${p.name} 🔥</button>`;
+        }
     } else {
-        const label = document.getElementById('current-planned-label');
         if(label) label.textContent = "Vila";
+        if(startContainer) startContainer.innerHTML = "";
     }
     
     renderCalendar(false); 
-    openModal(); 
 }
 
 function startFreeWorkoutOnDate(date) {
@@ -595,14 +603,7 @@ function renderActiveWorkout() {
         const div = document.createElement("div");
         div.className = "card glass" + (isDone ? " exercise-done" : "");
         
-        const masterEx = masterExercises.find(me => me.name === ex.name);
-        let videoTag = "";
-        if(masterEx && masterEx.animation) {
-            videoTag = `
-            <div style="border-radius:12px; overflow:hidden; margin:10px 0; background:#000; border:1px solid var(--glass-border);">
-                <video src="${masterEx.animation}" autoplay loop muted playsinline style="width:100%; display:block;"></video>
-            </div>`;
-        }
+        // Animationer borttagna härifrån enligt punkt 3.
 
         let setsHtml = `<div style="margin-top:10px;">
             <div style="display:grid; grid-template-columns: 35px 1fr 1fr 30px; gap:8px; margin-bottom:5px; align-items:center;">
@@ -638,7 +639,6 @@ function renderActiveWorkout() {
             <strong style="font-size:16px;">${ex.name}</strong>
             <button onclick="removeActiveExercise(${i})" style="color:var(--danger); background:none; border:none; font-size:20px;" ${isDone ? 'disabled' : ''}> ✖ </button>
         </div>
-        ${videoTag}
         ${setsHtml}`;
         
         list.appendChild(div);
@@ -813,10 +813,15 @@ const saveWorkoutBtn = document.getElementById("save-workout-btn");
 if(saveWorkoutBtn) {
     saveWorkoutBtn.onclick = () => {
         if(!activeDraft.isStarted) {
-            if(confirm("Du har inte startat passet än. Vill du bara avbryta och ta bort utkastet?")) {
-                localStorage.removeItem("activeWorkoutDraft");
-                location.reload();
-            }
+            // Specialdesignad confirm för att kasta pass (Punkt 1)
+            const body = document.getElementById("modal-body");
+            body.innerHTML = `
+                <h3>Kasta träningspass?</h3>
+                <p style="text-align:center; color:var(--text-light); margin-bottom:20px;">Du har inte startat passet än. Vill du kasta utkastet?</p>
+                <button class="mode-btn" style="background:var(--danger); color:white;" onclick="localStorage.removeItem('activeWorkoutDraft'); location.reload();">Kasta pass</button>
+                <button class="mode-btn glass-border" onclick="closeModal()">Avbryt</button>
+            `;
+            openModal();
             return;
         }
 
@@ -860,7 +865,7 @@ if(saveWorkoutBtn) {
 const pauseWorkoutBtn = document.getElementById("pause-workout-btn");
 if(pauseWorkoutBtn) {
     pauseWorkoutBtn.onclick = () => { 
-        pauseTimer();
+        // Punkt 2: Klockan stannar inte längre när man sparar utkast
         location.reload(); 
     };
 }
@@ -884,15 +889,25 @@ function changeMonth(off) { currentViewDate.setMonth(currentViewDate.getMonth() 
 function setOverride(date, val) { calendarOverrides[date] = val; saveAll(); closeModal(); renderCalendar(); }
 function prepareStart(date, id) { const p = programData.routine.find(x => x.id === id); closeModal(); startWorkout(p, null, date, false); }
 
+// Punkt 4: Designfull radering av genomfört pass
+function confirmDeleteWorkout(date, idx) {
+    const body = document.getElementById("modal-body");
+    body.innerHTML = `
+        <h3 style="color:var(--danger);">Radera passet?</h3>
+        <p style="text-align:center; color:var(--text-light); margin-bottom:20px;">Detta träningspass kommer att tas bort permanent från din historik.</p>
+        <button class="mode-btn" style="background:var(--danger); color:white; font-weight:800;" onclick="deleteLoggedWorkout('${date}', ${idx})">Radera permanent</button>
+        <button class="mode-btn glass-border" onclick="closeModal()">Avbryt</button>
+    `;
+    openModal();
+}
+
 function deleteLoggedWorkout(date, idx) {
-    if(confirm("Radera passet?")) {
-        const filtered = workoutHistory.filter(w => w.date === date);
-        const item = filtered[idx];
-        workoutHistory = workoutHistory.filter(w => w !== item);
-        localStorage.removeItem("activeWorkoutDraft");
-        activeDraft = null; 
-        saveAll(); closeModal(); renderCalendar();
-    }
+    const filtered = workoutHistory.filter(w => w.date === date);
+    const item = filtered[idx];
+    workoutHistory = workoutHistory.filter(w => w !== item);
+    localStorage.removeItem("activeWorkoutDraft");
+    activeDraft = null; 
+    saveAll(); closeModal(); renderCalendar();
 }
 
 function editLoggedWorkout(date, idx) {
