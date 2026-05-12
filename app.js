@@ -585,41 +585,25 @@ function startWorkout(workout, data = null, date = null, isImmediateStart = fals
 }
 
 function renderActiveWorkout() {
+    document.getElementById("active-title").textContent = activeDraft.workout.name;
     const list = document.getElementById("exercise-list");
     const footer = document.querySelector(".workout-footer");
-    const timerControls = document.getElementById("timer-controls");
-    
-    // Punkt 2: Papperskorg i rubriken
-    const headerHtml = `
-        <div class="workout-header-main">
-            <h2 id="active-title">${activeDraft.workout.name}</h2>
-            <button class="header-trash-btn" onclick="confirmDiscardActiveWorkout()">🗑️</button>
-        </div>
-    `;
-    
     list.innerHTML = "";
 
-    // Punkt 3: Ny ordning innan start (Rubrik -> Knapp -> Klocka)
     if(!activeDraft.isStarted) {
         footer.classList.add("hidden");
-        timerControls.classList.add("hidden"); // Dölj paus/fortsätt innan start
-
-        list.innerHTML = headerHtml + `
-            <div style="text-align:center; padding:10px 0 20px;">
+        list.innerHTML = `
+            <div style="text-align:center; padding:20px 0;">
                 <button class="mode-btn green" style="width:100%; padding:20px; font-size:18px; box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3);" onclick="actuallyStartWorkout()">STARTA TRÄNINGSPASSET 🔥</button>
             </div>
-            <p style="color:var(--text-light); font-size:13px; text-align:center; margin-bottom:10px;">Väntar på start...</p>
+            <p style="color:var(--text-light); font-size:13px; text-align:center; margin-top:10px;">Klicka på knappen ovan för att starta klockan.</p>
         `;
         document.getElementById("workout-timer").textContent = "00:00:00";
         showView("workout-view");
         return;
     }
 
-    // Passet är igång
     footer.classList.remove("hidden");
-    timerControls.classList.remove("hidden");
-    
-    list.innerHTML = headerHtml;
 
     const pauseBtn = document.getElementById("pause-workout-btn");
     pauseBtn.innerHTML = `Spara utkast 💾`;
@@ -656,15 +640,17 @@ function renderActiveWorkout() {
             </button>
         </div>`;
 
-        // Punkt 1: Enbart en knapp (✖) som nu öppnar valmeny
         div.innerHTML = `
-        <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:5px; gap:10px;">
-            <div style="display:flex; gap:8px; margin-top:3px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
+            <div style="display:flex; gap:8px;">
                 <button class="reorder-btn" onclick="moveActiveExercise(${i}, -1)" ${isDone ? 'disabled' : ''}>▲</button>
                 <button class="reorder-btn" onclick="moveActiveExercise(${i}, 1)" ${isDone ? 'disabled' : ''}>▼</button>
             </div>
-            <strong style="font-size:16px; flex:1; line-height:1.2;">${ex.name}</strong>
-            <button onclick="handleExerciseAction(${i})" style="color:var(--text-light); background:none; border:none; font-size:20px; padding:0 5px;" ${isDone ? 'disabled' : ''}> ✖ </button>
+            <strong style="font-size:16px;">${ex.name}</strong>
+            <div style="display:flex; gap:10px;">
+                <button onclick="openReplaceExerciseModal(${i})" style="color:var(--primary); background:none; border:none; font-size:18px;" ${isDone ? 'disabled' : ''}> 🔄 </button>
+                <button onclick="removeActiveExercise(${i})" style="color:var(--danger); background:none; border:none; font-size:20px;" ${isDone ? 'disabled' : ''}> ✖ </button>
+            </div>
         </div>
         ${setsHtml}`;
         
@@ -678,6 +664,7 @@ function renderActiveWorkout() {
     addBtn.onclick = openAddExerciseToWorkoutModal;
     list.appendChild(addBtn);
 
+    // Punkt 1: Lägg till Kassera-knappen i slutet
     const discardBtn = document.createElement("button");
     discardBtn.className = "mode-btn";
     discardBtn.style.cssText = "background:none; color:var(--danger); font-size:14px; margin-top:20px; border:1px solid rgba(239, 68, 68, 0.2);";
@@ -735,6 +722,7 @@ function openAddExerciseToWorkoutModal() {
     openModal();
 }
 
+// Punkt 3: Helper för att byta ut övning
 function openReplaceExerciseModal(index) {
     renderExercisePicker("Ben", index);
     openModal();
@@ -815,14 +803,16 @@ function moveActiveExercise(i, dir) {
 }
 
 function removeActiveExercise(i) {
-    activeDraft.workout.exercises.splice(i, 1);
-    activeDraft.data.splice(i, 1);
-    closeModal();
-    renderActiveWorkout();
+    if(confirm("Ta bort övningen?")) {
+        activeDraft.workout.exercises.splice(i, 1);
+        activeDraft.data.splice(i, 1);
+        renderActiveWorkout();
+    }
 }
 
 // --- STANDARD-LOGIK ---
 document.getElementById("global-home").onclick = () => {
+    // Punkt 2: Gå hem ska inte pausa klockan om den är igång
     location.reload();
 }
 
@@ -893,6 +883,7 @@ document.getElementById("save-workout-btn").onclick = () => {
 };
 
 document.getElementById("pause-workout-btn").onclick = () => { 
+    // Punkt 2: Spara utkast ska inte pausa klockan
     location.reload(); 
 };
 
@@ -928,6 +919,7 @@ function editLoggedWorkout(date, idx) {
     const filtered = workoutHistory.filter(w => w.date === date);
     const item = filtered[idx];
     
+    // Punkt 2: Räkna ut sekunder från sparad tid (HH:MM:SS)
     let savedSeconds = 0;
     if(item.totalTime) {
         const parts = item.totalTime.split(':');
@@ -946,6 +938,7 @@ function editLoggedWorkout(date, idx) {
     activeDraft = null;
     closeModal();
     
+    // Starta passet i edit-läge: Klockan ska INTE ticka (wasTimerRunning = false)
     secondsElapsed = savedSeconds;
     activeDraft = {
         workout: workoutObj,
@@ -976,6 +969,7 @@ function openConfirmDeleteModal(date, idx) {
 
 // --- NYA FUNKTIONER ---
 
+// Punkt 1: Snabb-kassera pågående pass
 function confirmDiscardActiveWorkout() {
     const body = document.getElementById("modal-body");
     body.innerHTML = `
@@ -986,20 +980,6 @@ function confirmDiscardActiveWorkout() {
             <button class="mode-btn" style="background:var(--danger); color:white; margin-bottom:12px;" onclick="localStorage.removeItem('activeWorkoutDraft'); location.reload();">Ja, kassera</button>
             <button class="mode-btn glass-border" onclick="closeModal()">Avbryt</button>
         </div>
-    `;
-    openModal();
-}
-
-// Punkt 1: Valmeny för övnings-krysset
-function handleExerciseAction(index) {
-    const body = document.getElementById("modal-body");
-    body.innerHTML = `
-        <h3>Övningsalternativ</h3>
-        <p style="text-align:center; color:var(--text-light); margin-bottom:20px;">Vad vill du göra med denna övning?</p>
-        <button class="mode-btn blue" onclick="openReplaceExerciseModal(${index})">Byt ut övning 🔄</button>
-        <button class="mode-btn" style="background:rgba(239, 68, 68, 0.1); color:var(--danger); border:1px solid var(--danger);" onclick="removeActiveExercise(${index})">Ta bort helt 🗑️</button>
-        <div class="separator"></div>
-        <button class="mode-btn glass-border" onclick="closeModal()">Avbryt</button>
     `;
     openModal();
 }
