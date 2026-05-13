@@ -683,35 +683,32 @@ function renderActiveWorkout() {
 
         exerciseData.sets_data.forEach((set, sIdx) => {
             let isLocked = false;
-            
             if (sIdx > 0 && !isDone) {
                 const prevSet = exerciseData.sets_data[sIdx - 1];
-                if (!prevSet.userConfirmed) {
-                    isLocked = true;
-                }
+                if (!prevSet.userConfirmed) isLocked = true;
             }
-            
-            // Om passet är klart låser vi allt, men vi vill behålla bockarna
             if (isDone) isLocked = true;
 
-            // ÄNDRING: Visa bock om setet är bekräftat ELLER om passet är helt klart
             const showSuccess = set.userConfirmed || isDone;
-            const statusContent = showSuccess ? '✅' : `<span style="opacity:0.8;">#${sIdx + 1}</span>`;
-            
-            // ÄNDRING: Behåll den gröna färgen även när det är låst/klart
+            // Vi använder fasta färgvärden här för att garantera att de syns
             const circleColor = showSuccess ? '#22c55e' : '#f59e0b';
+            const statusContent = showSuccess ? '✅' : `#${sIdx + 1}`;
 
             setsHtml += `
             <div style="display:grid; grid-template-columns: 40px 1fr 1fr 30px; gap:8px; margin-bottom:8px; align-items:center;" 
                  class="${isLocked ? 'set-locked' : ''}">
                 
-                <div onclick="${isLocked ? '' : `confirmSet(${i}, ${sIdx})`}" 
-                     style="width:32px; height:32px; border-radius:50%; border:2px solid ${circleColor}; 
-                            display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:10px; font-weight:800;
-                            background: ${showSuccess ? 'rgba(34, 197, 94, 0.1)' : 'rgba(245, 158, 11, 0.05)'};
-                            color: ${circleColor};
-                            /* Ser till att bocken inte blir för blek när hela rutan mörkas */
-                            opacity: 1 !important;">
+                <div onclick="${isLocked && !isDone ? '' : `confirmSet(${i}, ${sIdx})`}" 
+                     style="width:32px; height:32px; border-radius:50%; 
+                            border:2px solid ${circleColor} !important; 
+                            display:flex; align-items:center; justify-content:center; 
+                            cursor:pointer; font-size:10px; font-weight:800;
+                            background: ${showSuccess ? 'rgba(34, 197, 94, 0.2)' : 'rgba(245, 158, 11, 0.1)'} !important;
+                            color: ${circleColor} !important;
+                            /* Denna rad är kritisk för att stoppa mörkläggningen */
+                            filter: brightness(1.2); 
+                            opacity: 1 !important;
+                            z-index: 10;">
                     ${statusContent}
                 </div>
                 
@@ -784,10 +781,19 @@ function updateSetDataOnly(exIdx, setIdx) {
 }
 
 function confirmSet(exIdx, setIdx) {
+    // 1. Spara nuvarande rullningsposition
+    const scrollPos = window.scrollY;
+
     const currentState = activeDraft.data[exIdx].sets_data[setIdx].userConfirmed;
     activeDraft.data[exIdx].sets_data[setIdx].userConfirmed = !currentState;
+    
     localStorage.setItem("activeWorkoutDraft", JSON.stringify(activeDraft));
+    
+    // 2. Rita om vyn
     renderActiveWorkout();
+
+    // 3. Hoppa direkt tillbaka till där du var
+    window.scrollTo(0, scrollPos);
 }
 
 function addSetToExercise(exIdx) {
