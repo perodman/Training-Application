@@ -684,43 +684,21 @@ function renderActiveWorkout() {
         // HÄR ÄR DEN NYA LOOP SOM SKÖTER UTGRÅNING OCH TANGENTBORD
         exerciseData.sets_data.forEach((set, sIdx) => {
     let isLocked = false;
+    
+    // Om det inte är första setet, kolla om föregående set har "bekräftats"
     if (sIdx > 0 && !isDone) {
         const prevSet = exerciseData.sets_data[sIdx - 1];
-        if (!prevSet.weight || !prevSet.reps) {
+        
+        // LOGIK: Om föregående set saknar värde ELLER inte har markerats som ändrat/bekräftat
+        if (!prevSet.weight || !prevSet.reps || !prevSet.userConfirmed) {
             isLocked = true;
         }
     }
+    
     if (isDone) isLocked = true;
 
-    setsHtml += `
-    <div style="display:grid; grid-template-columns: 35px 1fr 1fr 30px; gap:8px; margin-bottom:8px; align-items:center;" 
-         class="${isLocked ? 'set-locked' : ''}">
-        <span style="font-size:12px; font-weight:800; color:var(--primary)">#${sIdx + 1}</span>
-        
-        <input type="text" 
-               inputmode="decimal" 
-               id="w-${i}-${sIdx}" 
-               class="log-input" 
-               style="margin:0; padding:12px; font-size:18px;" 
-               placeholder="0" 
-               value="${set.weight}" 
-               ${isLocked ? 'readonly' : ''}
-               oninput="updateSetData(${i}, ${sIdx})">
-        
-        <input type="text" 
-               inputmode="decimal" 
-               id="r-${i}-${sIdx}" 
-               class="log-input" 
-               style="margin:0; padding:12px; font-size:18px;" 
-               placeholder="0" 
-               value="${set.reps}" 
-               ${isLocked ? 'readonly' : ''}
-               oninput="updateSetData(${i}, ${sIdx})">
-        
-        <button onclick="removeSetFromExercise(${i}, ${sIdx})" 
-                style="background:none; border:none; color:var(--danger); font-size:16px;" 
-                ${isLocked ? 'disabled' : ''}>×</button>
-    </div>`;
+    // ... resten av din HTML för input-fälten ...
+    // VIKTIGT: Lägg till oninput="confirmSet(${i}, ${sIdx})" på dina inputs
 });
 
         setsHtml += `
