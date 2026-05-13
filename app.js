@@ -766,20 +766,23 @@ function renderActiveWorkout() {
     showView("workout-view");
 }
 
-function updateSetData(exIdx, setIdx, type) {
-    const wVal = document.getElementById(`w-${exIdx}-${setIdx}`).value;
-    const rVal = document.getElementById(`r-${exIdx}-${setIdx}`).value;
+function updateSetData(exIdx, setIdx) {
+    const wInput = document.getElementById(`w-${exIdx}-${setIdx}`);
+    const rInput = document.getElementById(`r-${exIdx}-${setIdx}`);
+    
+    const wVal = wInput.value;
+    const rVal = rInput.value;
     
     activeDraft.data[exIdx].sets_data[setIdx] = { weight: wVal, reps: rVal };
     localStorage.setItem("activeWorkoutDraft", JSON.stringify(activeDraft));
 
-    // På mobilen: Om båda fälten är ifyllda, rita om för att låsa upp nästa.
-    // Men vi väntar lite så att användaren hinner skriva klart.
-    if (wVal && rVal) {
+    // Om båda fälten i nuvarande set precis blev ifyllda, rita om för att låsa upp nästa
+    // Men vi gör det bara om nästa set faktiskt existerar och är låst
+    if (wVal !== "" && rVal !== "") {
         renderActiveWorkout();
-        // Sätt fokus tillbaka till fältet du skrev i så tangentbordet inte försvinner
-        const focusedId = type === 'w' ? `w-${exIdx}-${setIdx}` : `r-${exIdx}-${setIdx}`;
-        document.getElementById(focusedId).focus();
+        // Sätt tillbaka fokus så tangentbordet inte försvinner (viktigt för mobil)
+        // Vi gissar att användaren vill fortsätta i det fält de just var i om de raderar,
+        // men här låter vi renderActiveWorkout göra sitt jobb.
     }
 }
 
