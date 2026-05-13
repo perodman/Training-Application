@@ -697,25 +697,25 @@ function renderActiveWorkout() {
                  class="${isLocked ? 'set-locked' : ''}">
                 <span style="font-size:12px; font-weight:800; color:var(--primary)">#${sIdx + 1}</span>
                 
-                <input type="text" 
-                       inputmode="decimal" 
-                       id="w-${i}-${sIdx}" 
-                       class="log-input" 
-                       style="margin:0; padding:12px; font-size:18px;" 
-                       placeholder="0" 
-                       value="${set.weight}" 
-                       ${isLocked ? 'readonly' : ''}
-                       onchange="updateSetData(${i}, ${sIdx})">
-                
-                <input type="text" 
-                       inputmode="decimal" 
-                       id="r-${i}-${sIdx}" 
-                       class="log-input" 
-                       style="margin:0; padding:12px; font-size:18px;" 
-                       placeholder="0" 
-                       value="${set.reps}" 
-                       ${isLocked ? 'readonly' : ''}
-                       onchange="updateSetData(${i}, ${sIdx})">
+                input type="text" 
+                   inputmode="decimal" 
+                   id="w-${i}-${sIdx}" 
+                   class="log-input" 
+                   style="margin:0; padding:12px; font-size:18px;" 
+                   placeholder="0" 
+                   value="${set.weight}" 
+                   ${isLocked ? 'readonly' : ''}
+                   oninput="updateSetData(${i}, ${sIdx}, 'w')"> /* Ändrad till oninput */
+            
+                    <input type="text" 
+                   inputmode="decimal" 
+                   id="r-${i}-${sIdx}" 
+                   class="log-input" 
+                   style="margin:0; padding:12px; font-size:18px;" 
+                   placeholder="0" 
+                   value="${set.reps}" 
+                   ${isLocked ? 'readonly' : ''}
+                   oninput="updateSetData(${i}, ${sIdx}, 'r')"> /* Ändrad till oninput */
                 
                 <button onclick="removeSetFromExercise(${i}, ${sIdx})" 
                         style="background:none; border:none; color:var(--danger); font-size:16px;" 
@@ -766,14 +766,21 @@ function renderActiveWorkout() {
     showView("workout-view");
 }
 
-function updateSetData(exIdx, setIdx) {
+function updateSetData(exIdx, setIdx, type) {
     const wVal = document.getElementById(`w-${exIdx}-${setIdx}`).value;
     const rVal = document.getElementById(`r-${exIdx}-${setIdx}`).value;
+    
     activeDraft.data[exIdx].sets_data[setIdx] = { weight: wVal, reps: rVal };
     localStorage.setItem("activeWorkoutDraft", JSON.stringify(activeDraft));
-    
-    // Denna rad måste finnas för att nästa set ska låsas upp direkt:
-    renderActiveWorkout(); 
+
+    // På mobilen: Om båda fälten är ifyllda, rita om för att låsa upp nästa.
+    // Men vi väntar lite så att användaren hinner skriva klart.
+    if (wVal && rVal) {
+        renderActiveWorkout();
+        // Sätt fokus tillbaka till fältet du skrev i så tangentbordet inte försvinner
+        const focusedId = type === 'w' ? `w-${exIdx}-${setIdx}` : `r-${exIdx}-${setIdx}`;
+        document.getElementById(focusedId).focus();
+    }
 }
 
 function addSetToExercise(exIdx) {
