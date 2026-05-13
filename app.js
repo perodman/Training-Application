@@ -83,7 +83,9 @@ function closeModal() {
 }
 
 function openModal() {
-    document.getElementById("workout-modal").classList.remove("hidden");
+    const modal = document.getElementById("workout-modal");
+    modal.classList.remove("hidden");
+    modal.scrollTop = 0; // Punkt 4: Återställ scroll till toppen
 }
 
 // --- TIMER LOGIK ---
@@ -295,7 +297,8 @@ function renderCalendar(isFromStartBtn = false) {
         else if (isOngoing) { cell.classList.add("cell-ongoing"); info = "⏱️"; }
         else if (displayPass) { cell.classList.add("cell-planned"); info = displayPass.name.split(" ").pop(); }
         
-        cell.innerHTML = `<span>${d}</span><span>${info}</span>`;
+        // Punkt 3: Ändrad struktur för info-ikon för bättre centrering
+        cell.innerHTML = `<span>${d}</span><div class="cell-info">${info}</div>`;
         cell.onclick = () => openDayManager(dateStr, displayPass, hasWorkouts, isOngoing);
         grid.appendChild(cell);
     }
@@ -453,15 +456,10 @@ function renderExercisePickerForEdit(idx, category = "Ben") {
         { name: "Bål", icon: "🧘" }
     ];
 
-    // Avgränsande linje innan sektionen
     let html = `<div class="separator" style="margin: 25px 0;"></div>`;
-
-    // Rubriken LÄGG TILL ÖVNING
     html += `<h3 style="margin: 0 0 15px 0; color: var(--primary); font-size: 1.2rem; text-align: center; text-transform: uppercase; letter-spacing: 1px;">LÄGG TILL ÖVNING</h3>`;
-    
     html += `<p style="font-size:11px; text-transform:uppercase; color:var(--text-light); text-align:center; margin-bottom:10px;">Välj Kategori:</p>`;
     
-    // Rita kategoriknappar
     html += `<div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:8px; margin-bottom:15px;">`;
     categories.forEach(cat => {
         const isActive = cat.name === category;
@@ -474,9 +472,9 @@ function renderExercisePickerForEdit(idx, category = "Ben") {
     });
     html += `</div>`;
 
-    // Lista övningar för vald kategori
     html += `<p style="font-size:11px; text-transform:uppercase; color:var(--text-light); text-align:center; margin-bottom:10px;">Övningar (${category}):</p>`;
-    html += `<div style="max-height:200px; overflow-y:auto; padding-right:5px; background:rgba(0,0,0,0.2); border-radius:15px; padding:10px;">`;
+    // Punkt 5: Ändrat max-height till 400px för att se 5-6 övningar
+    html += `<div style="max-height:400px; overflow-y:auto; padding-right:5px; background:rgba(0,0,0,0.2); border-radius:15px; padding:10px;">`;
     
     const filtered = masterExercises.filter(ex => category === "Armar" ? (ex.target === "Biceps" || ex.target === "Triceps") : ex.target === category);
     
@@ -546,14 +544,6 @@ function deleteEntireProgram(idx) {
         document.getElementById("program-details-area").classList.add("hidden");
         renderProgramView();
     }
-}
-
-function addExerciseToPass(pIdx) {
-    const exId = document.getElementById("add-ex-select").value;
-    if(!exId) return;
-    const ex = masterExercises.find(e => e.id == exId);
-    programData.routine[pIdx].exercises.push({ name: ex.name, target: ex.target, defaultSets: 3 });
-    openEditProgramModal(pIdx);
 }
 
 function createNewExForPass(pIdx) {
@@ -706,16 +696,19 @@ function renderActiveWorkout() {
             </button>
         </div>`;
 
+        // Punkt 2: Ombyggd Header för att hantera långa namn
         div.innerHTML = `
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
-            <div style="display:flex; gap:8px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px; gap:10px;">
+            <div style="display:flex; gap:5px; flex-shrink:0;">
                 <button class="reorder-btn" onclick="moveActiveExercise(${i}, -1)" ${isDone ? 'disabled' : ''}>▲</button>
                 <button class="reorder-btn" onclick="moveActiveExercise(${i}, 1)" ${isDone ? 'disabled' : ''}>▼</button>
             </div>
-            <strong style="font-size:16px;">${ex.name}</strong>
-            <div style="display:flex; gap:10px;">
-                <button onclick="openReplaceExerciseModal(${i})" style="color:var(--primary); background:none; border:none; font-size:18px;" ${isDone ? 'disabled' : ''}> 🔄 </button>
-                <button onclick="removeActiveExercise(${i})" style="color:var(--danger); background:none; border:none; font-size:20px;" ${isDone ? 'disabled' : ''}> ✖ </button>
+            <div style="flex-grow:1; min-width:0; overflow:hidden;">
+                <strong style="font-size:15px; display:block; white-space:nowrap; text-overflow:ellipsis;">${ex.name}</strong>
+            </div>
+            <div style="display:flex; gap:8px; flex-shrink:0; align-items:center;">
+                <button onclick="openReplaceExerciseModal(${i})" style="color:var(--primary); background:none; border:none; font-size:16px; cursor:pointer;" ${isDone ? 'disabled' : ''}> 🔄 </button>
+                <button onclick="removeActiveExercise(${i})" style="color:var(--danger); background:none; border:none; font-size:18px; cursor:pointer;" ${isDone ? 'disabled' : ''}> ✖ </button>
             </div>
         </div>
         ${setsHtml}`;
@@ -805,10 +798,8 @@ function renderExercisePicker(category, replaceIndex = null) {
     ];
     
     let html = `<h3>${replaceIndex !== null ? 'Byt ut övning' : 'Välj Övning'}</h3>`;
-    
     html += `<p style="font-size:11px; text-transform:uppercase; color:var(--text-light); text-align:center; margin-bottom:10px;">Välj Kategori:</p>`;
     
-    // Rutnät med kategorier (samma som i redigera)
     html += `<div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:8px; margin-bottom:15px;">`;
     categories.forEach(cat => {
         const isActive = cat.name === category;
@@ -822,7 +813,8 @@ function renderExercisePicker(category, replaceIndex = null) {
     html += `</div>`;
     
     html += `<p style="font-size:11px; text-transform:uppercase; color:var(--text-light); text-align:center; margin-bottom:10px;">Övningar (${category}):</p>`;
-    html += `<div style="max-height:250px; overflow-y:auto; padding-right:5px; background:rgba(0,0,0,0.2); border-radius:15px; padding:10px; margin-bottom:15px;">`;
+    // Punkt 5: Även här 400px
+    html += `<div style="max-height:400px; overflow-y:auto; padding-right:5px; background:rgba(0,0,0,0.2); border-radius:15px; padding:10px; margin-bottom:15px;">`;
     
     const filtered = masterExercises.filter(ex => category === "Armar" ? (ex.target === "Biceps" || ex.target === "Triceps") : ex.target === category);
     
@@ -898,8 +890,7 @@ document.getElementById("global-home").onclick = () => {
 }
 
 document.getElementById("start-new-btn").onclick = () => renderCalendar(true);
-
-document.getElementById("calendar-mode").onclick = renderCalendar;
+document.getElementById("calendar-mode").onclick = () => renderCalendar(false);
 document.getElementById("view-exercises-btn").onclick = () => { showView("exercises-view"); filterExercises(currentExerciseCategory); };
 document.getElementById("view-programs-btn").onclick = () => renderProgramView();
 document.getElementById("stats-mode").onclick = renderStats;
@@ -908,23 +899,27 @@ document.getElementById("add-custom-pass-btn").onclick = openCreateProgramModal;
 function renderHome() {
     showView("home-view");
     
-    // Lagt till separator på startsidan
+    // Punkt 1: Permanent avgränsande linje på startsidan
     const homeView = document.getElementById("home-view");
-    const titleHeader = homeView.querySelector("header p");
-    const startBtn = document.getElementById("start-new-btn");
+    const headerP = homeView.querySelector("header p");
     
-    // Om det inte redan finns en separator där, lägg till en
-    if (titleHeader && !titleHeader.nextElementSibling?.classList.contains("separator")) {
+    // Ta bort ev gamla kopior först för att undvika dubletter vid omladdning
+    homeView.querySelectorAll(".home-separator").forEach(s => s.remove());
+    
+    if (headerP) {
         const sep = document.createElement("div");
-        sep.className = "separator";
-        sep.style.margin = "20px 0";
-        titleHeader.after(sep);
+        sep.className = "separator home-separator";
+        sep.style.margin = "25px 0";
+        headerP.after(sep);
     }
 
     if(activeDraft) {
         document.getElementById("draft-alert").classList.remove("hidden");
         document.getElementById("start-new-btn").classList.add("hidden");
         document.getElementById("resume-workout-btn").onclick = () => startWorkout(activeDraft.workout, activeDraft.data, activeDraft.date);
+    } else {
+        document.getElementById("start-new-btn").classList.remove("hidden");
+        document.getElementById("draft-alert").classList.add("hidden");
     }
 }
 
@@ -956,19 +951,6 @@ document.getElementById("save-workout-btn").onclick = () => {
         })
     };
     
-    if (activeDraft.workout.id && activeDraft.workout.id.toString().startsWith("free-")) {
-        if (confirm("Vill du spara detta som ett nytt träningsprogram?")) {
-            const newName = prompt("Namnge passet:", "Mitt nya pass");
-            if (newName) {
-                programData.routine.push({
-                    id: "pass-" + Date.now(),
-                    name: newName,
-                    exercises: JSON.parse(JSON.stringify(activeDraft.workout.exercises))
-                });
-            }
-        }
-    }
-
     workoutHistory.push(log);
     saveAll();
     localStorage.removeItem("activeWorkoutDraft");
