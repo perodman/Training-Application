@@ -388,7 +388,7 @@ function setOverrideSilent(date, val) {
 
 function startFreeWorkoutOnDate(date) {
     const freePass = { id: "free-" + Date.now(), name: "Fritt Pass", exercises: [] };
-    startWorkout(freePass, null, date, true); // Ändrad till true för direktstart
+    startWorkout(freePass, null, date, true); 
 }
 
 function openMonthPicker() {
@@ -440,7 +440,6 @@ function showProgramDetails(idx) {
     `;
 }
 
-// NY FUNKTION: Renderar kategorier och filtrerade övningar i Redigera-modalen
 function renderExercisePickerForEdit(idx, category = "Ben") {
     const container = document.getElementById("modal-exercise-picker-container");
     if (!container) return;
@@ -454,7 +453,10 @@ function renderExercisePickerForEdit(idx, category = "Ben") {
         { name: "Bål", icon: "🧘" }
     ];
 
-    let html = `<p style="font-size:11px; text-transform:uppercase; color:var(--text-light); text-align:center; margin-bottom:10px;">Välj Kategori:</p>`;
+    // Rubriken LÄGG TILL ÖVNING placerad ovanför kategorivalet
+    let html = `<h3 style="margin: 25px 0 15px 0; color: var(--primary); font-size: 1.2rem; text-align: center; text-transform: uppercase; letter-spacing: 1px;">LÄGG TILL ÖVNING</h3>`;
+    
+    html += `<p style="font-size:11px; text-transform:uppercase; color:var(--text-light); text-align:center; margin-bottom:10px;">Välj Kategori:</p>`;
     
     // Rita kategoriknappar
     html += `<div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:8px; margin-bottom:15px;">`;
@@ -491,12 +493,11 @@ function renderExercisePickerForEdit(idx, category = "Ben") {
     container.innerHTML = html;
 }
 
-// Hjälpfunktion för att lägga till direkt från picker
 function addExerciseToPassDirectly(pIdx, exId) {
     const ex = masterExercises.find(e => e.id == exId);
     if (!ex) return;
     programData.routine[pIdx].exercises.push({ name: ex.name, target: ex.target, defaultSets: 3 });
-    openEditProgramModal(pIdx); // Ladda om modalen för att visa den nya listan
+    openEditProgramModal(pIdx); 
 }
 
 function openEditProgramModal(idx) {
@@ -520,8 +521,6 @@ function openEditProgramModal(idx) {
                 </div>`).join("")}
         </div>
 
-        <div class="separator" style="margin: 20px 0;"></div>
-        
         <div id="modal-exercise-picker-container"></div>
 
         <div style="margin-top:15px;">
@@ -532,7 +531,6 @@ function openEditProgramModal(idx) {
         <button class="mode-btn" style="color:var(--danger); background:none; font-size:14px; margin-top:10px;" onclick="deleteEntireProgram(${idx})">Radera pass permanent</button>
     `;
     
-    // Initialisera pickern med "Ben" som standard
     renderExercisePickerForEdit(idx, "Ben");
     openModal();
 }
@@ -618,7 +616,6 @@ function getExerciseHistory(exerciseName) {
 
 // --- AKTIVT PASS ---
 function startWorkout(workout, data = null, date = null, isImmediateStart = false) {
-    // Om vi inte har någon sparad tid, nollställ den
     if(!activeDraft || !activeDraft.secondsElapsed) {
         secondsElapsed = 0;
     } else {
@@ -640,14 +637,14 @@ function startWorkout(workout, data = null, date = null, isImmediateStart = fals
         data: data, 
         date: date || new Date().toISOString().split('T')[0],
         secondsElapsed: secondsElapsed,
-        isStarted: true, // Tvinga isStarted till true för att skippa start-vyn
-        wasTimerRunning: true // Starta timern direkt
+        isStarted: true, 
+        wasTimerRunning: true 
     };
     
     localStorage.setItem("activeWorkoutDraft", JSON.stringify(activeDraft));
     renderActiveWorkout();
     updateTimerDisplay();
-    startTimer(); // Kör timern direkt
+    startTimer(); 
 }
 
 function renderActiveWorkout() {
@@ -656,7 +653,6 @@ function renderActiveWorkout() {
     const footer = document.querySelector(".workout-footer");
     list.innerHTML = "";
 
-    // Denna if-sats körs nu aldrig vid nystart då isStarted tvingas till true
     if(!activeDraft.isStarted) {
         footer.classList.add("hidden");
         list.innerHTML = `
@@ -971,7 +967,7 @@ function setOverride(date, val) { calendarOverrides[date] = val; saveAll(); clos
 function prepareStart(date, id) { 
     const p = programData.routine.find(x => x.id === id); 
     closeModal(); 
-    startWorkout(p, null, date, true); // Skickar true för att starta direkt
+    startWorkout(p, null, date, true); 
 }
 
 function deleteLoggedWorkout(date, idx) {
