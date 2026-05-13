@@ -722,8 +722,13 @@ function renderActiveWorkout() {
 
         // --- Här bygger vi den nya Headern med alla knappar ---
         div.innerHTML = `
-        <div onclick="toggleExercise(${i})" style="padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; background: ${isOpen ? 'rgba(250, 204, 21, 0.05)' : 'transparent'}">
+        <div onclick="toggleExercise(${i})" style="padding: 12px 15px; display: flex; align-items: center; cursor: pointer; background: ${isOpen ? 'rgba(250, 204, 21, 0.05)' : 'transparent'}">
             
+            <div style="display: flex; gap: 4px; margin-right: 12px; flex-shrink: 0;">
+                <button class="reorder-btn" onclick="event.stopPropagation(); moveActiveExercise(${i}, -1)" ${isDone ? 'disabled' : ''} style="padding: 4px 6px; font-size: 10px;">▲</button>
+                <button class="reorder-btn" onclick="event.stopPropagation(); moveActiveExercise(${i}, 1)" ${isDone ? 'disabled' : ''} style="padding: 4px 6px; font-size: 10px;">▼</button>
+            </div>
+
             <div style="display: flex; flex-direction: column; min-width:0; flex-grow:1;">
                 <strong style="font-size: 14px; color: ${isDone ? 'var(--text-light)' : 'var(--text)'}; text-decoration: ${isDone ? 'line-through' : 'none'}; white-space:nowrap; text-overflow:ellipsis; overflow:hidden;">
                     ${ex.name}
@@ -733,11 +738,9 @@ function renderActiveWorkout() {
                 </small>
             </div>
 
-            <div style="display: flex; align-items: center; gap: 5px; margin-left: 10px;">
-                <button class="reorder-btn" onclick="event.stopPropagation(); moveActiveExercise(${i}, -1)" ${isDone ? 'disabled' : ''} style="padding: 5px 8px;">▲</button>
-                <button class="reorder-btn" onclick="event.stopPropagation(); moveActiveExercise(${i}, 1)" ${isDone ? 'disabled' : ''} style="padding: 5px 8px;">▼</button>
-                <button onclick="event.stopPropagation(); openReplaceExerciseModal(${i})" style="background:none; border:none; font-size:14px; padding:5px;" ${isDone ? 'disabled' : ''}>🔄</button>
-                <button onclick="event.stopPropagation(); removeActiveExercise(${i})" style="background:none; border:none; font-size:14px; padding:5px;" ${isDone ? 'disabled' : ''}>✖</button>
+            <div style="display: flex; align-items: center; gap: 8px; flex-shrink: 0; margin-left: 10px;">
+                <button onclick="event.stopPropagation(); openReplaceExerciseModal(${i})" style="background:none; border:none; font-size:14px; padding:5px; opacity: 0.7;" ${isDone ? 'disabled' : ''}>🔄</button>
+                <button onclick="event.stopPropagation(); removeActiveExercise(${i})" style="background:none; border:none; font-size:14px; padding:5px; opacity: 0.7;" ${isDone ? 'disabled' : ''}>✖</button>
                 <span style="font-size: 10px; color: var(--text-light); margin-left: 5px; transform: ${isOpen ? 'rotate(180deg)' : 'rotate(0)'}; transition: 0.3s;">▼</span>
             </div>
         </div>
