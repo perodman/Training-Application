@@ -85,7 +85,10 @@ function closeModal() {
 function openModal() {
     const modal = document.getElementById("workout-modal");
     modal.classList.remove("hidden");
-    modal.scrollTop = 0; // Punkt 4: Återställ scroll till toppen
+    // En liten timeout säkerställer att scrollen faktiskt nollställs efter att innehållet laddats
+    setTimeout(() => {
+        modal.scrollTo(0, 0);
+    }, 10);
 }
 
 // --- TIMER LOGIK ---
