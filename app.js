@@ -801,12 +801,31 @@ function confirmSet(exIdx, setIdx) {
 
 function toggleExercise(index) {
     const scrollPos = window.scrollY;
+    
+    // Initiera ui_state och openExercises-listan om de inte finns
     if (!activeDraft.ui_state) activeDraft.ui_state = {};
+    if (!activeDraft.ui_state.openExercises) {
+        // Om vi bara hade openExercise (singular) innan, konvertera till den nya listan
+        const currentOpen = activeDraft.ui_state.openExercise;
+        activeDraft.ui_state.openExercises = currentOpen !== undefined && currentOpen !== -1 ? [currentOpen] : [];
+    }
+
+    const openIdx = activeDraft.ui_state.openExercises.indexOf(index);
+
+    if (openIdx > -1) {
+        // Om övningen redan är öppen -> stäng den (ta bort från listan)
+        activeDraft.ui_state.openExercises.splice(openIdx, 1);
+    } else {
+        // Om övningen är stängd -> öppna den (lägg till i listan)
+        activeDraft.ui_state.openExercises.push(index);
+    }
     
-    // Om man klickar på en övning som redan är öppen -> stäng den. Annars -> öppna den klickade.
-    activeDraft.ui_state.openExercise = activeDraft.ui_state.openExercise === index ? -1 : index;
-    
+    // Ta bort den gamla singular-variabeln för att undvika krockar
+    delete activeDraft.ui_state.openExercise;
+
+    localStorage.setItem("activeWorkoutDraft", JSON.stringify(activeDraft));
     renderActiveWorkout();
+    
     window.scrollTo(0, scrollPos);
 }
 
