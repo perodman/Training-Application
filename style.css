@@ -31,6 +31,15 @@ body { font-family: 'Inter', sans-serif; background: #0f172a; color: var(--text)
 .mode-btn:active, .prog-card:active, .cat-btn:active, .circle-ctrl:active {
     transform: scale(0.96);
     filter: brightness(1.1);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3) !important; /* Ger knappen en in-tryckt känsla */
+}
+
+/* Hover-effekt enbart för enheter som stöder muspekare (för att undvika fastnade knappar på mobilen) */
+@media (hover: hover) {
+    .mode-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+    }
 }
 
 .timer-display {
@@ -83,11 +92,16 @@ body { font-family: 'Inter', sans-serif; background: #0f172a; color: var(--text)
 .prog-card.active { border-color: var(--primary); background: linear-gradient(135deg, rgba(34, 211, 238, 0.25) 0%, rgba(129, 140, 248, 0.25) 100%); box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
 .prog-card h4 { margin: 10px 0 0; font-size: 1.1rem; font-weight: 800; }
 .glass-modern { background: rgba(30, 41, 59, 0.7); border: 1px solid var(--glass-border); border-radius: 24px; box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1); backdrop-filter: blur(5px); }
-.mode-btn { width: 100%; padding: 20px; border-radius: 18px; border: none; color: white; font-weight: 700; cursor: pointer; margin-bottom: 12px; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 1.05rem; font-family: 'Inter', sans-serif; }
-.blue { background: var(--primary); color: #0f172a; }
-.green { background: var(--success); }
-.orange { background: var(--warning); }
-.glass-border { background: transparent; border: 2px solid var(--glass-border); color: white; }
+
+/* Uppdaterad med mjukare hörn, skugga och transitions */
+.mode-btn { width: 100%; padding: 20px; border-radius: 20px; border: none; color: white; font-weight: 700; cursor: pointer; margin-bottom: 12px; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 1.05rem; font-family: 'Inter', sans-serif; box-shadow: 0 4px 15px rgba(0,0,0,0.2); transition: all 0.3s ease; }
+
+/* Uppdaterade färgklasser med 3D-gradienter */
+.blue { background: linear-gradient(135deg, var(--primary) 0%, #0284c7 100%); color: #0f172a; }
+.green { background: linear-gradient(135deg, var(--success) 0%, #059669 100%); }
+.orange { background: linear-gradient(135deg, var(--warning) 0%, #d97706 100%); }
+.glass-border { background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, transparent 100%); border: 2px solid var(--glass-border); color: white; }
+
 .btn-disabled { opacity: 0.8; cursor: not-allowed; pointer-events: none; background: rgba(255,255,255,0.05) !important; color: rgba(255,255,255,0.3) !important; }
 .calendar-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
 .nav-arrow { background: var(--card); border: 1px solid var(--glass-border); color: white; padding: 10px 15px; border-radius: 12px; cursor: pointer; }
