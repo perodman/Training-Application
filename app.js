@@ -690,39 +690,37 @@ function renderActiveWorkout() {
             if (isDone) isLocked = true;
 
             const showSuccess = set.userConfirmed || isDone;
-            // Vi använder fasta färgvärden här för att garantera att de syns
             const circleColor = showSuccess ? '#22c55e' : '#f59e0b';
             const statusContent = showSuccess ? '✅' : `#${sIdx + 1}`;
 
             setsHtml += `
-            <div style="display:grid; grid-template-columns: 40px 1fr 1fr 30px; gap:8px; margin-bottom:8px; align-items:center;" 
-                 class="${isLocked ? 'set-locked' : ''}">
+            <div style="display:grid; grid-template-columns: 40px 1fr 1fr 30px; gap:8px; margin-bottom:8px; align-items:center;">
                 
                 <div onclick="${isLocked && !isDone ? '' : `confirmSet(${i}, ${sIdx})`}" 
                      style="width:32px; height:32px; border-radius:50%; 
-                            border:2px solid ${circleColor} !important; 
+                            border:2px solid ${circleColor}; 
                             display:flex; align-items:center; justify-content:center; 
                             cursor:pointer; font-size:10px; font-weight:800;
-                            background: ${showSuccess ? 'rgba(34, 197, 94, 0.2)' : 'rgba(245, 158, 11, 0.1)'} !important;
-                            color: ${circleColor} !important;
-                            /* Denna rad är kritisk för att stoppa mörkläggningen */
-                            filter: brightness(1.2); 
-                            opacity: 1 !important;
-                            z-index: 10;">
+                            background: ${showSuccess ? 'rgba(34, 197, 94, 0.2)' : 'rgba(245, 158, 11, 0.1)'};
+                            color: ${circleColor};
+                            flex-shrink: 0;">
                     ${statusContent}
                 </div>
                 
-                <input type="text" inputmode="decimal" id="w-${i}-${sIdx}" class="log-input" 
+                <input type="text" inputmode="decimal" id="w-${i}-${sIdx}" 
+                       class="log-input ${isLocked ? 'set-locked' : ''}" 
                        style="margin:0; padding:12px; font-size:18px;" placeholder="0" 
                        value="${set.weight || ''}" ${isLocked ? 'readonly' : ''}
                        oninput="updateSetDataOnly(${i}, ${sIdx})">
                 
-                <input type="text" inputmode="decimal" id="r-${i}-${sIdx}" class="log-input" 
+                <input type="text" inputmode="decimal" id="r-${i}-${sIdx}" 
+                       class="log-input ${isLocked ? 'set-locked' : ''}" 
                        style="margin:0; padding:12px; font-size:18px;" placeholder="0" 
                        value="${set.reps || ''}" ${isLocked ? 'readonly' : ''}
                        oninput="updateSetDataOnly(${i}, ${sIdx})">
                 
                 <button onclick="removeSetFromExercise(${i}, ${sIdx})" 
+                        class="${isLocked ? 'set-locked' : ''}"
                         style="background:none; border:none; color:var(--danger); font-size:16px;" 
                         ${isLocked ? 'disabled' : ''}>×</button>
             </div>`;
