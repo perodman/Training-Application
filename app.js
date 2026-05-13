@@ -690,13 +690,16 @@ function renderActiveWorkout() {
                     isLocked = true;
                 }
             }
+            
+            // Om passet är klart låser vi allt, men vi vill behålla bockarna
             if (isDone) isLocked = true;
 
-            // Punkt 2: Lägg till # framför siffran
-            const statusContent = set.userConfirmed ? '✅' : `<span style="opacity:0.8;">#${sIdx + 1}</span>`;
+            // ÄNDRING: Visa bock om setet är bekräftat ELLER om passet är helt klart
+            const showSuccess = set.userConfirmed || isDone;
+            const statusContent = showSuccess ? '✅' : `<span style="opacity:0.8;">#${sIdx + 1}</span>`;
             
-            // Punkt 3: Ändra färg till gul (#f59e0b) när det inte är klart
-            const circleColor = set.userConfirmed ? '#22c55e' : '#f59e0b';
+            // ÄNDRING: Behåll den gröna färgen även när det är låst/klart
+            const circleColor = showSuccess ? '#22c55e' : '#f59e0b';
 
             setsHtml += `
             <div style="display:grid; grid-template-columns: 40px 1fr 1fr 30px; gap:8px; margin-bottom:8px; align-items:center;" 
@@ -705,8 +708,10 @@ function renderActiveWorkout() {
                 <div onclick="${isLocked ? '' : `confirmSet(${i}, ${sIdx})`}" 
                      style="width:32px; height:32px; border-radius:50%; border:2px solid ${circleColor}; 
                             display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:10px; font-weight:800;
-                            background: ${set.userConfirmed ? 'rgba(34, 197, 94, 0.1)' : 'rgba(245, 158, 11, 0.05)'};
-                            color: ${circleColor};">
+                            background: ${showSuccess ? 'rgba(34, 197, 94, 0.1)' : 'rgba(245, 158, 11, 0.05)'};
+                            color: ${circleColor};
+                            /* Ser till att bocken inte blir för blek när hela rutan mörkas */
+                            opacity: 1 !important;">
                     ${statusContent}
                 </div>
                 
