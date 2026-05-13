@@ -440,6 +440,65 @@ function showProgramDetails(idx) {
     `;
 }
 
+// NY FUNKTION: Renderar kategorier och filtrerade övningar i Redigera-modalen
+function renderExercisePickerForEdit(idx, category = "Ben") {
+    const container = document.getElementById("modal-exercise-picker-container");
+    if (!container) return;
+
+    const categories = [
+        { name: "Ben", icon: "🦵" },
+        { name: "Bröst", icon: "🏋️" },
+        { name: "Rygg", icon: "🪵" },
+        { name: "Axlar", icon: "👐" },
+        { name: "Armar", icon: "💪" },
+        { name: "Bål", icon: "🧘" }
+    ];
+
+    let html = `<p style="font-size:11px; text-transform:uppercase; color:var(--text-light); text-align:center; margin-bottom:10px;">Välj Kategori:</p>`;
+    
+    // Rita kategoriknappar
+    html += `<div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:8px; margin-bottom:15px;">`;
+    categories.forEach(cat => {
+        const isActive = cat.name === category;
+        html += `
+            <button onclick="renderExercisePickerForEdit(${idx}, '${cat.name}')" 
+                style="padding:10px 5px; font-size:11px; border-radius:12px; border:1px solid ${isActive ? 'var(--primary)' : 'rgba(255,255,255,0.1)'}; 
+                background:${isActive ? 'rgba(34, 211, 238, 0.1)' : 'var(--card)'}; color:${isActive ? 'var(--primary)' : 'white'}; cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:4px;">
+                <span style="font-size:16px;">${cat.icon}</span> ${cat.name}
+            </button>`;
+    });
+    html += `</div>`;
+
+    // Lista övningar för vald kategori
+    html += `<p style="font-size:11px; text-transform:uppercase; color:var(--text-light); text-align:center; margin-bottom:10px;">Övningar (${category}):</p>`;
+    html += `<div style="max-height:200px; overflow-y:auto; padding-right:5px; background:rgba(0,0,0,0.2); border-radius:15px; padding:10px;">`;
+    
+    const filtered = masterExercises.filter(ex => category === "Armar" ? (ex.target === "Biceps" || ex.target === "Triceps") : ex.target === category);
+    
+    if (filtered.length === 0) {
+        html += `<p style="text-align:center; font-size:12px; color:var(--text-light); padding:10px;">Inga övningar hittades.</p>`;
+    }
+
+    filtered.forEach(ex => {
+        html += `
+        <div class="card glass" style="padding:12px; margin-bottom:8px; cursor:pointer; display:flex; justify-content:space-between; align-items:center; border-radius:12px;" onclick="addExerciseToPassDirectly(${idx}, ${ex.id})">
+            <span style="font-size:13px; font-weight:600;">${ex.name}</span>
+            <span style="color:var(--primary); font-weight:800; font-size:18px;">+</span>
+        </div>`;
+    });
+    html += `</div>`;
+
+    container.innerHTML = html;
+}
+
+// Hjälpfunktion för att lägga till direkt från picker
+function addExerciseToPassDirectly(pIdx, exId) {
+    const ex = masterExercises.find(e => e.id == exId);
+    if (!ex) return;
+    programData.routine[pIdx].exercises.push({ name: ex.name, target: ex.target, defaultSets: 3 });
+    openEditProgramModal(pIdx); // Ladda om modalen för att visa den nya listan
+}
+
 function openEditProgramModal(idx) {
     const pass = programData.routine[idx];
     const body = document.getElementById("modal-body");
@@ -448,6 +507,7 @@ function openEditProgramModal(idx) {
         <label style="font-size:12px; color:var(--text-light); text-align:left; display:block; margin-left:10px;">NAMN PÅ PASS</label>
         <input type="text" id="edit-pass-name" class="log-input" value="${pass.name}">
         
+        <p style="font-size:11px; text-transform:uppercase; color:var(--text-light); text-align:center; margin-bottom:10px;">Nuvarande övningar:</p>
         <div id="edit-pass-exercises">
             ${pass.exercises.map((ex, i) => `
                 <div class="edit-item-row">
@@ -461,17 +521,19 @@ function openEditProgramModal(idx) {
         </div>
 
         <div class="separator" style="margin: 20px 0;"></div>
-        <p style="font-size:11px; text-transform:uppercase; color:var(--text-light); text-align:center;">Lägg till övning:</p>
-        <select id="add-ex-select" class="log-input">
-            <option value="">Välj från banken...</option>
-            ${masterExercises.map(ex => `<option value="${ex.id}">${ex.name} (${ex.target})</option>`).join("")}
-        </select>
-        <button class="mode-btn glass-border" style="font-size:13px; padding:10px;" onclick="addExerciseToPass(${idx})">+ Lägg till vald</button>
-        <button class="mode-btn glass-border" style="font-size:13px; padding:10px;" onclick="createNewExForPass(${idx})">+ Skapa ny övning till banken</button>
+        
+        <div id="modal-exercise-picker-container"></div>
+
+        <div style="margin-top:15px;">
+            <button class="mode-btn glass-border" style="font-size:13px; padding:10px;" onclick="createNewExForPass(${idx})">+ Skapa helt ny övning till banken</button>
+        </div>
 
         <button class="mode-btn blue" style="margin-top:20px;" onclick="saveProgramEdit(${idx})">Spara alla ändringar</button>
         <button class="mode-btn" style="color:var(--danger); background:none; font-size:14px; margin-top:10px;" onclick="deleteEntireProgram(${idx})">Radera pass permanent</button>
     `;
+    
+    // Initialisera pickern med "Ben" som standard
+    renderExercisePickerForEdit(idx, "Ben");
     openModal();
 }
 
