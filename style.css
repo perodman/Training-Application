@@ -176,3 +176,24 @@ select.log-input { font-size: 16px !important; text-align-last: center; appearan
     color: var(--text-light) !important;
     width: 100%;
 }
+
+/* --- ISOLERADE FIXAR (RÖR EJ OVANSTÅENDE STRUKTUR) --- */
+
+/* Tvingar kalendern att hålla sig till 7 kolumner på mobil utan att zooma */
+#calendar-view .calendar-grid {
+    grid-template-columns: repeat(7, 1fr) !important;
+    width: 100% !important;
+}
+
+/* Gör historikvyn scrollbar så att "Stäng"-knappen alltid går att nå */
+#history-detail-view {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: #0f172a;
+    z-index: 9999;
+    overflow-y: auto !important; /* Denna rad är kritisk */
+    padding: 20px;
+}
