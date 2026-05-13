@@ -683,45 +683,45 @@ function renderActiveWorkout() {
 
         // HÄR ÄR DEN NYA LOOP SOM SKÖTER UTGRÅNING OCH TANGENTBORD
         exerciseData.sets_data.forEach((set, sIdx) => {
-            let isLocked = false;
-            if (sIdx > 0 && !isDone) {
-                const prevSet = exerciseData.sets_data[sIdx - 1];
-                if (!prevSet.weight || !prevSet.reps) {
-                    isLocked = true;
-                }
-            }
-            if (isDone) isLocked = true;
+    let isLocked = false;
+    if (sIdx > 0 && !isDone) {
+        const prevSet = exerciseData.sets_data[sIdx - 1];
+        if (!prevSet.weight || !prevSet.reps) {
+            isLocked = true;
+        }
+    }
+    if (isDone) isLocked = true;
 
-            setsHtml += `
-            <div style="display:grid; grid-template-columns: 35px 1fr 1fr 30px; gap:8px; margin-bottom:8px; align-items:center;" 
-                 class="${isLocked ? 'set-locked' : ''}">
-                <span style="font-size:12px; font-weight:800; color:var(--primary)">#${sIdx + 1}</span>
-                
-                <input type="text" 
-       inputmode="decimal" 
-       id="w-${i}-${sIdx}" 
-       class="log-input" 
-       style="margin:0; padding:12px; font-size:18px;" 
-       placeholder="0" 
-       value="${set.weight}" 
-       ${isLocked ? 'readonly' : ''}
-       oninput="updateSetData(${i}, ${sIdx}, 'w')"> /* Ändrad till oninput */
-
-<input type="text" 
-       inputmode="decimal" 
-       id="r-${i}-${sIdx}" 
-       class="log-input" 
-       style="margin:0; padding:12px; font-size:18px;" 
-       placeholder="0" 
-       value="${set.reps}" 
-       ${isLocked ? 'readonly' : ''}
-       oninput="updateSetData(${i}, ${sIdx}, 'r')"> /* Ändrad till oninput */
-                
-                <button onclick="removeSetFromExercise(${i}, ${sIdx})" 
-                        style="background:none; border:none; color:var(--danger); font-size:16px;" 
-                        ${isLocked ? 'disabled' : ''}>×</button>
-            </div>`;
-        });
+    setsHtml += `
+    <div style="display:grid; grid-template-columns: 35px 1fr 1fr 30px; gap:8px; margin-bottom:8px; align-items:center;" 
+         class="${isLocked ? 'set-locked' : ''}">
+        <span style="font-size:12px; font-weight:800; color:var(--primary)">#${sIdx + 1}</span>
+        
+        <input type="text" 
+               inputmode="decimal" 
+               id="w-${i}-${sIdx}" 
+               class="log-input" 
+               style="margin:0; padding:12px; font-size:18px;" 
+               placeholder="0" 
+               value="${set.weight}" 
+               ${isLocked ? 'readonly' : ''}
+               oninput="updateSetData(${i}, ${sIdx})">
+        
+        <input type="text" 
+               inputmode="decimal" 
+               id="r-${i}-${sIdx}" 
+               class="log-input" 
+               style="margin:0; padding:12px; font-size:18px;" 
+               placeholder="0" 
+               value="${set.reps}" 
+               ${isLocked ? 'readonly' : ''}
+               oninput="updateSetData(${i}, ${sIdx})">
+        
+        <button onclick="removeSetFromExercise(${i}, ${sIdx})" 
+                style="background:none; border:none; color:var(--danger); font-size:16px;" 
+                ${isLocked ? 'disabled' : ''}>×</button>
+    </div>`;
+});
 
         setsHtml += `
             <button class="mode-btn glass-border" style="padding:8px; font-size:11px; margin-top:5px; border-style:dashed;" onclick="addSetToExercise(${i})" ${isDone ? 'disabled' : ''}>+ Lägg till set</button>
