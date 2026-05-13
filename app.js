@@ -6,12 +6,10 @@ let calendarOverrides = JSON.parse(localStorage.getItem("calendarOverrides") || 
 let currentViewDate = new Date();
 let currentExerciseCategory = "Ben";
 
-// Timer-variabler
 let timerInterval = null;
 let secondsElapsed = 0;
 let isTimerRunning = false;
 
-// --- INIT ---
 fetch("program.json")
 .then(r => r.json())
 .then(json => {
@@ -85,13 +83,11 @@ function closeModal() {
 function openModal() {
     const modal = document.getElementById("workout-modal");
     modal.classList.remove("hidden");
-    // En liten timeout säkerställer att scrollen faktiskt nollställs efter att innehållet laddats
     setTimeout(() => {
         modal.scrollTo(0, 0);
     }, 10);
 }
 
-// --- TIMER LOGIK ---
 function updateTimerDisplay() {
     const hrs = String(Math.floor(secondsElapsed / 3600)).padStart(2, '0');
     const mins = String(Math.floor((secondsElapsed % 3600) / 60)).padStart(2, '0');
@@ -127,7 +123,6 @@ document.getElementById("timer-toggle-btn").onclick = () => {
     else startTimer();
 };
 
-// --- ÖVNINGAR & INSTÄLLNINGAR ---
 function openCreateExerciseModal(callback = null) {
     const body = document.getElementById("modal-body");
     body.innerHTML = `
@@ -257,7 +252,6 @@ function deleteMasterExercise(id) {
     }
 }
 
-// --- KALENDER ---
 function renderCalendar(isFromStartBtn = false) {
     const grid = document.getElementById("calendar-grid");
     const label = document.getElementById("month-label");
@@ -300,7 +294,6 @@ function renderCalendar(isFromStartBtn = false) {
         else if (isOngoing) { cell.classList.add("cell-ongoing"); info = displayPass.name.split(" ").pop(); }
         else if (displayPass) { cell.classList.add("cell-planned"); info = displayPass.name.split(" ").pop(); }
         
-        // Punkt 3: Ändrad struktur för info-ikon för bättre centrering
         cell.innerHTML = `<span>${d}</span><div class="cell-info">${info}</div>`;
         cell.onclick = () => openDayManager(dateStr, displayPass, hasWorkouts, isOngoing);
         grid.appendChild(cell);
@@ -408,7 +401,6 @@ function openMonthPicker() {
 
 function selectMonth(m) { currentViewDate.setMonth(m); closeModal(); renderCalendar(); }
 
-// --- PROGRAM & REDIGERING ---
 function renderProgramView(activeIdx = null) {
     const selector = document.getElementById("pass-selector-list");
     selector.innerHTML = "";
@@ -476,7 +468,6 @@ function renderExercisePickerForEdit(idx, category = "Ben") {
     html += `</div>`;
 
     html += `<p style="font-size:11px; text-transform:uppercase; color:var(--text-light); text-align:center; margin-bottom:10px;">Övningar (${category}):</p>`;
-    // Punkt 5: Ändrat max-height till 400px för att se 5-6 övningar
     html += `<div style="max-height:400px; overflow-y:auto; padding-right:5px; background:rgba(0,0,0,0.2); border-radius:15px; padding:10px;">`;
     
     const filtered = masterExercises.filter(ex => category === "Armar" ? (ex.target === "Biceps" || ex.target === "Triceps") : ex.target === category);
@@ -595,7 +586,6 @@ function saveNewProgram() {
     openEditProgramModal(newIdx);
 }
 
-// --- LOGIK FÖR HISTORIK ---
 function getExerciseHistory(exerciseName) {
     for (let i = workoutHistory.length - 1; i >= 0; i--) {
         const workout = workoutHistory[i];
@@ -610,7 +600,6 @@ function getExerciseHistory(exerciseName) {
     return null;
 }
 
-// --- AKTIVT PASS ---
 function startWorkout(workout, data = null, date = null, isImmediateStart = false) {
     if(!activeDraft || !activeDraft.secondsElapsed) {
         secondsElapsed = 0;
@@ -663,7 +652,6 @@ function renderActiveWorkout() {
     }
 
     footer.classList.remove("hidden");
-
     const pauseBtn = document.getElementById("pause-workout-btn");
     pauseBtn.innerHTML = `Spara utkast 💾`;
     pauseBtn.className = "mode-btn save-draft-btn";
@@ -683,12 +671,22 @@ function renderActiveWorkout() {
             </div>`;
 
         exerciseData.sets_data.forEach((set, sIdx) => {
+            // Logik för sekventiell låsning
+            let isLocked = false;
+            if (sIdx > 0) {
+                const prevSet = exerciseData.sets_data[sIdx - 1];
+                if (!prevSet.weight || !prevSet.reps) {
+                    isLocked = true;
+                }
+            }
+            if (isDone) isLocked = true;
+
             setsHtml += `
-            <div style="display:grid; grid-template-columns: 35px 1fr 1fr 30px; gap:8px; margin-bottom:8px; align-items:center;">
+            <div style="display:grid; grid-template-columns: 35px 1fr 1fr 30px; gap:8px; margin-bottom:8px; align-items:center;" class="${isLocked ? 'set-locked' : ''}">
                 <span style="font-size:12px; font-weight:800; color:var(--primary)">#${sIdx + 1}</span>
-                <input type="number" id="w-${i}-${sIdx}" class="log-input" style="margin:0; padding:8px;" placeholder="0" value="${set.weight}" onchange="updateSetData(${i}, ${sIdx})">
-                <input type="number" id="r-${i}-${sIdx}" class="log-input" style="margin:0; padding:8px;" placeholder="0" value="${set.reps}" onchange="updateSetData(${i}, ${sIdx})">
-                <button onclick="removeSetFromExercise(${i}, ${sIdx})" style="background:none; border:none; color:var(--danger); font-size:16px;" ${isDone ? 'disabled' : ''}>×</button>
+                <input type="text" inputmode="decimal" id="w-${i}-${sIdx}" class="log-input" style="margin:0; padding:12px; font-size:18px;" placeholder="0" value="${set.weight}" ${isLocked ? 'readonly' : ''} onchange="updateSetData(${i}, ${sIdx})">
+                <input type="text" inputmode="decimal" id="r-${i}-${sIdx}" class="log-input" style="margin:0; padding:12px; font-size:18px;" placeholder="0" value="${set.reps}" ${isLocked ? 'readonly' : ''} onchange="updateSetData(${i}, ${sIdx})">
+                <button onclick="removeSetFromExercise(${i}, ${sIdx})" style="background:none; border:none; color:var(--danger); font-size:16px;" ${isLocked ? 'disabled' : ''}>×</button>
             </div>`;
         });
 
@@ -699,7 +697,6 @@ function renderActiveWorkout() {
             </button>
         </div>`;
 
-        // Punkt 2: Ombyggd Header för att hantera långa namn
         div.innerHTML = `
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px; gap:10px;">
             <div style="display:flex; gap:5px; flex-shrink:0;">
@@ -741,6 +738,8 @@ function updateSetData(exIdx, setIdx) {
     const rVal = document.getElementById(`r-${exIdx}-${setIdx}`).value;
     activeDraft.data[exIdx].sets_data[setIdx] = { weight: wVal, reps: rVal };
     localStorage.setItem("activeWorkoutDraft", JSON.stringify(activeDraft));
+    // Rendera om för att låsa upp nästa set om det föregående fylldes i
+    renderActiveWorkout();
 }
 
 function addSetToExercise(exIdx) {
@@ -816,7 +815,6 @@ function renderExercisePicker(category, replaceIndex = null) {
     html += `</div>`;
     
     html += `<p style="font-size:11px; text-transform:uppercase; color:var(--text-light); text-align:center; margin-bottom:10px;">Övningar (${category}):</p>`;
-    // Punkt 5: Även här 400px
     html += `<div style="max-height:400px; overflow-y:auto; padding-right:5px; background:rgba(0,0,0,0.2); border-radius:15px; padding:10px; margin-bottom:15px;">`;
     
     const filtered = masterExercises.filter(ex => category === "Armar" ? (ex.target === "Biceps" || ex.target === "Triceps") : ex.target === category);
@@ -887,7 +885,6 @@ function removeActiveExercise(i) {
     }
 }
 
-// --- STANDARD-LOGIK ---
 document.getElementById("global-home").onclick = () => {
     location.reload();
 }
@@ -901,12 +898,8 @@ document.getElementById("add-custom-pass-btn").onclick = openCreateProgramModal;
 
 function renderHome() {
     showView("home-view");
-    
-    // Punkt 1: Permanent avgränsande linje på startsidan
     const homeView = document.getElementById("home-view");
     const headerP = homeView.querySelector("header p");
-    
-    // Ta bort ev gamla kopior först för att undvika dubletter vid omladdning
     homeView.querySelectorAll(".home-separator").forEach(s => s.remove());
     
     if (headerP) {
