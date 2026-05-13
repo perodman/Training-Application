@@ -684,41 +684,37 @@ function renderActiveWorkout() {
         // HÄR ÄR DEN NYA LOOP SOM SKÖTER UTGRÅNING OCH TANGENTBORD
         exerciseData.sets_data.forEach((set, sIdx) => {
             let isLocked = false;
-            
-            // Logik: Lås om föregående set inte är "bekräftat" (interagerat med) i detta pass
             if (sIdx > 0 && !isDone) {
                 const prevSet = exerciseData.sets_data[sIdx - 1];
-                // Vi kollar om det saknas värden ELLER om användaren inte bekräftat dem än
-                if (!prevSet.weight || !prevSet.reps || !prevSet.userConfirmed) {
+                if (!prevSet.userConfirmed) {
                     isLocked = true;
                 }
             }
             if (isDone) isLocked = true;
 
+            // Välj ikon: Bock om klar, siffra om inte klar
+            const statusIcon = set.userConfirmed ? '✅' : `<span style="opacity:0.5;">${sIdx + 1}</span>`;
+
             setsHtml += `
-            <div style="display:grid; grid-template-columns: 35px 1fr 1fr 30px; gap:8px; margin-bottom:8px; align-items:center;" 
+            <div style="display:grid; grid-template-columns: 40px 1fr 1fr 30px; gap:8px; margin-bottom:8px; align-items:center;" 
                  class="${isLocked ? 'set-locked' : ''}">
-                <span style="font-size:12px; font-weight:800; color:var(--primary)">#${sIdx + 1}</span>
                 
-                <input type="text" 
-                       inputmode="decimal" 
-                       id="w-${i}-${sIdx}" 
-                       class="log-input" 
-                       style="margin:0; padding:12px; font-size:18px;" 
-                       placeholder="0" 
-                       value="${set.weight || ''}" 
-                       ${isLocked ? 'readonly' : ''}
-                       onchange="updateSetData(${i}, ${sIdx})">
+                <div onclick="${isLocked ? '' : `confirmSet(${i}, ${sIdx})`}" 
+                     style="width:30px; height:30px; border-radius:50%; border:2px solid ${set.userConfirmed ? 'var(--green)' : 'var(--primary)'}; 
+                            display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:12px; font-weight:bold;
+                            background: ${set.userConfirmed ? 'rgba(34, 197, 94, 0.1)' : 'transparent'}">
+                    ${statusIcon}
+                </div>
                 
-                <input type="text" 
-                       inputmode="decimal" 
-                       id="r-${i}-${sIdx}" 
-                       class="log-input" 
-                       style="margin:0; padding:12px; font-size:18px;" 
-                       placeholder="0" 
-                       value="${set.reps || ''}" 
-                       ${isLocked ? 'readonly' : ''}
-                       onchange="updateSetData(${i}, ${sIdx})">
+                <input type="text" inputmode="decimal" id="w-${i}-${sIdx}" class="log-input" 
+                       style="margin:0; padding:12px; font-size:18px;" placeholder="0" 
+                       value="${set.weight || ''}" ${isLocked ? 'readonly' : ''}
+                       oninput="updateSetDataOnly(${i}, ${sIdx})">
+                
+                <input type="text" inputmode="decimal" id="r-${i}-${sIdx}" class="log-input" 
+                       style="margin:0; padding:12px; font-size:18px;" placeholder="0" 
+                       value="${set.reps || ''}" ${isLocked ? 'readonly' : ''}
+                       oninput="updateSetDataOnly(${i}, ${sIdx})">
                 
                 <button onclick="removeSetFromExercise(${i}, ${sIdx})" 
                         style="background:none; border:none; color:var(--danger); font-size:16px;" 
@@ -769,17 +765,24 @@ function renderActiveWorkout() {
     showView("workout-view");
 }
 
-function updateSetData(exIdx, setIdx) {
+// Denna sparar bara siffrorna medan du skriver (ingen omladdning = inget hoppande tangentbord)
+function updateSetDataOnly(exIdx, setIdx) {
     const wVal = document.getElementById(`w-${exIdx}-${setIdx}`).value;
     const rVal = document.getElementById(`r-${exIdx}-${setIdx}`).value;
-    
-    // Markera att användaren har interagerat med detta set i detta pass
-    activeDraft.data[exIdx].sets_data[setIdx].userConfirmed = true; 
-    
     activeDraft.data[exIdx].sets_data[setIdx].weight = wVal;
     activeDraft.data[exIdx].sets_data[setIdx].reps = rVal;
+    localStorage.setItem("activeWorkoutDraft", JSON.stringify(activeDraft));
+}
+
+// Denna körs när du klickar på cirkeln
+function confirmSet(exIdx, setIdx) {
+    // Växla mellan bekräftad och obekräftad
+    const currentState = activeDraft.data[exIdx].sets_data[setIdx].userConfirmed;
+    activeDraft.data[exIdx].sets_data[setIdx].userConfirmed = !currentState;
     
     localStorage.setItem("activeWorkoutDraft", JSON.stringify(activeDraft));
+    
+    // Rita om för att låsa upp nästa rad och visa bocken
     renderActiveWorkout();
 }
 
