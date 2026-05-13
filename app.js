@@ -745,23 +745,17 @@ function renderActiveWorkout() {
 }
 
 function updateSetData(exIdx, setIdx) {
-    const wInput = document.getElementById(`w-${exIdx}-${setIdx}`);
-    const rInput = document.getElementById(`r-${exIdx}-${setIdx}`);
+    const wVal = document.getElementById(`w-${exIdx}-${setIdx}`).value;
+    const rVal = document.getElementById(`r-${exIdx}-${setIdx}`).value;
     
-    const wVal = wInput.value;
-    const rVal = rInput.value;
+    // Markera att användaren har interagerat med detta set i detta pass
+    activeDraft.data[exIdx].sets_data[setIdx].userConfirmed = true; 
     
-    activeDraft.data[exIdx].sets_data[setIdx] = { weight: wVal, reps: rVal };
+    activeDraft.data[exIdx].sets_data[setIdx].weight = wVal;
+    activeDraft.data[exIdx].sets_data[setIdx].reps = rVal;
+    
     localStorage.setItem("activeWorkoutDraft", JSON.stringify(activeDraft));
-
-    // Om båda fälten i nuvarande set precis blev ifyllda, rita om för att låsa upp nästa
-    // Men vi gör det bara om nästa set faktiskt existerar och är låst
-    if (wVal !== "" && rVal !== "") {
-        renderActiveWorkout();
-        // Sätt tillbaka fokus så tangentbordet inte försvinner (viktigt för mobil)
-        // Vi gissar att användaren vill fortsätta i det fält de just var i om de raderar,
-        // men här låter vi renderActiveWorkout göra sitt jobb.
-    }
+    renderActiveWorkout();
 }
 
 function addSetToExercise(exIdx) {
