@@ -130,20 +130,16 @@ body {
 .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
 
 .calendar-cell { 
-    aspect-ratio: 1; 
-    border-radius: 12px; 
+    border-radius: 8px; 
     background: rgba(255,255,255,0.05); 
     display: flex; 
     flex-direction: column; 
     align-items: center; 
-    justify-content: flex-start; /* Siffran högst upp */
-    padding: 5px;
-    font-size: 14px; 
+    justify-content: center;
+    padding: 4px 2px;
+    font-size: 12px; 
     border: 1px solid transparent; 
     cursor: pointer; 
-    overflow: hidden;
-    position: relative;
-    min-height: 55px;
 }
 
 .cell-info {
