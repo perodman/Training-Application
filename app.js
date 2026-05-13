@@ -453,8 +453,11 @@ function renderExercisePickerForEdit(idx, category = "Ben") {
         { name: "Bål", icon: "🧘" }
     ];
 
-    // Rubriken LÄGG TILL ÖVNING placerad ovanför kategorivalet
-    let html = `<h3 style="margin: 25px 0 15px 0; color: var(--primary); font-size: 1.2rem; text-align: center; text-transform: uppercase; letter-spacing: 1px;">LÄGG TILL ÖVNING</h3>`;
+    // Avgränsande linje innan sektionen
+    let html = `<div class="separator" style="margin: 25px 0;"></div>`;
+
+    // Rubriken LÄGG TILL ÖVNING
+    html += `<h3 style="margin: 0 0 15px 0; color: var(--primary); font-size: 1.2rem; text-align: center; text-transform: uppercase; letter-spacing: 1px;">LÄGG TILL ÖVNING</h3>`;
     
     html += `<p style="font-size:11px; text-transform:uppercase; color:var(--text-light); text-align:center; margin-bottom:10px;">Välj Kategori:</p>`;
     
@@ -791,28 +794,46 @@ function openReplaceExerciseModal(index) {
 
 function renderExercisePicker(category, replaceIndex = null) {
     const body = document.getElementById("modal-body");
-    const categories = ["Ben", "Bröst", "Rygg", "Axlar", "Armar", "Bål"];
+    
+    const categories = [
+        { name: "Ben", icon: "🦵" },
+        { name: "Bröst", icon: "🏋️" },
+        { name: "Rygg", icon: "🪵" },
+        { name: "Axlar", icon: "👐" },
+        { name: "Armar", icon: "💪" },
+        { name: "Bål", icon: "🧘" }
+    ];
     
     let html = `<h3>${replaceIndex !== null ? 'Byt ut övning' : 'Välj Övning'}</h3>`;
     
-    html += `<div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:5px; margin-bottom:15px;">`;
+    html += `<p style="font-size:11px; text-transform:uppercase; color:var(--text-light); text-align:center; margin-bottom:10px;">Välj Kategori:</p>`;
+    
+    // Rutnät med kategorier (samma som i redigera)
+    html += `<div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:8px; margin-bottom:15px;">`;
     categories.forEach(cat => {
-        const isActive = cat === category;
-        html += `<button onclick="renderExercisePicker('${cat}', ${replaceIndex})" 
-            style="padding:8px 5px; font-size:10px; border-radius:8px; border:1px solid ${isActive ? 'var(--primary)' : 'rgba(255,255,255,0.1)'}; 
-            background:${isActive ? 'rgba(56,189,248,0.1)' : 'none'}; color:${isActive ? 'var(--primary)' : 'white'}; cursor:pointer;">
-            ${cat}
-        </button>`;
+        const isActive = cat.name === category;
+        html += `
+            <button onclick="renderExercisePicker('${cat.name}', ${replaceIndex})" 
+                style="padding:10px 5px; font-size:11px; border-radius:12px; border:1px solid ${isActive ? 'var(--primary)' : 'rgba(255,255,255,0.1)'}; 
+                background:${isActive ? 'rgba(34, 211, 238, 0.1)' : 'var(--card)'}; color:${isActive ? 'var(--primary)' : 'white'}; cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:4px;">
+                <span style="font-size:16px;">${cat.icon}</span> ${cat.name}
+            </button>`;
     });
     html += `</div>`;
     
-    html += `<div style="max-height:250px; overflow-y:auto; padding-right:5px; margin-bottom:15px;">`;
+    html += `<p style="font-size:11px; text-transform:uppercase; color:var(--text-light); text-align:center; margin-bottom:10px;">Övningar (${category}):</p>`;
+    html += `<div style="max-height:250px; overflow-y:auto; padding-right:5px; background:rgba(0,0,0,0.2); border-radius:15px; padding:10px; margin-bottom:15px;">`;
+    
     const filtered = masterExercises.filter(ex => category === "Armar" ? (ex.target === "Biceps" || ex.target === "Triceps") : ex.target === category);
     
+    if (filtered.length === 0) {
+        html += `<p style="text-align:center; font-size:12px; color:var(--text-light); padding:10px;">Inga övningar hittades.</p>`;
+    }
+
     filtered.forEach(ex => {
         html += `
-        <div class="card glass" style="padding:12px; margin-bottom:8px; cursor:pointer; display:flex; justify-content:space-between; align-items:center;" onclick="confirmAddExerciseToActive(${ex.id}, ${replaceIndex})">
-            <span style="font-size:14px; font-weight:600;">${ex.name}</span>
+        <div class="card glass" style="padding:12px; margin-bottom:8px; cursor:pointer; display:flex; justify-content:space-between; align-items:center; border-radius:12px;" onclick="confirmAddExerciseToActive(${ex.id}, ${replaceIndex})">
+            <span style="font-size:13px; font-weight:600;">${ex.name}</span>
             <span style="color:var(--primary); font-size:18px;">${replaceIndex !== null ? '🔄' : '+'}</span>
         </div>`;
     });
@@ -886,6 +907,20 @@ document.getElementById("add-custom-pass-btn").onclick = openCreateProgramModal;
 
 function renderHome() {
     showView("home-view");
+    
+    // Lagt till separator på startsidan
+    const homeView = document.getElementById("home-view");
+    const titleHeader = homeView.querySelector("header p");
+    const startBtn = document.getElementById("start-new-btn");
+    
+    // Om det inte redan finns en separator där, lägg till en
+    if (titleHeader && !titleHeader.nextElementSibling?.classList.contains("separator")) {
+        const sep = document.createElement("div");
+        sep.className = "separator";
+        sep.style.margin = "20px 0";
+        titleHeader.after(sep);
+    }
+
     if(activeDraft) {
         document.getElementById("draft-alert").classList.remove("hidden");
         document.getElementById("start-new-btn").classList.add("hidden");
