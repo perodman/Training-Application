@@ -783,20 +783,20 @@ function updateSetDataOnly(exIdx, setIdx) {
     localStorage.setItem("activeWorkoutDraft", JSON.stringify(activeDraft));
 }
 
-function confirmSet(exIdx, setIdx) {
-    // 1. Spara nuvarande rullningsposition
-    const scrollPos = window.scrollY;
-
-    const currentState = activeDraft.data[exIdx].sets_data[setIdx].userConfirmed;
-    activeDraft.data[exIdx].sets_data[setIdx].userConfirmed = !currentState;
+function confirmSet(exIdx, sIdx) {
+    const set = activeDraft.data[exIdx].sets_data[sIdx];
     
-    localStorage.setItem("activeWorkoutDraft", JSON.stringify(activeDraft));
+    // 1. Markera som bekräftad
+    set.userConfirmed = true;
     
-    // 2. Rita om vyn
+    // 2. Spara data (viktigt för att inte tappa framsteg)
+    saveActiveDraft();
+    
+    // 3. Rita om vyn så vi ser bocken
     renderActiveWorkout();
 
-    // 3. Hoppa direkt tillbaka till där du var
-    window.scrollTo(0, scrollPos);
+    // 4. TRICKER: Starta viloklockan!
+    startRestTimer();
 }
 
 function toggleExercise(index) {
@@ -821,6 +821,66 @@ function toggleExercise(index) {
     localStorage.setItem("activeWorkoutDraft", JSON.stringify(activeDraft));
     renderActiveWorkout();
     window.scrollTo(0, scrollPos);
+}
+
+let restInterval = null;
+let restSeconds = 0;
+
+function startRestTimer() {
+    clearInterval(restInterval);
+    restSeconds = 0;
+    
+    let timerElem = document.getElementById("rest-timer-banner");
+    if (!timerElem) {
+        timerElem = document.createElement("div");
+        timerElem.id = "rest-timer-banner";
+        // Styling för en snygg "flytande" klocka ovanför menyn
+        timerElem.style.cssText = `
+            position: fixed;
+            bottom: 90px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #3b82f6;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 50px;
+            font-weight: 800;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 16px;
+            border: 2px solid rgba(255,255,255,0.2);
+            transition: background 0.5s ease;
+        `;
+        document.body.appendChild(timerElem);
+    }
+    
+    timerElem.style.display = "flex";
+    timerElem.style.background = "#3b82f6"; // Återställ till blå vid start
+
+    restInterval = setInterval(() => {
+        restSeconds++;
+        const mins = Math.floor(restSeconds / 60);
+        const secs = restSeconds % 60;
+        const timeStr = `${mins}:${secs.toString().padStart(2, '0')}`;
+        
+        timerElem.innerHTML = `
+            <span style="letter-spacing: 1px;">VILA: ${timeStr}</span>
+            <button onclick="stopRestTimer()" style="background:rgba(255,255,255,0.3); border:none; color:white; border-radius:50%; width:24px; height:24px; cursor:pointer; font-weight:bold; display:flex; align-items:center; justify-content:center;">✕</button>
+        `;
+
+        // Logik för färgbyte (Varna när vilan är "klar")
+        if (restSeconds >= 90) timerElem.style.background = "#22c55e"; // Grön efter 1.5 min
+        if (restSeconds >= 150) timerElem.style.background = "#f59e0b"; // Orange efter 2.5 min
+    }, 1000);
+}
+
+function stopRestTimer() {
+    clearInterval(restInterval);
+    const timerElem = document.getElementById("rest-timer-banner");
+    if (timerElem) timerElem.style.display = "none";
 }
 
 function addSetToExercise(exIdx) {
