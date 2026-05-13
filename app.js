@@ -683,14 +683,28 @@ function renderActiveWorkout() {
 
         exerciseData.sets_data.forEach((set, sIdx) => {
             let isLocked = false;
+            let isCurrent = false; // För att hålla koll på vilket set som är "nästa på tur"
+            
+            // Logik för att låsa rader
             if (sIdx > 0 && !isDone) {
                 const prevSet = exerciseData.sets_data[sIdx - 1];
                 if (!prevSet.userConfirmed) isLocked = true;
             }
             if (isDone) isLocked = true;
 
+            // Identifiera "Aktivt" set: Det som inte är bekräftat men som heller inte är låst
+            if (!set.userConfirmed && !isLocked && !isDone) {
+                isCurrent = true;
+            }
+
             const showSuccess = set.userConfirmed || isDone;
-            const circleColor = showSuccess ? '#22c55e' : '#f59e0b';
+            
+            // Färgval baserat på status
+            // Grön = Klar, Gul (#facc15) = Aktiv, Orange (#f59e0b) = Väntar
+            let circleColor = '#f59e0b'; // Standard orange
+            if (showSuccess) circleColor = '#22c55e'; // Grön
+            else if (isCurrent) circleColor = '#facc15'; // Klar gul för aktivt set
+
             const statusContent = showSuccess ? '✅' : `#${sIdx + 1}`;
 
             setsHtml += `
@@ -701,18 +715,21 @@ function renderActiveWorkout() {
                             border:2px solid ${circleColor}; 
                             display:flex; align-items:center; justify-content:center; 
                             cursor:pointer; font-size:10px; font-weight:800;
-                            background: ${showSuccess ? 'rgba(34, 197, 94, 0.2)' : 'rgba(245, 158, 11, 0.1)'};
+                            background: ${showSuccess ? 'rgba(34, 197, 94, 0.2)' : (isCurrent ? 'rgba(250, 204, 21, 0.15)' : 'rgba(245, 158, 11, 0.05)')};
                             color: ${circleColor};
                             flex-shrink: 0;
-                            opacity: 1; 
-                            z-index: 2;">
+                            ${isCurrent ? 'box-shadow: 0 0 8px rgba(250, 204, 21, 0.3);' : ''} /* Extra glöd på aktiv cirkel */
+                            opacity: 1;">
                     ${statusContent}
                 </div>
                 
                 <input type="text" inputmode="decimal" id="w-${i}-${sIdx}" 
                        class="log-input ${isLocked ? 'set-locked' : ''}" 
                        style="margin:0; padding:12px; font-size:18px; 
-                              opacity: ${isLocked ? '0.3' : '1'};" 
+                              /* 0.3 för klara/låsta, 1.0 för det du jobbar med nu */
+                              opacity: ${isCurrent ? '1' : '0.3'}; 
+                              transition: opacity 0.3s ease;
+                              border-color: ${isCurrent ? 'rgba(250, 204, 21, 0.5)' : 'transparent'};" 
                        placeholder="0" 
                        value="${set.weight || ''}" ${isLocked ? 'readonly' : ''}
                        oninput="updateSetDataOnly(${i}, ${sIdx})">
@@ -720,14 +737,16 @@ function renderActiveWorkout() {
                 <input type="text" inputmode="decimal" id="r-${i}-${sIdx}" 
                        class="log-input ${isLocked ? 'set-locked' : ''}" 
                        style="margin:0; padding:12px; font-size:18px; 
-                              opacity: ${isLocked ? '0.3' : '1'};" 
+                              opacity: ${isCurrent ? '1' : '0.3'};
+                              transition: opacity 0.3s ease;
+                              border-color: ${isCurrent ? 'rgba(250, 204, 21, 0.5)' : 'transparent'};" 
                        placeholder="0" 
                        value="${set.reps || ''}" ${isLocked ? 'readonly' : ''}
                        oninput="updateSetDataOnly(${i}, ${sIdx})">
                 
                 <button onclick="removeSetFromExercise(${i}, ${sIdx})" 
                         style="background:none; border:none; color:var(--danger); font-size:16px; 
-                               opacity: ${isLocked ? '0.2' : '1'};" 
+                               opacity: ${isLocked || showSuccess ? '0.1' : '0.8'};" 
                         ${isLocked ? 'disabled' : ''}>×</button>
             </div>`;
         });
