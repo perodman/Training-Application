@@ -703,25 +703,31 @@ function renderActiveWorkout() {
                             cursor:pointer; font-size:10px; font-weight:800;
                             background: ${showSuccess ? 'rgba(34, 197, 94, 0.2)' : 'rgba(245, 158, 11, 0.1)'};
                             color: ${circleColor};
-                            flex-shrink: 0;">
+                            flex-shrink: 0;
+                            opacity: 1; 
+                            z-index: 2;">
                     ${statusContent}
                 </div>
                 
                 <input type="text" inputmode="decimal" id="w-${i}-${sIdx}" 
                        class="log-input ${isLocked ? 'set-locked' : ''}" 
-                       style="margin:0; padding:12px; font-size:18px;" placeholder="0" 
+                       style="margin:0; padding:12px; font-size:18px; 
+                              opacity: ${isLocked ? '0.3' : '1'};" 
+                       placeholder="0" 
                        value="${set.weight || ''}" ${isLocked ? 'readonly' : ''}
                        oninput="updateSetDataOnly(${i}, ${sIdx})">
                 
                 <input type="text" inputmode="decimal" id="r-${i}-${sIdx}" 
                        class="log-input ${isLocked ? 'set-locked' : ''}" 
-                       style="margin:0; padding:12px; font-size:18px;" placeholder="0" 
+                       style="margin:0; padding:12px; font-size:18px; 
+                              opacity: ${isLocked ? '0.3' : '1'};" 
+                       placeholder="0" 
                        value="${set.reps || ''}" ${isLocked ? 'readonly' : ''}
                        oninput="updateSetDataOnly(${i}, ${sIdx})">
                 
                 <button onclick="removeSetFromExercise(${i}, ${sIdx})" 
-                        class="${isLocked ? 'set-locked' : ''}"
-                        style="background:none; border:none; color:var(--danger); font-size:16px;" 
+                        style="background:none; border:none; color:var(--danger); font-size:16px; 
+                               opacity: ${isLocked ? '0.2' : '1'};" 
                         ${isLocked ? 'disabled' : ''}>×</button>
             </div>`;
         });
