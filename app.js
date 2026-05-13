@@ -644,6 +644,7 @@ function startWorkout(workout, data = null, date = null, isImmediateStart = fals
 }
 
 function renderActiveWorkout() {
+    // --- START: Din befintliga logik (RÖR EJ) ---
     document.getElementById("active-title").textContent = activeDraft.workout.name;
     const list = document.getElementById("exercise-list");
     const footer = document.querySelector(".workout-footer");
@@ -666,13 +667,25 @@ function renderActiveWorkout() {
     const pauseBtn = document.getElementById("pause-workout-btn");
     pauseBtn.innerHTML = `Spara utkast 💾`;
     pauseBtn.className = "mode-btn save-draft-btn";
+    // --- SLUT: Din befintliga logik ---
+
+    // Ny variabel för att veta vilken övning som är öppen
+    let openExerciseIndex = activeDraft.ui_state?.openExercise ?? 0;
 
     activeDraft.workout.exercises.forEach((ex, i) => {
         const exerciseData = activeDraft.data[i];
         const isDone = exerciseData.isCompleted;
+        const isOpen = openExerciseIndex === i; // Kolla om denna övning ska vara utfälld
+        
         const div = document.createElement("div");
         div.className = "card glass" + (isDone ? " exercise-done" : "");
+        div.style.padding = "0"; // Viktigt för att headern ska gå hela vägen ut
+        div.style.overflow = "hidden";
         
+        // Räkna klara set för sammanfattningen
+        const completedSets = exerciseData.sets_data.filter(s => s.userConfirmed).length;
+        const totalSets = exerciseData.sets_data.length;
+
         let setsHtml = `<div style="margin-top:10px;">
             <div style="display:grid; grid-template-columns: 40px 1fr 1fr 30px; gap:8px; margin-bottom:5px; align-items:center;">
                 <small style="text-align:center; color:var(--text-light); font-size:9px;">SET</small>
@@ -683,100 +696,77 @@ function renderActiveWorkout() {
 
         exerciseData.sets_data.forEach((set, sIdx) => {
             let isLocked = false;
-            let isCurrent = false; // För att hålla koll på vilket set som är "nästa på tur"
+            let isCurrent = false;
             
-            // Logik för att låsa rader
             if (sIdx > 0 && !isDone) {
                 const prevSet = exerciseData.sets_data[sIdx - 1];
                 if (!prevSet.userConfirmed) isLocked = true;
             }
             if (isDone) isLocked = true;
-
-            // Identifiera "Aktivt" set: Det som inte är bekräftat men som heller inte är låst
-            if (!set.userConfirmed && !isLocked && !isDone) {
-                isCurrent = true;
-            }
+            if (!set.userConfirmed && !isLocked && !isDone) isCurrent = true;
 
             const showSuccess = set.userConfirmed || isDone;
-            
-            // Färgval baserat på status
-            // Grön = Klar, Gul (#facc15) = Aktiv, Orange (#f59e0b) = Väntar
-            let circleColor = '#f59e0b'; // Standard orange
-            if (showSuccess) circleColor = '#22c55e'; // Grön
-            else if (isCurrent) circleColor = '#facc15'; // Klar gul för aktivt set
-
+            let circleColor = showSuccess ? '#22c55e' : (isCurrent ? '#facc15' : '#f59e0b');
             const statusContent = showSuccess ? '✅' : `#${sIdx + 1}`;
 
             setsHtml += `
             <div style="display:grid; grid-template-columns: 40px 1fr 1fr 30px; gap:8px; margin-bottom:8px; align-items:center;">
-                
                 <div onclick="${isLocked && !isDone ? '' : `confirmSet(${i}, ${sIdx})`}" 
-                     style="width:32px; height:32px; border-radius:50%; 
-                            border:2px solid ${circleColor}; 
-                            display:flex; align-items:center; justify-content:center; 
-                            cursor:pointer; font-size:10px; font-weight:800;
+                     style="width:32px; height:32px; border-radius:50%; border:2px solid ${circleColor}; 
+                            display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:10px; font-weight:800;
                             background: ${showSuccess ? 'rgba(34, 197, 94, 0.2)' : (isCurrent ? 'rgba(250, 204, 21, 0.15)' : 'rgba(245, 158, 11, 0.05)')};
-                            color: ${circleColor};
-                            flex-shrink: 0;
-                            ${isCurrent ? 'box-shadow: 0 0 8px rgba(250, 204, 21, 0.3);' : ''} /* Extra glöd på aktiv cirkel */
-                            opacity: 1;">
+                            color: ${circleColor}; flex-shrink: 0; opacity: 1;">
                     ${statusContent}
                 </div>
-                
                 <input type="text" inputmode="decimal" id="w-${i}-${sIdx}" 
                        class="log-input ${isLocked ? 'set-locked' : ''}" 
-                       style="margin:0; padding:12px; font-size:18px; 
-                              /* 0.3 för klara/låsta, 1.0 för det du jobbar med nu */
-                              opacity: ${isCurrent ? '1' : '0.3'}; 
-                              transition: opacity 0.3s ease;
-                              border-color: ${isCurrent ? 'rgba(250, 204, 21, 0.5)' : 'transparent'};" 
-                       placeholder="0" 
-                       value="${set.weight || ''}" ${isLocked ? 'readonly' : ''}
-                       oninput="updateSetDataOnly(${i}, ${sIdx})">
-                
+                       style="margin:0; padding:12px; font-size:18px; opacity: ${isCurrent ? '1' : '0.3'}; transition: opacity 0.3s ease;" 
+                       placeholder="0" value="${set.weight || ''}" ${isLocked ? 'readonly' : ''} oninput="updateSetDataOnly(${i}, ${sIdx})">
                 <input type="text" inputmode="decimal" id="r-${i}-${sIdx}" 
                        class="log-input ${isLocked ? 'set-locked' : ''}" 
-                       style="margin:0; padding:12px; font-size:18px; 
-                              opacity: ${isCurrent ? '1' : '0.3'};
-                              transition: opacity 0.3s ease;
-                              border-color: ${isCurrent ? 'rgba(250, 204, 21, 0.5)' : 'transparent'};" 
-                       placeholder="0" 
-                       value="${set.reps || ''}" ${isLocked ? 'readonly' : ''}
-                       oninput="updateSetDataOnly(${i}, ${sIdx})">
-                
+                       style="margin:0; padding:12px; font-size:18px; opacity: ${isCurrent ? '1' : '0.3'}; transition: opacity 0.3s ease;" 
+                       placeholder="0" value="${set.reps || ''}" ${isLocked ? 'readonly' : ''} oninput="updateSetDataOnly(${i}, ${sIdx})">
                 <button onclick="removeSetFromExercise(${i}, ${sIdx})" 
-                        style="background:none; border:none; color:var(--danger); font-size:16px; 
-                               opacity: ${isLocked || showSuccess ? '0.1' : '0.8'};" 
+                        style="background:none; border:none; color:var(--danger); font-size:16px; opacity: ${isLocked || showSuccess ? '0.1' : '0.8'};" 
                         ${isLocked ? 'disabled' : ''}>×</button>
             </div>`;
         });
 
-        setsHtml += `
-            <button class="mode-btn glass-border" style="padding:8px; font-size:11px; margin-top:5px; border-style:dashed;" onclick="addSetToExercise(${i})" ${isDone ? 'disabled' : ''}>+ Lägg till set</button>
-            <button class="mode-btn ${isDone ? 'blue' : 'green'}" style="padding:10px; font-size:13px; margin-top:10px;" onclick="toggleExerciseDone(${i})">
+        // Denna del bygger själva "dragspels"-knappen och innehållet
+        div.innerHTML = `
+        <div onclick="toggleExercise(${i})" style="padding: 15px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; background: ${isOpen ? 'rgba(250, 204, 21, 0.05)' : 'transparent'}">
+            <div style="display: flex; flex-direction: column; min-width:0;">
+                <strong style="font-size: 15px; color: ${isDone ? 'var(--text-light)' : 'var(--text)'}; text-decoration: ${isDone ? 'line-through' : 'none'}; white-space:nowrap; text-overflow:ellipsis; overflow:hidden;">
+                    ${ex.name}
+                </strong>
+                <small style="color: ${isDone ? '#22c55e' : 'var(--primary)'}; font-size: 11px; margin-top: 2px;">
+                    ${isDone ? 'AVKLARAD ✅' : `${completedSets} av ${totalSets} set klara`}
+                </small>
+            </div>
+            <span style="font-size: 12px; color: var(--text-light); transform: ${isOpen ? 'rotate(180deg)' : 'rotate(0)'}; transition: 0.3s;">▼</span>
+        </div>
+
+        <div style="padding: 0 15px 15px 15px; display: ${isOpen ? 'block' : 'none'}; border-top: 1px solid rgba(255,255,255,0.05);">
+            <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:10px;">
+                <button class="reorder-btn" onclick="moveActiveExercise(${i}, -1)" ${isDone ? 'disabled' : ''}>▲</button>
+                <button class="reorder-btn" onclick="moveActiveExercise(${i}, 1)" ${isDone ? 'disabled' : ''}>▼</button>
+                <button onclick="openReplaceExerciseModal(${i})" style="color:var(--primary); background:none; border:none; font-size:16px;" ${isDone ? 'disabled' : ''}> 🔄 </button>
+                <button onclick="removeActiveExercise(${i})" style="color:var(--danger); background:none; border:none; font-size:18px;" ${isDone ? 'disabled' : ''}> ✖ </button>
+            </div>
+
+            ${setsHtml}
+
+            <button class="mode-btn glass-border" style="padding:8px; font-size:11px; margin-top:5px; border-style:dashed; width:100%;" onclick="addSetToExercise(${i})" ${isDone ? 'disabled' : ''}>+ Lägg till set</button>
+            
+            <button class="mode-btn ${isDone ? 'blue' : 'green'}" style="padding:10px; font-size:13px; margin-top:15px; width:100%; font-weight:bold;" onclick="toggleExerciseDone(${i})">
                 ${isDone ? 'Ångra Klar ↩️' : 'Markera som klar ✅'}
             </button>
         </div>`;
-
-        div.innerHTML = `
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px; gap:10px;">
-            <div style="display:flex; gap:5px; flex-shrink:0;">
-                <button class="reorder-btn" onclick="moveActiveExercise(${i}, -1)" ${isDone ? 'disabled' : ''}>▲</button>
-                <button class="reorder-btn" onclick="moveActiveExercise(${i}, 1)" ${isDone ? 'disabled' : ''}>▼</button>
-            </div>
-            <div style="flex-grow:1; min-width:0; overflow:hidden;">
-                <strong style="font-size:15px; display:block; white-space:nowrap; text-overflow:ellipsis;">${ex.name}</strong>
-            </div>
-            <div style="display:flex; gap:8px; flex-shrink:0; align-items:center;">
-                <button onclick="openReplaceExerciseModal(${i})" style="color:var(--primary); background:none; border:none; font-size:16px; cursor:pointer;" ${isDone ? 'disabled' : ''}> 🔄 </button>
-                <button onclick="removeActiveExercise(${i})" style="color:var(--danger); background:none; border:none; font-size:18px; cursor:pointer;" ${isDone ? 'disabled' : ''}> ✖ </button>
-            </div>
-        </div>
-        ${setsHtml}`;
         
         list.appendChild(div);
     });
 
+    // --- Slutknappar (Lägg till övning osv) ---
     const addBtn = document.createElement("button");
     addBtn.className = "mode-btn glass-border";
     addBtn.style.marginTop = "10px";
@@ -816,6 +806,17 @@ function confirmSet(exIdx, setIdx) {
     renderActiveWorkout();
 
     // 3. Hoppa direkt tillbaka till där du var
+    window.scrollTo(0, scrollPos);
+}
+
+function toggleExercise(index) {
+    const scrollPos = window.scrollY;
+    if (!activeDraft.ui_state) activeDraft.ui_state = {};
+    
+    // Om man klickar på en övning som redan är öppen -> stäng den. Annars -> öppna den klickade.
+    activeDraft.ui_state.openExercise = activeDraft.ui_state.openExercise === index ? -1 : index;
+    
+    renderActiveWorkout();
     window.scrollTo(0, scrollPos);
 }
 
