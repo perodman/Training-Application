@@ -297,7 +297,7 @@ function renderCalendar(isFromStartBtn = false) {
         
         let info = "";
         if (hasWorkouts.length > 0) { cell.classList.add("cell-completed"); info = "✓"; }
-        else if (isOngoing) { cell.classList.add("cell-ongoing"); info = "⏱️"; }
+        else if (isOngoing) { cell.classList.add("cell-ongoing"); info = displayPass.name.split(" ").pop(); }
         else if (displayPass) { cell.classList.add("cell-planned"); info = displayPass.name.split(" ").pop(); }
         
         // Punkt 3: Ändrad struktur för info-ikon för bättre centrering
