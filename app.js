@@ -674,18 +674,16 @@ function renderActiveWorkout() {
         div.className = "card glass" + (isDone ? " exercise-done" : "");
         
         let setsHtml = `<div style="margin-top:10px;">
-            <div style="display:grid; grid-template-columns: 35px 1fr 1fr 30px; gap:8px; margin-bottom:5px; align-items:center;">
-                <span></span>
+            <div style="display:grid; grid-template-columns: 40px 1fr 1fr 30px; gap:8px; margin-bottom:5px; align-items:center;">
+                <small style="text-align:center; color:var(--text-light); font-size:9px;">SET</small>
                 <small style="text-align:center; color:var(--text-light); font-size:9px;">KG</small>
                 <small style="text-align:center; color:var(--text-light); font-size:9px;">REPS</small>
                 <span></span>
             </div>`;
 
-        // HÄR ÄR DEN NYA LOOP SOM SKÖTER UTGRÅNING OCH TANGENTBORD
         exerciseData.sets_data.forEach((set, sIdx) => {
             let isLocked = false;
             
-            // Logik: Om det inte är första setet, kolla om föregående set är "checkat" (userConfirmed)
             if (sIdx > 0 && !isDone) {
                 const prevSet = exerciseData.sets_data[sIdx - 1];
                 if (!prevSet.userConfirmed) {
@@ -694,38 +692,32 @@ function renderActiveWorkout() {
             }
             if (isDone) isLocked = true;
 
-            // Välj vad som ska synas i cirkeln: En bock om klar, annars siffran
-            const statusContent = set.userConfirmed ? '✅' : `<span style="opacity:0.5;">${sIdx + 1}</span>`;
+            // Punkt 2: Lägg till # framför siffran
+            const statusContent = set.userConfirmed ? '✅' : `<span style="opacity:0.8;">#${sIdx + 1}</span>`;
+            
+            // Punkt 3: Ändra färg till gul (#f59e0b) när det inte är klart
+            const circleColor = set.userConfirmed ? '#22c55e' : '#f59e0b';
 
             setsHtml += `
             <div style="display:grid; grid-template-columns: 40px 1fr 1fr 30px; gap:8px; margin-bottom:8px; align-items:center;" 
                  class="${isLocked ? 'set-locked' : ''}">
                 
                 <div onclick="${isLocked ? '' : `confirmSet(${i}, ${sIdx})`}" 
-                     style="width:30px; height:30px; border-radius:50%; border:2px solid ${set.userConfirmed ? '#22c55e' : 'var(--primary)'}; 
-                            display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:12px; font-weight:bold;
-                            background: ${set.userConfirmed ? 'rgba(34, 197, 94, 0.1)' : 'transparent'}">
+                     style="width:32px; height:32px; border-radius:50%; border:2px solid ${circleColor}; 
+                            display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:10px; font-weight:800;
+                            background: ${set.userConfirmed ? 'rgba(34, 197, 94, 0.1)' : 'rgba(245, 158, 11, 0.05)'};
+                            color: ${circleColor};">
                     ${statusContent}
                 </div>
                 
-                <input type="text" 
-                       inputmode="decimal" 
-                       id="w-${i}-${sIdx}" 
-                       class="log-input" 
-                       style="margin:0; padding:12px; font-size:18px;" 
-                       placeholder="0" 
-                       value="${set.weight || ''}" 
-                       ${isLocked ? 'readonly' : ''}
+                <input type="text" inputmode="decimal" id="w-${i}-${sIdx}" class="log-input" 
+                       style="margin:0; padding:12px; font-size:18px;" placeholder="0" 
+                       value="${set.weight || ''}" ${isLocked ? 'readonly' : ''}
                        oninput="updateSetDataOnly(${i}, ${sIdx})">
                 
-                <input type="text" 
-                       inputmode="decimal" 
-                       id="r-${i}-${sIdx}" 
-                       class="log-input" 
-                       style="margin:0; padding:12px; font-size:18px;" 
-                       placeholder="0" 
-                       value="${set.reps || ''}" 
-                       ${isLocked ? 'readonly' : ''}
+                <input type="text" inputmode="decimal" id="r-${i}-${sIdx}" class="log-input" 
+                       style="margin:0; padding:12px; font-size:18px;" placeholder="0" 
+                       value="${set.reps || ''}" ${isLocked ? 'readonly' : ''}
                        oninput="updateSetDataOnly(${i}, ${sIdx})">
                 
                 <button onclick="removeSetFromExercise(${i}, ${sIdx})" 
