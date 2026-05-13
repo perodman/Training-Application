@@ -697,25 +697,25 @@ function renderActiveWorkout() {
                  class="${isLocked ? 'set-locked' : ''}">
                 <span style="font-size:12px; font-weight:800; color:var(--primary)">#${sIdx + 1}</span>
                 
-                input type="text" 
-                   inputmode="decimal" 
-                   id="w-${i}-${sIdx}" 
-                   class="log-input" 
-                   style="margin:0; padding:12px; font-size:18px;" 
-                   placeholder="0" 
-                   value="${set.weight}" 
-                   ${isLocked ? 'readonly' : ''}
-                   oninput="updateSetData(${i}, ${sIdx}, 'w')"> /* Ändrad till oninput */
-            
-                    <input type="text" 
-                   inputmode="decimal" 
-                   id="r-${i}-${sIdx}" 
-                   class="log-input" 
-                   style="margin:0; padding:12px; font-size:18px;" 
-                   placeholder="0" 
-                   value="${set.reps}" 
-                   ${isLocked ? 'readonly' : ''}
-                   oninput="updateSetData(${i}, ${sIdx}, 'r')"> /* Ändrad till oninput */
+                <input type="text" 
+       inputmode="decimal" 
+       id="w-${i}-${sIdx}" 
+       class="log-input" 
+       style="margin:0; padding:12px; font-size:18px;" 
+       placeholder="0" 
+       value="${set.weight}" 
+       ${isLocked ? 'readonly' : ''}
+       oninput="updateSetData(${i}, ${sIdx}, 'w')"> /* Ändrad till oninput */
+
+<input type="text" 
+       inputmode="decimal" 
+       id="r-${i}-${sIdx}" 
+       class="log-input" 
+       style="margin:0; padding:12px; font-size:18px;" 
+       placeholder="0" 
+       value="${set.reps}" 
+       ${isLocked ? 'readonly' : ''}
+       oninput="updateSetData(${i}, ${sIdx}, 'r')"> /* Ändrad till oninput */
                 
                 <button onclick="removeSetFromExercise(${i}, ${sIdx})" 
                         style="background:none; border:none; color:var(--danger); font-size:16px;" 
