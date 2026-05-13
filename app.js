@@ -778,15 +778,10 @@ function updateSetDataOnly(exIdx, setIdx) {
     localStorage.setItem("activeWorkoutDraft", JSON.stringify(activeDraft));
 }
 
-// Denna körs när du klickar på cirkeln
 function confirmSet(exIdx, setIdx) {
-    // Växla mellan bekräftad och obekräftad
     const currentState = activeDraft.data[exIdx].sets_data[setIdx].userConfirmed;
     activeDraft.data[exIdx].sets_data[setIdx].userConfirmed = !currentState;
-    
     localStorage.setItem("activeWorkoutDraft", JSON.stringify(activeDraft));
-    
-    // Rita om för att låsa upp nästa rad och visa bocken
     renderActiveWorkout();
 }
 
