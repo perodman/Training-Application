@@ -669,13 +669,15 @@ function renderActiveWorkout() {
     pauseBtn.className = "mode-btn save-draft-btn";
     // --- SLUT: Din befintliga logik ---
 
-    // Ny variabel för att veta vilken övning som är öppen
-    let openExerciseIndex = activeDraft.ui_state?.openExercise ?? 0;
+    // HÄR ÄR UPPDATERINGEN: Vi hämtar en lista (array) istället för ett enskilt index
+    const openExercises = activeDraft.ui_state?.openExercises || [];
 
     activeDraft.workout.exercises.forEach((ex, i) => {
         const exerciseData = activeDraft.data[i];
         const isDone = exerciseData.isCompleted;
-        const isOpen = openExerciseIndex === i;
+        
+        // HÄR ÄR UPPDATERINGEN: Vi kollar om nuvarande index finns i listan över öppna
+        const isOpen = openExercises.includes(i);
         
         const div = document.createElement("div");
         div.className = "card glass" + (isDone ? " exercise-done" : "");
@@ -685,7 +687,6 @@ function renderActiveWorkout() {
         const completedSets = exerciseData.sets_data.filter(s => s.userConfirmed).length;
         const totalSets = exerciseData.sets_data.length;
 
-        // --- Logik för SET-listan (samma som innan) ---
         let setsHtml = `<div style="margin-top:10px;">
             <div style="display:grid; grid-template-columns: 40px 1fr 1fr 30px; gap:8px; margin-bottom:5px; align-items:center;">
                 <small style="text-align:center; color:var(--text-light); font-size:9px;">SET</small>
@@ -720,7 +721,6 @@ function renderActiveWorkout() {
             </div>`;
         });
 
-        // --- Här bygger vi den nya Headern med alla knappar ---
         div.innerHTML = `
         <div onclick="toggleExercise(${i})" style="padding: 12px 15px; display: flex; align-items: center; cursor: pointer; background: ${isOpen ? 'rgba(250, 204, 21, 0.05)' : 'transparent'}">
             
@@ -756,7 +756,7 @@ function renderActiveWorkout() {
         list.appendChild(div);
     });
 
-    // --- Slutknappar (Lägg till övning osv) ---
+    // --- Slutknappar ---
     const addBtn = document.createElement("button");
     addBtn.className = "mode-btn glass-border";
     addBtn.style.marginTop = "10px";
