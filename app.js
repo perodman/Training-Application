@@ -68,7 +68,7 @@ function showView(id) {
     
     if (target.classList.contains("hidden")) {
         document.querySelectorAll(".view").forEach(v => v.classList.add("hidden"));
-        target.remove();
+        target.classList.remove("hidden");
         target.style.animation = 'none';
         target.offsetHeight; 
         target.style.animation = null;
@@ -85,6 +85,7 @@ function closeModal() {
 function openModal() {
     const modal = document.getElementById("workout-modal");
     modal.classList.remove("hidden");
+    // En liten timeout säkerställer att scrollen faktiskt nollställs efter att innehållet laddats
     setTimeout(() => {
         modal.scrollTo(0, 0);
     }, 10);
@@ -299,6 +300,7 @@ function renderCalendar(isFromStartBtn = false) {
         else if (isOngoing) { cell.classList.add("cell-ongoing"); info = displayPass.name.split(" ").pop(); }
         else if (displayPass) { cell.classList.add("cell-planned"); info = displayPass.name.split(" ").pop(); }
         
+        // Punkt 3: Ändrad struktur för info-ikon för bättre centrering
         cell.innerHTML = `<span>${d}</span><div class="cell-info">${info}</div>`;
         cell.onclick = () => openDayManager(dateStr, displayPass, hasWorkouts, isOngoing);
         grid.appendChild(cell);
@@ -313,8 +315,7 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
     if (completed.length > 0) {
         completed.forEach((w, idx) => {
             const timeStr = w.totalTime ? `⏱️ ${w.totalTime}` : "";
-            // Kopplat till CSS-klass: .day-manager-card-completed (mjuk gradient)
-            html += `<div class="card glass day-manager-card-completed">
+            html += `<div class="card glass" style="border-left:4px solid var(--success); text-align:left; margin-bottom:10px;">
                 <div style="display:flex; justify-content:space-between; align-items:center;">
                     <strong>${w.programName}</strong>
                     <div style="font-size:10px; color:var(--text-light)">${timeStr}</div>
@@ -341,34 +342,25 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
     } else if (isOngoing) {
         html += `<button class="mode-btn orange" onclick="closeModal(); startWorkout(activeDraft.workout, activeDraft.data, activeDraft.date)">Fortsätt pågående pass</button>`;
     } else {
-        // Kopplat till CSS-klass: .day-manager-card (mjuk gradient huvudkort)
-        html += `
-            <div class="card glass day-manager-card">
-                <p style="text-align:center; margin: 0; font-size: 13px; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.5px;">Planerad aktivitet</p>
-                <p style="text-align:center; margin: 8px 0 0 0; font-size: 20px;"><strong id="current-planned-label" style="color: #fff; font-weight: 800;">${planned ? planned.name : 'Vila 💤'}</strong></p>
-            </div>
-        `;
+        html += `<p style="text-align:center;">Planerat: <strong id="current-planned-label">${planned ? planned.name : 'Vila'}</strong></p>`;
         
         html += `<div id="day-manager-action-btn-container">`;
         if(planned) {
-            // Kopplat till CSS-klass: .pro-green-btn (pulserande levande knapp)
-            html += `<button class="mode-btn pro-green-btn" style="margin-bottom: 12px; padding: 16px;" onclick="prepareStart('${dateStr}', '${planned.id}')">Starta ${planned.name} 🔥</button>`;
+            html += `<button class="mode-btn green" onclick="prepareStart('${dateStr}', '${planned.id}')">Starta ${planned.name} 🔥</button>`;
         }
         html += `</div>`;
         
-        // Kopplat till CSS-klass: .glass-accent-btn (Cyan-glas-knapp för fritt pass)
-        html += `<button class="mode-btn glass-accent-btn" style="padding: 14px;" onclick="closeModal(); startFreeWorkoutOnDate('${dateStr}')"><span style="font-weight: 800; font-size: 16px; margin-right: 4px;">+</span> Starta Fritt Pass</button>`;
+        html += `<button class="mode-btn glass-border" style="border-color:var(--primary); color:var(--primary);" onclick="closeModal(); startFreeWorkoutOnDate('${dateStr}')"><span style="color:var(--primary)">+</span> Starta Fritt Pass</button>`;
 
-        html += `<div class="separator" style="margin: 25px 0 diners 15px 0;"></div><p style="font-size:11px; text-transform:uppercase; color:var(--text-light); text-align:center; letter-spacing: 0.5px; margin-bottom: 15px;">Ändra planering för dagen:</p>`;
-        html += `<div class="plan-override-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">`;
+        html += `<div class="separator"></div><p style="font-size:11px; text-transform:uppercase; color:var(--text-light); text-align:center;">Ändra planering:</p>`;
+        html += `<div class="plan-override-grid">`;
         programData.routine.forEach(p => {
             const isSelected = planned && p.id === planned.id;
-            // Kopplat till CSS-klass: .pro-override-btn
-            html += `<button class="mode-btn pro-override-btn ${isSelected ? 'active-choice' : ''}" id="btn-ovr-${p.id}" onclick="setOverrideSilent('${dateStr}', '${p.id}')">${p.name}</button>`;
+            html += `<button class="mode-btn glass-border plan-override-btn ${isSelected ? 'active-choice' : ''}" id="btn-ovr-${p.id}" onclick="setOverrideSilent('${dateStr}', '${p.id}')">${p.name}</button>`;
         });
         html += `</div>`;
         html += `<div style="margin-top:10px;">
-                    <button class="mode-btn pro-rest-btn" onclick="setOverrideSilent('${dateStr}', 'none')">Markera som Vila</button>
+                    <button class="mode-btn glass-border plan-override-btn override-rest-btn" onclick="setOverrideSilent('${dateStr}', 'none')">Vila</button>
                  </div>`;
     }
     body.innerHTML = html;
@@ -379,7 +371,7 @@ function setOverrideSilent(date, val) {
     calendarOverrides[date] = val;
     saveAll();
     
-    document.querySelectorAll('.pro-override-btn').forEach(b => b.classList.remove('active-choice'));
+    document.querySelectorAll('.plan-override-btn').forEach(b => b.classList.remove('active-choice'));
     const btnContainer = document.getElementById('day-manager-action-btn-container');
     
     if(val !== 'none') {
@@ -389,10 +381,10 @@ function setOverrideSilent(date, val) {
         document.getElementById('current-planned-label').textContent = p.name;
         
         if(btnContainer) {
-            btnContainer.innerHTML = `<button class="mode-btn pro-green-btn" style="margin-bottom: 12px; padding: 16px;" onclick="prepareStart('${date}', '${p.id}')">Starta ${p.name} 🔥</button>`;
+            btnContainer.innerHTML = `<button class="mode-btn green" onclick="prepareStart('${date}', '${p.id}')">Starta ${p.name} 🔥</button>`;
         }
     } else {
-        document.getElementById('current-planned-label').textContent = "Vila 💤";
+        document.getElementById('current-planned-label').textContent = "Vila";
         if(btnContainer) btnContainer.innerHTML = "";
     }
     
@@ -484,6 +476,7 @@ function renderExercisePickerForEdit(idx, category = "Ben") {
     html += `</div>`;
 
     html += `<p style="font-size:11px; text-transform:uppercase; color:var(--text-light); text-align:center; margin-bottom:10px;">Övningar (${category}):</p>`;
+    // Punkt 5: Ändrat max-height till 400px för att se 5-6 övningar
     html += `<div style="max-height:400px; overflow-y:auto; padding-right:5px; background:rgba(0,0,0,0.2); border-radius:15px; padding:10px;">`;
     
     const filtered = masterExercises.filter(ex => category === "Armar" ? (ex.target === "Biceps" || ex.target === "Triceps") : ex.target === category);
@@ -651,6 +644,7 @@ function startWorkout(workout, data = null, date = null, isImmediateStart = fals
 }
 
 function renderActiveWorkout() {
+    // --- START: Din befintliga logik (RÖR EJ) ---
     document.getElementById("active-title").textContent = activeDraft.workout.name;
     const list = document.getElementById("exercise-list");
     const footer = document.querySelector(".workout-footer");
@@ -673,12 +667,16 @@ function renderActiveWorkout() {
     const pauseBtn = document.getElementById("pause-workout-btn");
     pauseBtn.innerHTML = `Spara utkast 💾`;
     pauseBtn.className = "mode-btn save-draft-btn";
+    // --- SLUT: Din befintliga logik ---
 
+    // HÄR ÄR UPPDATERINGEN: Vi hämtar en lista (array) istället för ett enskilt index
     const openExercises = activeDraft.ui_state?.openExercises || [];
 
     activeDraft.workout.exercises.forEach((ex, i) => {
         const exerciseData = activeDraft.data[i];
         const isDone = exerciseData.isCompleted;
+        
+        // HÄR ÄR UPPDATERINGEN: Vi kollar om nuvarande index finns i listan över öppna
         const isOpen = openExercises.includes(i);
         
         const div = document.createElement("div");
@@ -758,6 +756,7 @@ function renderActiveWorkout() {
         list.appendChild(div);
     });
 
+    // --- Slutknappar ---
     const addBtn = document.createElement("button");
     addBtn.className = "mode-btn glass-border";
     addBtn.style.marginTop = "10px";
@@ -775,6 +774,7 @@ function renderActiveWorkout() {
     showView("workout-view");
 }
 
+// Denna sparar bara siffrorna medan du skriver (ingen omladdning = inget hoppande tangentbord)
 function updateSetDataOnly(exIdx, setIdx) {
     const wVal = document.getElementById(`w-${exIdx}-${setIdx}`).value;
     const rVal = document.getElementById(`r-${exIdx}-${setIdx}`).value;
@@ -784,12 +784,18 @@ function updateSetDataOnly(exIdx, setIdx) {
 }
 
 function confirmSet(exIdx, setIdx) {
+    // 1. Spara nuvarande rullningsposition
     const scrollPos = window.scrollY;
+
     const currentState = activeDraft.data[exIdx].sets_data[setIdx].userConfirmed;
     activeDraft.data[exIdx].sets_data[setIdx].userConfirmed = !currentState;
     
     localStorage.setItem("activeWorkoutDraft", JSON.stringify(activeDraft));
+    
+    // 2. Rita om vyn
     renderActiveWorkout();
+
+    // 3. Hoppa direkt tillbaka till där du var
     window.scrollTo(0, scrollPos);
 }
 
@@ -797,6 +803,7 @@ function toggleExercise(index) {
     const scrollPos = window.scrollY;
     
     if (!activeDraft.ui_state) activeDraft.ui_state = {};
+    // Säkerställ att vi har en array för öppna övningar
     if (!activeDraft.ui_state.openExercises) {
         activeDraft.ui_state.openExercises = [];
     }
@@ -804,8 +811,10 @@ function toggleExercise(index) {
     const openIdx = activeDraft.ui_state.openExercises.indexOf(index);
 
     if (openIdx > -1) {
+        // Om den finns -> ta bort (stäng)
         activeDraft.ui_state.openExercises.splice(openIdx, 1);
     } else {
+        // Om den inte finns -> lägg till (öppna)
         activeDraft.ui_state.openExercises.push(index);
     }
 
@@ -813,6 +822,7 @@ function toggleExercise(index) {
     renderActiveWorkout();
     window.scrollTo(0, scrollPos);
 }
+
 
 function addSetToExercise(exIdx) {
     const scrollPos = window.scrollY;
@@ -887,6 +897,7 @@ function renderExercisePicker(category, replaceIndex = null) {
     html += `</div>`;
     
     html += `<p style="font-size:11px; text-transform:uppercase; color:var(--text-light); text-align:center; margin-bottom:10px;">Övningar (${category}):</p>`;
+    // Punkt 5: Även här 400px
     html += `<div style="max-height:400px; overflow-y:auto; padding-right:5px; background:rgba(0,0,0,0.2); border-radius:15px; padding:10px; margin-bottom:15px;">`;
     
     const filtered = masterExercises.filter(ex => category === "Armar" ? (ex.target === "Biceps" || ex.target === "Triceps") : ex.target === category);
@@ -972,9 +983,11 @@ document.getElementById("add-custom-pass-btn").onclick = openCreateProgramModal;
 function renderHome() {
     showView("home-view");
     
+    // Punkt 1: Permanent avgränsande linje på startsidan
     const homeView = document.getElementById("home-view");
     const headerP = homeView.querySelector("header p");
     
+    // Ta bort ev gamla kopior först för att undvika dubletter vid omladdning
     homeView.querySelectorAll(".home-separator").forEach(s => s.remove());
     
     if (headerP) {
