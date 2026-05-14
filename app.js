@@ -154,7 +154,7 @@ function openCreateExerciseModal(callback = null) {
             <div style="width: 100%;">
                 <label style="font-size:11px; color:var(--text-light); text-transform: uppercase; letter-spacing: 1px; display:block; margin-bottom: 12px; text-align: center;">Välj Kategori</label>
                 
-                <div id="category-selector-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; padding: 0 10px;">
+                <div id="category-selector-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 0 10px;">
                     ${categories.map(cat => `
                         <div class="cat-select-item ${cat.id === selectedCategory ? 'active' : ''}" 
                              onclick="window.selectModalCategory('${cat.id}')"
@@ -297,9 +297,9 @@ function openEditExerciseModal(id) {
             </div>
 
             <div style="width: 100%;">
-                <label style="font-size:11px; color:var(--text-light); text-transform: uppercase; letter-spacing: 1px; display:block; margin-bottom: 12px; text-align: center;">Kategori</label>
+                <label style="font-size:11px; color:var(--text-light); text-transform: uppercase; letter-spacing: 1px; display:block; margin-bottom: 12px; text-align: center;">Välj Kategori</label>
                 
-                <div id="edit-category-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; padding: 0 10px;">
+                <div id="edit-category-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 0 10px;">
                     ${categories.map(cat => `
                         <div class="cat-select-item ${cat.id === selectedCategory ? 'active' : ''}" 
                              onclick="window.selectEditModalCategory('${cat.id}')"
