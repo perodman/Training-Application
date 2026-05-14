@@ -130,34 +130,90 @@ document.getElementById("timer-toggle-btn").onclick = () => {
 // --- ÖVNINGAR & INSTÄLLNINGAR ---
 function openCreateExerciseModal(callback = null) {
     const body = document.getElementById("modal-body");
+    let selectedCategory = "Ben"; // Standardval
+
+    // Definiera kategorierna med deras ikoner
+    const categories = [
+        { id: "Ben", icon: "🦵" },
+        { id: "Bröst", icon: "🏋️" },
+        { id: "Rygg", icon: "🪵" },
+        { id: "Axlar", icon: "👐" },
+        { id: "Biceps", icon: "💪" },
+        { id: "Triceps", icon: "🦾" },
+        { id: "Bål", icon: "🧘" }
+    ];
+
     body.innerHTML = `
-        <h3>Skapa Ny Övning</h3>
-        <div style="text-align:center;">
-        <label style="font-size:12px; color:var(--text-light); text-align:left; display:block; margin-left:10px;">NAMN PÅ ÖVNING</label>
-        <input type="text" id="new-ex-name" class="log-input" placeholder="T.ex. Knäböj">
-        <label style="font-size:12px; color:var(--text-light); text-align:left; display:block; margin-left:10px;">KATEGORI</label>
-        <select id="new-ex-cat" class="log-input">
-            <option value="Ben">Ben</option>
-            <option value="Bröst">Bröst</option>
-            <option value="Rygg">Rygg</option>
-            <option value="Axlar">Axlar</option>
-            <option value="Biceps">Biceps</option>
-            <option value="Triceps">Triceps</option>
-            <option value="Bål">Bål</option>
-        </select>
-        <button class="mode-btn blue" id="save-new-ex-btn">Spara Övning</button>
+        <h3 style="text-align:center; margin-bottom: 20px;">Skapa Ny Övning</h3>
+        
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 15px;">
+            <div style="width: 100%; max-width: 300px;">
+                <label style="font-size:11px; color:var(--text-light); text-transform: uppercase; letter-spacing: 1px; display:block; margin-bottom: 8px; text-align: center;">Namn på övning</label>
+                <input type="text" id="new-ex-name" class="log-input" placeholder="T.ex. Knäböj" style="text-align: center;">
+            </div>
+
+            <div style="width: 100%;">
+                <label style="font-size:11px; color:var(--text-light); text-transform: uppercase; letter-spacing: 1px; display:block; margin-bottom: 12px; text-align: center;">Välj Kategori</label>
+                
+                <div id="category-selector-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; padding: 0 10px;">
+                    ${categories.map(cat => `
+                        <div class="cat-select-item ${cat.id === selectedCategory ? 'active' : ''}" 
+                             onclick="window.selectModalCategory('${cat.id}')"
+                             id="modal-cat-${cat.id}"
+                             style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 12px 5px; border-radius: 12px; text-align: center; cursor: pointer; transition: all 0.2s ease;">
+                            <div style="font-size: 20px; margin-bottom: 4px;">${cat.icon}</div>
+                            <div style="font-size: 10px; font-weight: 700; color: var(--text-light);">${cat.id}</div>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+
+            <button class="mode-btn blue" id="save-new-ex-btn" style="width: 100%; max-width: 300px; margin-top: 10px;">Spara Övning</button>
+        </div>
+
+        <style>
+            .cat-select-item.active {
+                background: rgba(59, 130, 246, 0.2) !important;
+                border-color: var(--primary) !important;
+                box-shadow: 0 0 15px rgba(59, 130, 246, 0.2);
+            }
+            .cat-select-item.active div {
+                color: var(--text) !important;
+            }
+        </style>
     `;
-    
+
+    // Funktion för att hantera valet av kategori i modalen
+    window.selectModalCategory = (catId) => {
+        selectedCategory = catId;
+        // Återställ alla till standardstil
+        document.querySelectorAll('.cat-select-item').forEach(el => el.classList.remove('active'));
+        // Aktivera den valda
+        document.getElementById(`modal-cat-${catId}`).classList.add('active');
+    };
+
     document.getElementById("save-new-ex-btn").onclick = () => {
         const name = document.getElementById("new-ex-name").value.trim();
-        const target = document.getElementById("new-ex-cat").value;
         if(!name) return alert("Ange ett namn!");
-        const newEx = { id: Date.now(), name, target, defaultSets: 3, animation: "" };
+        
+        const newEx = { 
+            id: Date.now(), 
+            name, 
+            target: selectedCategory, 
+            defaultSets: 3, 
+            animation: "" 
+        };
+        
         masterExercises.push(newEx);
         saveAll();
+        
         if(callback) callback(newEx);
-        else { closeModal(); filterExercises(currentExerciseCategory); }
+        else { 
+            closeModal(); 
+            filterExercises(currentExerciseCategory); 
+        }
     };
+    
     openModal();
 }
 
