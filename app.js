@@ -433,28 +433,25 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
 }
 
 function setOverrideSilent(date, val) {
+    // 1. Uppdatera datan
     calendarOverrides[date] = val;
     saveAll();
     
-    document.querySelectorAll('.plan-override-btn').forEach(b => b.classList.remove('active-choice'));
-    const btnContainer = document.getElementById('day-manager-action-btn-container');
-    
-    if(val !== 'none') {
-        const activeBtn = document.getElementById(`btn-ovr-${val}`);
-        if(activeBtn) activeBtn.classList.add('active-choice');
-        const p = programData.routine.find(x => x.id === val);
-        document.getElementById('current-planned-label').textContent = p.name;
-        
-        if(btnContainer) {
-            btnContainer.innerHTML = `<button class="mode-btn green" onclick="prepareStart('${date}', '${p.id}')">Starta ${p.name} 🔥</button>`;
-        }
-    } else {
-        document.getElementById('current-planned-label').textContent = "Vila";
-        if(btnContainer) btnContainer.innerHTML = "";
-    }
-    
+    // 2. Uppdatera kalendern i bakgrunden
     renderCalendar(false); 
-    openModal(); 
+    
+    // 3. Hämta data för att kunna rita om Modal-fönstret (openDayManager)
+    // Vi behöver veta vad som är planerat nu efter ändringen
+    const newPlanned = val === 'none' ? null : programData.routine.find(x => x.id === val);
+    
+    // Vi behöver också veta om det finns slutförda pass eller pågående pass för detta datum
+    // Här använder vi samma logik som kalendern använder för att skicka in rätt info
+    const completed = userHistory[date] || [];
+    const isOngoing = (activeDraft && activeDraft.date === date && activeDraft.isStarted);
+
+    // 4. "Refresh" - Kör openDayManager igen med den nya datan
+    // Detta gör att statuskortet, startknappen och grid-markeringen uppdateras direkt
+    openDayManager(date, newPlanned, completed, isOngoing);
 }
 
 function startFreeWorkoutOnDate(date) {
