@@ -220,12 +220,10 @@ function openEditExerciseModal(id) {
     const body = document.getElementById("modal-body");
     body.innerHTML = `
         <h3>Redigera Övning</h3>
-        <div style="text-align:left;">
-            <label style="font-size:12px; color:var(--text-light); margin-left:10px;">NAMN PÅ ÖVNING</label>
+        <div style="text-align:center;">
+            <label style="font-size:14px; color:var(--text-light); margin-center:10px;">NAMN PÅ ÖVNING</label>
             <input type="text" id="edit-ex-name" class="log-input" value="${ex.name}">
-            <label style="font-size:12px; color:var(--text-light); margin-left:10px;">ANIMATIONSFIL (.mp4)</label>
-            <input type="text" id="edit-ex-anim" class="log-input" value="${ex.animation || ''}" placeholder="t.ex. video.mp4">
-            <label style="font-size:12px; color:var(--text-light); margin-left:10px;">KATEGORI</label>
+            <label style="font-size:14px; color:var(--text-light); margin-center:10px;">KATEGORI</label>
             <select id="edit-ex-cat" class="log-input">
                 <option value="Ben" ${ex.target==='Ben'?'selected':''}>Ben</option>
                 <option value="Bröst" ${ex.target==='Bröst'?'selected':''}>Bröst</option>
