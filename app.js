@@ -221,9 +221,9 @@ function openEditExerciseModal(id) {
     body.innerHTML = `
         <h3>Redigera Övning</h3>
         <div style="text-align:center;">
-            <label style="font-size:14px; color:var(--text-light); margin-center:10px;">NAMN PÅ ÖVNING</label>
+            <label style="font-size:12px; color:var(--text-light); margin-left:10px;">NAMN PÅ ÖVNING</label>
             <input type="text" id="edit-ex-name" class="log-input" value="${ex.name}">
-            <label style="font-size:14px; color:var(--text-light); margin-center:10px;">KATEGORI</label>
+            <label style="font-size:12px; color:var(--text-light); margin-left:10px;">KATEGORI</label>
             <select id="edit-ex-cat" class="log-input">
                 <option value="Ben" ${ex.target==='Ben'?'selected':''}>Ben</option>
                 <option value="Bröst" ${ex.target==='Bröst'?'selected':''}>Bröst</option>
