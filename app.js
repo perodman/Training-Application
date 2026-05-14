@@ -133,7 +133,7 @@ function openCreateExerciseModal(callback = null) {
     body.innerHTML = `
         <h3>Skapa Ny Övning</h3>
         <div style="text-align:center;">
-        <label style="font-size:12px; color:var(--text-light); text-align:left; display:block; margin-left:10px;">NAMN</label>
+        <label style="font-size:12px; color:var(--text-light); text-align:left; display:block; margin-left:10px;">NAMN PÅ ÖVNING</label>
         <input type="text" id="new-ex-name" class="log-input" placeholder="T.ex. Knäböj">
         <label style="font-size:12px; color:var(--text-light); text-align:left; display:block; margin-left:10px;">KATEGORI</label>
         <select id="new-ex-cat" class="log-input">
