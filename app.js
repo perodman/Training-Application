@@ -138,8 +138,7 @@ function openCreateExerciseModal(callback = null) {
         { id: "Bröst", icon: "🏋️" },
         { id: "Rygg", icon: "🪵" },
         { id: "Axlar", icon: "👐" },
-        { id: "Biceps", icon: "💪" },
-        { id: "Triceps", icon: "🦾" },
+        { id: "Armar", icon: "💪" },
         { id: "Bål", icon: "🧘" }
     ];
 
@@ -284,8 +283,7 @@ function openEditExerciseModal(id) {
         { id: "Bröst", icon: "🏋️" },
         { id: "Rygg", icon: "🪵" },
         { id: "Axlar", icon: "👐" },
-        { id: "Biceps", icon: "💪" },
-        { id: "Triceps", icon: "🦾" },
+        { id: "Armar", icon: "💪" },
         { id: "Bål", icon: "🧘" }
     ];
 
