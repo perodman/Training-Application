@@ -398,13 +398,26 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
             
             programData.routine.forEach(p => {
                 const isSelected = planned && p.id === planned.id;
+                
+                // Generera en kompakt lista av övningar för passet
+                const exList = p.exercises.map(e => `<span style="display:block; margin-bottom:2px; border-bottom:1px solid rgba(255,255,255,0.05);">• ${e.name}</span>`).join('');
+
                 html += `
-                <button class="mode-btn glass-border plan-override-btn ${isSelected ? 'active-choice' : ''}" 
-                        id="btn-ovr-${p.id}" 
-                        onclick="setOverrideSilent('${dateStr}', '${p.id}')"
-                        style="margin: 0; padding: 12px; font-size: 13px; border-radius: 12px; font-weight: 600; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">
-                    ${p.name}
-                </button>`;
+                <div style="display: flex; flex-direction: column; gap: 5px;">
+                    <button class="mode-btn glass-border plan-override-btn ${isSelected ? 'active-choice' : ''}" 
+                            id="btn-ovr-${p.id}" 
+                            onclick="setOverrideSilent('${dateStr}', '${p.id}')"
+                            style="margin: 0; padding: 12px; font-size: 13px; border-radius: 12px; font-weight: 600; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; width:100%;">
+                        ${p.name}
+                    </button>
+                    
+                    <details style="width: 100%; text-align: center;">
+                        <summary style="list-style: none; font-size: 10px; color: var(--text-light); opacity: 0.6; cursor: pointer; padding: 2px;">Visa övningar ▾</summary>
+                        <div style="text-align: left; background: rgba(0,0,0,0.2); padding: 8px; border-radius: 8px; margin-top: 4px; font-size: 10px; color: var(--text-light); max-height: 100px; overflow-y: auto;">
+                            ${exList}
+                        </div>
+                    </details>
+                </div>`;
             });
             
             const isRestSelected = !planned;
