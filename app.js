@@ -433,25 +433,51 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
 }
 
 function setOverrideSilent(date, val) {
-    // 1. Uppdatera datan
+    // 1. Spara i bakgrunden som vanligt
     calendarOverrides[date] = val;
     saveAll();
     
-    // 2. Uppdatera kalendern i bakgrunden
+    // 2. Ta bort markeringen från ALLA planering-knappar direkt
+    document.querySelectorAll('.plan-override-btn').forEach(b => b.classList.remove('active-choice'));
+    
+    const btnContainer = document.getElementById('day-manager-action-btn-container');
+    const statusTextElem = document.getElementById('current-planned-label');
+    
+    // 3. Om man valde ett pass (inte Vila)
+    if(val !== 'none') {
+        // Tänd den nya knappen
+        const activeBtn = document.getElementById(`btn-ovr-${val}`);
+        if(activeBtn) activeBtn.classList.add('active-choice');
+        
+        // Hitta passets namn
+        const p = programData.routine.find(x => x.id === val);
+        
+        // Uppdatera texten i statuskortet direkt
+        if(statusTextElem) statusTextElem.textContent = `📋 Inplanerat: ${p.name}`;
+        
+        // Uppdatera den stora startknappen direkt
+        if(btnContainer) {
+            btnContainer.innerHTML = `
+                <button class="mode-btn green" onclick="prepareStart('${date}', '${p.id}')" style="width: 100%; padding: 16px; font-size: 16px; font-weight: bold; border-radius: 14px; box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3); margin-bottom: 10px;">
+                    Starta ${p.name} 🔥
+                </button>`;
+        }
+    } 
+    // 4. Om man valde Vila
+    else {
+        // Tänd Vila-knappen
+        const restBtn = document.getElementById('btn-ovr-none');
+        if(restBtn) restBtn.classList.add('active-choice');
+        
+        // Uppdatera texten i statuskortet till Vila
+        if(statusTextElem) statusTextElem.textContent = "🧘 Planerad Vila";
+        
+        // Dölj startknappen eftersom det är vila
+        if(btnContainer) btnContainer.innerHTML = "";
+    }
+    
+    // Uppdatera kalendern i bakgrunden så det stämmer när vi stänger fönstret
     renderCalendar(false); 
-    
-    // 3. Hämta data för att kunna rita om Modal-fönstret (openDayManager)
-    // Vi behöver veta vad som är planerat nu efter ändringen
-    const newPlanned = val === 'none' ? null : programData.routine.find(x => x.id === val);
-    
-    // Vi behöver också veta om det finns slutförda pass eller pågående pass för detta datum
-    // Här använder vi samma logik som kalendern använder för att skicka in rätt info
-    const completed = userHistory[date] || [];
-    const isOngoing = (activeDraft && activeDraft.date === date && activeDraft.isStarted);
-
-    // 4. "Refresh" - Kör openDayManager igen med den nya datan
-    // Detta gör att statuskortet, startknappen och grid-markeringen uppdateras direkt
-    openDayManager(date, newPlanned, completed, isOngoing);
 }
 
 function startFreeWorkoutOnDate(date) {
