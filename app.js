@@ -310,59 +310,124 @@ function renderCalendar(isFromStartBtn = false) {
 
 function openDayManager(dateStr, planned, completed, isOngoing) {
     const body = document.getElementById("modal-body");
-    let html = `<h3>${dateStr}</h3>`;
     
+    // Modern, ren rubrik för datumet
+    let html = `
+        <div style="text-align: center; margin-bottom: 20px;">
+            <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-light); font-weight: 600;">Valt datum</span>
+            <h3 style="margin: 5px 0 0 0; font-size: 22px; font-weight: 800; color: var(--text);">${dateStr}</h3>
+        </div>
+    `;
+    
+    // --- SCENARIO 1: UTFÖRDA PASS (Dina slutförda pass) ---
     if (completed.length > 0) {
         completed.forEach((w, idx) => {
             const timeStr = w.totalTime ? `⏱️ ${w.totalTime}` : "";
-            html += `<div class="card glass" style="border-left:4px solid var(--success); text-align:left; margin-bottom:10px;">
-                <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <strong>${w.programName}</strong>
-                    <div style="font-size:10px; color:var(--text-light)">${timeStr}</div>
+            html += `
+            <div class="card glass" style="border-left: 4px solid #22c55e; text-align: left; margin-bottom: 15px; padding: 15px; border-radius: 16px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
                     <div>
-                        <button onclick="editLoggedWorkout('${dateStr}', ${idx})" style="background:none; border:none; color:var(--primary); cursor:pointer; font-size:16px; margin-right:10px;"> ✏️ </button>
-                        <button onclick="openConfirmDeleteModal('${dateStr}', ${idx})" style="background:none; border:none; color:var(--danger); cursor:pointer; font-size:16px;"> ✖ </button>
+                        <strong style="font-size: 16px; color: var(--text); display: block;">${w.programName}</strong>
+                        <span style="font-size: 11px; color: var(--text-light); font-weight: 500;">${timeStr || 'Slutfört pass ✅'}</span>
+                    </div>
+                    <div style="display: flex; gap: 5px;">
+                        <button onclick="editLoggedWorkout('${dateStr}', ${idx})" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: var(--primary); cursor: pointer; font-size: 14px; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">✏️</button>
+                        <button onclick="openConfirmDeleteModal('${dateStr}', ${idx})" style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2); color: var(--danger); cursor: pointer; font-size: 12px; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">✖</button>
                     </div>
                 </div>
-                <div style="margin-top:10px;">`;
+                
+                <div style="background: rgba(0,0,0,0.15); padding: 12px; border-radius: 12px; display: flex; flex-direction: column; gap: 10px;">`;
+            
             w.exercises.forEach(ex => {
-                html += `<div style="font-size:12px; margin-bottom:5px; border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:3px;">
-                    <span style="color:var(--text-light)">${ex.name}:</span><br>`;
+                html += `
+                <div style="font-size: 13px;">
+                    <span style="color: var(--text); font-weight: 600; display: block; margin-bottom: 4px;">${ex.name}</span>
+                    <div style="display: flex; flex-wrap: wrap; gap: 5px;">`;
+                
                 if(ex.sets_data) {
                     ex.sets_data.forEach((s, sIdx) => {
-                        html += `<span style="color:var(--primary); font-weight:700;">Set ${sIdx+1}: ${s.weight} kg x ${s.reps} reps</span><br>`;
+                        html += `<span style="background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.2); color: #60a5fa; font-size: 11px; padding: 3px 8px; border-radius: 6px; font-weight: 700;">S${sIdx+1}: ${s.weight}kg × ${s.reps}</span>`;
                     });
                 } else {
-                    html += `<span style="color:var(--primary); font-weight:700;">Set: ${ex.weight} kg x ${ex.reps} reps x ${ex.sets} set</span>`;
+                    html += `<span style="background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.2); color: #60a5fa; font-size: 11px; padding: 3px 8px; border-radius: 6px; font-weight: 700;">${ex.sets} set × ${ex.weight}kg × ${ex.reps}r</span>`;
                 }
-                html += `</div>`;
+                html += `</div></div>`;
             });
             html += `</div></div>`;
         });
-    } else if (isOngoing) {
-        html += `<button class="mode-btn orange" onclick="closeModal(); startWorkout(activeDraft.workout, activeDraft.data, activeDraft.date)">Fortsätt pågående pass</button>`;
-    } else {
-        html += `<p style="text-align:center;">Planerat: <strong id="current-planned-label">${planned ? planned.name : 'Vila'}</strong></p>`;
-        
-        html += `<div id="day-manager-action-btn-container">`;
-        if(planned) {
-            html += `<button class="mode-btn green" onclick="prepareStart('${dateStr}', '${planned.id}')">Starta ${planned.name} 🔥</button>`;
-        }
-        html += `</div>`;
-        
-        html += `<button class="mode-btn glass-border" style="border-color:var(--primary); color:var(--primary);" onclick="closeModal(); startFreeWorkoutOnDate('${dateStr}')"><span style="color:var(--primary)">+</span> Starta Fritt Pass</button>`;
+    } 
+    // --- SCENARIO 2: PÅGÅENDE PASS ---
+    else if (isOngoing) {
+        html += `
+        <div style="padding: 20px 10px; text-align: center;">
+            <button class="mode-btn orange" onclick="closeModal(); startWorkout(activeDraft.workout, activeDraft.data, activeDraft.date)" style="width: 100%; padding: 16px; font-size: 16px; font-weight: bold; border-radius: 14px; box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);">
+                Fortsätt pågående pass 🔥
+            </button>
+        </div>`;
+    } 
+    // --- SCENARIO 3: PLANERING / INPUT (Det du vill snygga till!) ---
+    else {
+        // Huvudkort för dagens status
+        html += `
+        <div class="card glass" style="padding: 20px; border-radius: 18px; text-align: center; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.08);">
+            <span style="font-size: 11px; text-transform: uppercase; color: var(--text-light); font-weight: 600; letter-spacing: 0.5px;">Status</span>
+            <p style="margin: 5px 0 15px 0; font-size: 18px; font-weight: 700; color: ${planned ? 'var(--primary)' : 'var(--text-light)'};">
+                ${planned ? `📋 Inplanerat: ${planned.name}` : '🧘 Planerad Vila'}
+            </p>
+            
+            <div id="day-manager-action-btn-container" style="margin-bottom: 10px;">`;
+            if(planned) {
+                html += `
+                <button class="mode-btn green" onclick="prepareStart('${dateStr}', '${planned.id}')" style="width: 100%; padding: 16px; font-size: 16px; font-weight: bold; border-radius: 14px; box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3); margin-bottom: 10px;">
+                    Starta ${planned.name} 🔥
+                </button>`;
+            }
+        html += `
+            </div>
+            
+            <button class="mode-btn glass-border" onclick="closeModal(); startFreeWorkoutOnDate('${dateStr}')" style="width: 100%; padding: 12px; font-size: 14px; border-radius: 12px; border-style: dashed; transition: 0.2s;">
+                ➕ Starta Fritt Pass
+            </button>
+        </div>`;
 
-        html += `<div class="separator"></div><p style="font-size:11px; text-transform:uppercase; color:var(--text-light); text-align:center;">Ändra planering:</p>`;
-        html += `<div class="plan-override-grid">`;
-        programData.routine.forEach(p => {
-            const isSelected = planned && p.id === planned.id;
-            html += `<button class="mode-btn glass-border plan-override-btn ${isSelected ? 'active-choice' : ''}" id="btn-ovr-${p.id}" onclick="setOverrideSilent('${dateStr}', '${p.id}')">${p.name}</button>`;
-        });
-        html += `</div>`;
-        html += `<div style="margin-top:10px;">
-                    <button class="mode-btn glass-border plan-override-btn override-rest-btn" onclick="setOverrideSilent('${dateStr}', 'none')">Vila</button>
-                 </div>`;
+        // SEKTION: ÄNDRA PLANERING
+        html += `
+        <div style="margin-top: 25px;">
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px;">
+                <div style="flex-grow: 1; height: 1px; background: rgba(255,255,255,0.08);"></div>
+                <p style="font-size: 11px; text-transform: uppercase; color: var(--text-light); font-weight: 700; letter-spacing: 1px; margin: 0;">Ändra planering</p>
+                <div style="flex-grow: 1; height: 1px; background: rgba(255,255,255,0.08);"></div>
+            </div>
+            
+            <div class="plan-override-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">`;
+            
+            // Loopa igenom dina träningspass
+            programData.routine.forEach(p => {
+                const isSelected = planned && p.id === planned.id;
+                html += `
+                <button class="mode-btn glass-border plan-override-btn ${isSelected ? 'active-choice' : ''}" 
+                        id="btn-ovr-${p.id}" 
+                        onclick="setOverrideSilent('${dateStr}', '${p.id}')"
+                        style="margin: 0; padding: 12px; font-size: 13px; border-radius: 12px; font-weight: 600; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; ${isSelected ? 'background: var(--primary); color: white; border-color: var(--primary);' : ''}">
+                    ${p.name}
+                </button>`;
+            });
+            
+            // VI FLYTTAR IN VILA I GRIDDET SOM EN EGEN KNAPP I SLUTET
+            const isRestSelected = !planned;
+            html += `
+                <button class="mode-btn glass-border plan-override-btn override-rest-btn" 
+                        onclick="setOverrideSilent('${dateStr}', 'none')"
+                        style="margin: 0; padding: 12px; font-size: 13px; border-radius: 12px; font-weight: bold; grid-column: span 2; background: ${isRestSelected ? 'rgba(99, 102, 241, 0.2)' : 'rgba(255,255,255,0.02)'}; color: ${isRestSelected ? '#818cf8' : 'var(--text-light)'}; border-color: ${isRestSelected ? '#6366f1' : 'rgba(255,255,255,0.1)'};">
+                    🧘 Markera som Vila
+                </button>
+            `;
+            
+        html += `
+            </div>
+        </div>`;
     }
+    
     body.innerHTML = html;
     openModal();
 }
