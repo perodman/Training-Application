@@ -365,13 +365,12 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
             </button>
         </div>`;
     } 
-    // --- SCENARIO 3: PLANERING / INPUT (Det du vill snygga till!) ---
+    // --- SCENARIO 3: PLANERING / INPUT ---
     else {
-        // Huvudkort för dagens status
         html += `
         <div class="card glass" style="padding: 20px; border-radius: 18px; text-align: center; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.08);">
             <span style="font-size: 11px; text-transform: uppercase; color: var(--text-light); font-weight: 600; letter-spacing: 0.5px;">Status</span>
-            <p style="margin: 5px 0 15px 0; font-size: 18px; font-weight: 700; color: ${planned ? 'var(--primary)' : 'var(--text-light)'};">
+            <p style="margin: 5px 0 15px 0; font-size: 18px; font-weight: 700; color: var(--primary);">
                 ${planned ? `📋 Inplanerat: ${planned.name}` : '🧘 Planerad Vila'}
             </p>
             
@@ -385,7 +384,7 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
         html += `
             </div>
             
-            <button class="mode-btn glass-border" onclick="closeModal(); startFreeWorkoutOnDate('${dateStr}')" style="width: 100%; padding: 12px; font-size: 14px; border-radius: 12px; border-style: dashed; transition: 0.2s;">
+            <button class="mode-btn glass-border" onclick="closeModal(); startFreeWorkoutOnDate('${dateStr}')" style="width: 100%; padding: 12px; font-size: 14px; border-radius: 12px; border-style: dashed;">
                 ➕ Starta Fritt Pass
             </button>
         </div>`;
@@ -401,25 +400,26 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
             
             <div class="plan-override-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">`;
             
-            // Loopa igenom dina träningspass
+            // Loopa träningspass
             programData.routine.forEach(p => {
                 const isSelected = planned && p.id === planned.id;
                 html += `
                 <button class="mode-btn glass-border plan-override-btn ${isSelected ? 'active-choice' : ''}" 
                         id="btn-ovr-${p.id}" 
                         onclick="setOverrideSilent('${dateStr}', '${p.id}')"
-                        style="margin: 0; padding: 12px; font-size: 13px; border-radius: 12px; font-weight: 600; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; ${isSelected ? 'background: var(--primary); color: white; border-color: var(--primary);' : ''}">
+                        style="margin: 0; padding: 12px; font-size: 13px; border-radius: 12px; font-weight: 600; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">
                     ${p.name}
                 </button>`;
             });
             
-            // VI FLYTTAR IN VILA I GRIDDET SOM EN EGEN KNAPP I SLUTET
+            // Vila-knapp (använder dina rena originalklasser så setOverrideSilent kan styra stilen)
             const isRestSelected = !planned;
             html += `
-                <button class="mode-btn glass-border plan-override-btn override-rest-btn" 
+                <button class="mode-btn glass-border plan-override-btn override-rest-btn ${isRestSelected ? 'active-choice' : ''}" 
+                        id="btn-ovr-none"
                         onclick="setOverrideSilent('${dateStr}', 'none')"
-                        style="margin: 0; padding: 12px; font-size: 13px; border-radius: 12px; font-weight: bold; grid-column: span 2; background: ${isRestSelected ? 'rgba(99, 102, 241, 0.2)' : 'rgba(255,255,255,0.02)'}; color: ${isRestSelected ? '#818cf8' : 'var(--text-light)'}; border-color: ${isRestSelected ? '#6366f1' : 'rgba(255,255,255,0.1)'};">
-                    🧘 Markera som Vila
+                        style="margin: 0; padding: 12px; font-size: 13px; border-radius: 12px; font-weight: bold; grid-column: span 2;">
+                    🧘 Vila
                 </button>
             `;
             
