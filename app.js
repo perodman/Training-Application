@@ -145,7 +145,7 @@ function openCreateExerciseModal(callback = null) {
     body.innerHTML = `
         <h3 style="text-align:center; margin-bottom: 20px;">Skapa Ny Övning</h3>
         
-        <div style="display: flex; flex-direction: column; align-items: center; gap: 15px;">
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 10px;">
             <div style="width: 100%; max-width: 300px;">
                 <label style="font-size:11px; color:var(--text-light); text-transform: uppercase; letter-spacing: 1px; display:block; margin-bottom: 8px; text-align: center;">Namn på övning</label>
                 <input type="text" id="new-ex-name" class="log-input" placeholder="T.ex. Knäböj" style="text-align: center;">
@@ -290,7 +290,7 @@ function openEditExerciseModal(id) {
     body.innerHTML = `
         <h3 style="text-align:center; margin-bottom: 20px;">Redigera Övning</h3>
         
-        <div style="display: flex; flex-direction: column; align-items: center; gap: 15px;">
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 10px;">
             <div style="width: 100%; max-width: 300px;">
                 <label style="font-size:11px; color:var(--text-light); text-transform: uppercase; letter-spacing: 1px; display:block; margin-bottom: 8px; text-align: center;">Namn på övning</label>
                 <input type="text" id="edit-ex-name" class="log-input" value="${ex.name}" style="text-align: center;">
