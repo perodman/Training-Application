@@ -313,19 +313,11 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
     
     let html = `
         <div style="text-align: center; margin-bottom: 25px;">
-            <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: var(--text-light); font-weight: 600; display: block; margin-bottom: 4px;">Valt datum</span>
+            <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: var(--text-light); font-weight: 600; display: block; margin-bottom: 5px;">Valt datum</span>
             
-            <div style="display: block;">
-                <h3 style="margin: 0; font-size: 28px; font-weight: 900; 
-                    background: linear-gradient(to bottom, #ffffff 30%, #3b82f6 100%);
-                    -webkit-background-clip: text;
-                    -webkit-text-fill-color: transparent;
-                    background-clip: text;
-                    letter-spacing: -0.5px;
-                    display: inline-block;">
-                    ${dateStr}
-                </h3>
-            </div>
+            <h2 class="section-title modern-header" style="margin: 0; display: inline-block; font-size: 26px;">
+                ${dateStr}
+            </h2>
         </div>
     `;
     
