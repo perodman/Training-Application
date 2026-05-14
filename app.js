@@ -314,7 +314,14 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
     let html = `
         <div style="text-align: center; margin-bottom: 20px;">
             <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-light); font-weight: 600;">Valt datum</span>
-            <h3 style="margin: 5px 0 0 0; font-size: 22px; font-weight: 800; color: #60a5fa;">${dateStr}</h3>
+            <h3 style="margin: 5px 0 0 0; font-size: 26px; font-weight: 900; 
+                background: linear-gradient(135deg, #ffffff 0%, #3b82f6 100%);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+                display: inline-block;">
+                ${dateStr}
+            </h3>
         </div>
     `;
     
@@ -398,8 +405,6 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
             
             programData.routine.forEach(p => {
                 const isSelected = planned && p.id === planned.id;
-                
-                // PUNKT 1: Mer designfull lista av övningar (små tags/badges)
                 const exList = p.exercises.map(e => `
                     <div style="background: rgba(255,255,255,0.05); padding: 5px 8px; border-radius: 6px; margin-bottom: 4px; border-left: 2px solid var(--primary); font-size: 10px; color: #ddd; display: flex; align-items: center;">
                         <span style="margin-right: 6px; opacity: 0.5;">•</span> ${e.name}
@@ -416,7 +421,7 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
                     </button>
                     
                     <details style="width: 100%; text-align: center;">
-                        <summary style="list-style: none; font-size: 10px; color: var(--text-light); opacity: 0.6; cursor: pointer; padding: 4px; border-radius: 8px; transition: background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.background='transparent'">
+                        <summary style="list-style: none; font-size: 10px; color: var(--text-light); opacity: 0.6; cursor: pointer; padding: 4px; border-radius: 8px;">
                             Innehåll ▾
                         </summary>
                         <div style="text-align: left; padding: 8px; border-radius: 10px; margin-top: 4px; max-height: 120px; overflow-y: auto; background: rgba(0,0,0,0.1);">
@@ -427,7 +432,6 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
             });
             
             const isRestSelected = !planned;
-            // PUNKT 3: Ljusgul border i Vila-rutan
             html += `
                 <button class="mode-btn glass-border plan-override-btn override-rest-btn ${isRestSelected ? 'active-choice' : ''}" 
                         id="btn-ovr-none"
