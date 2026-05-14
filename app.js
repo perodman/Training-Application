@@ -311,7 +311,6 @@ function renderCalendar(isFromStartBtn = false) {
 function openDayManager(dateStr, planned, completed, isOngoing) {
     const body = document.getElementById("modal-body");
     
-    // Modern, ren rubrik för datumet
     let html = `
         <div style="text-align: center; margin-bottom: 20px;">
             <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-light); font-weight: 600;">Valt datum</span>
@@ -319,7 +318,6 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
         </div>
     `;
     
-    // --- SCENARIO 1: UTFÖRDA PASS (Dina slutförda pass) ---
     if (completed.length > 0) {
         completed.forEach((w, idx) => {
             const timeStr = w.totalTime ? `⏱️ ${w.totalTime}` : "";
@@ -356,7 +354,6 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
             html += `</div></div>`;
         });
     } 
-    // --- SCENARIO 2: PÅGÅENDE PASS ---
     else if (isOngoing) {
         html += `
         <div style="padding: 20px 10px; text-align: center;">
@@ -365,12 +362,12 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
             </button>
         </div>`;
     } 
-    // --- SCENARIO 3: PLANERING / INPUT ---
     else {
         html += `
         <div class="card glass" style="padding: 20px; border-radius: 18px; text-align: center; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.08);">
             <span style="font-size: 11px; text-transform: uppercase; color: var(--text-light); font-weight: 600; letter-spacing: 0.5px;">Status</span>
-            <p style="margin: 5px 0 15px 0; font-size: 18px; font-weight: 700; color: var(--primary);">
+            
+            <p id="current-planned-label" style="margin: 5px 0 15px 0; font-size: 18px; font-weight: 700; color: var(--text);">
                 ${planned ? `📋 Inplanerat: ${planned.name}` : '🧘 Planerad Vila'}
             </p>
             
@@ -389,7 +386,6 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
             </button>
         </div>`;
 
-        // SEKTION: ÄNDRA PLANERING
         html += `
         <div style="margin-top: 25px;">
             <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px;">
@@ -400,7 +396,6 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
             
             <div class="plan-override-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">`;
             
-            // Loopa träningspass
             programData.routine.forEach(p => {
                 const isSelected = planned && p.id === planned.id;
                 html += `
@@ -412,7 +407,6 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
                 </button>`;
             });
             
-            // Vila-knapp (använder dina rena originalklasser så setOverrideSilent kan styra stilen)
             const isRestSelected = !planned;
             html += `
                 <button class="mode-btn glass-border plan-override-btn override-rest-btn ${isRestSelected ? 'active-choice' : ''}" 
