@@ -862,7 +862,7 @@ function renderActiveWorkout() {
     const discardBtn = document.createElement("button");
     discardBtn.className = "mode-btn";
     discardBtn.style.cssText = "background:none; color:var(--danger); font-size:14px; margin-top:20px; border:1px solid rgba(239, 68, 68, 0.2);";
-    discardBtn.innerHTML = "Kassera pass 🗑️";
+    discardBtn.innerHTML = "Radera pass 🗑️";
     discardBtn.onclick = confirmDiscardActiveWorkout;
     list.appendChild(discardBtn);
 
@@ -1230,9 +1230,9 @@ function confirmDiscardActiveWorkout() {
     body.innerHTML = `
         <div style="text-align:center; padding:10px;">
             <div style="font-size:40px; margin-bottom:15px;">⚠️</div>
-            <h3>Kassera passet?</h3>
+            <h3>Radera passet?</h3>
             <p style="color:var(--text-light); margin-bottom:25px;">Allt pågående arbete i detta pass kommer att raderas.</p>
-            <button class="mode-btn" style="background:var(--danger); color:white; margin-bottom:12px;" onclick="localStorage.removeItem('activeWorkoutDraft'); location.reload();">Ja, kassera</button>
+            <button class="mode-btn" style="background:var(--danger); color:white; margin-bottom:12px;" onclick="localStorage.removeItem('activeWorkoutDraft'); location.reload();">Ja, radera!</button>
             <button class="mode-btn glass-border" onclick="closeModal()">Avbryt</button>
         </div>
     `;
