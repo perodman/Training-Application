@@ -31,7 +31,6 @@
 
         <div id="calendar-view" class="view hidden">
             <h2 class="section-title modern-header">Träningsschema</h2>
-            <!-- Behållare för informationsnotisen via JS -->
             <div id="calendar-info-box"></div>
             
             <div class="calendar-nav">
@@ -53,7 +52,8 @@
         </div>
 
         <div id="exercises-view" class="view hidden">
-            <h2 class="section-title modern-header">Muskelgrupper</h2>
+            <h2 class="section-title modern-header">Övningar</h2>
+            
             <div id="category-menu" class="category-grid">
                 <button class="cat-btn glass" data-cat="Ben" onclick="filterExercises('Ben')"><span class="cat-icon"> 🦵 </span> Ben</button>
                 <button class="cat-btn glass" data-cat="Bröst" onclick="filterExercises('Bröst')"><span class="cat-icon"> 🏋️ </span> Bröst</button>
@@ -62,11 +62,17 @@
                 <button class="cat-btn glass" data-cat="Armar" onclick="filterExercises('Armar')"><span class="cat-icon"> 💪 </span> Armar</button>
                 <button class="cat-btn glass" data-cat="Bål" onclick="filterExercises('Bål')"><span class="cat-icon"> 🧘 </span> Bål</button>
             </div>
-            <div class="separator" style="margin: 30px 0;"></div>
-            <div style="display: flex; align-items: center; justify-content: center; position: relative; margin-bottom: 20px;">
-                <h2 class="section-title modern-header" style="margin:0;">Övningar</h2>
-                <button class="add-inline-btn" onclick="openCreateExerciseModal()">+</button>
+
+            <div style="display: flex; align-items: center; gap: 15px; margin: 35px 0 20px 0; opacity: 0.8;">
+                <div style="flex-grow: 1; height: 1px; background: linear-gradient(to right, transparent, var(--primary), transparent);"></div>
+                <div style="width: 8px; height: 8px; background: var(--primary); transform: rotate(45deg); border-radius: 2px; box-shadow: 0 0 10px var(--primary);"></div>
+                <div style="flex-grow: 1; height: 1px; background: linear-gradient(to left, transparent, var(--primary), transparent);"></div>
             </div>
+
+            <div style="display: flex; justify-content: flex-end; margin-bottom: 15px;">
+                <button class="add-inline-btn" onclick="openCreateExerciseModal()" style="position: static; transform: none; font-size: 13px; padding: 8px 15px;">+ Ny övning</button>
+            </div>
+
             <div id="exercise-results" class="exercise-bank-list"></div>
         </div>
 
