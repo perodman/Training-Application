@@ -314,7 +314,7 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
     let html = `
         <div style="text-align: center; margin-bottom: 20px;">
             <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-light); font-weight: 600;">Valt datum</span>
-            <h3 style="margin: 5px 0 0 0; font-size: 22px; font-weight: 800; color: var(--text);">${dateStr}</h3>
+            <h3 style="margin: 5px 0 0 0; font-size: 22px; font-weight: 800; color: #60a5fa;">${dateStr}</h3>
         </div>
     `;
     
@@ -399,8 +399,12 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
             programData.routine.forEach(p => {
                 const isSelected = planned && p.id === planned.id;
                 
-                // Generera en kompakt lista av övningar för passet
-                const exList = p.exercises.map(e => `<span style="display:block; margin-bottom:2px; border-bottom:1px solid rgba(255,255,255,0.05);">• ${e.name}</span>`).join('');
+                // PUNKT 1: Mer designfull lista av övningar (små tags/badges)
+                const exList = p.exercises.map(e => `
+                    <div style="background: rgba(255,255,255,0.05); padding: 5px 8px; border-radius: 6px; margin-bottom: 4px; border-left: 2px solid var(--primary); font-size: 10px; color: #ddd; display: flex; align-items: center;">
+                        <span style="margin-right: 6px; opacity: 0.5;">•</span> ${e.name}
+                    </div>
+                `).join('');
 
                 html += `
                 <div style="display: flex; flex-direction: column; gap: 5px;">
@@ -412,8 +416,10 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
                     </button>
                     
                     <details style="width: 100%; text-align: center;">
-                        <summary style="list-style: none; font-size: 10px; color: var(--text-light); opacity: 0.6; cursor: pointer; padding: 2px;">Visa övningar ▾</summary>
-                        <div style="text-align: left; background: rgba(0,0,0,0.2); padding: 8px; border-radius: 8px; margin-top: 4px; font-size: 10px; color: var(--text-light); max-height: 100px; overflow-y: auto;">
+                        <summary style="list-style: none; font-size: 10px; color: var(--text-light); opacity: 0.6; cursor: pointer; padding: 4px; border-radius: 8px; transition: background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.background='transparent'">
+                            Innehåll ▾
+                        </summary>
+                        <div style="text-align: left; padding: 8px; border-radius: 10px; margin-top: 4px; max-height: 120px; overflow-y: auto; background: rgba(0,0,0,0.1);">
                             ${exList}
                         </div>
                     </details>
@@ -421,11 +427,12 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
             });
             
             const isRestSelected = !planned;
+            // PUNKT 3: Ljusgul border i Vila-rutan
             html += `
                 <button class="mode-btn glass-border plan-override-btn override-rest-btn ${isRestSelected ? 'active-choice' : ''}" 
                         id="btn-ovr-none"
                         onclick="setOverrideSilent('${dateStr}', 'none')"
-                        style="margin: 0; padding: 12px; font-size: 13px; border-radius: 12px; font-weight: bold; grid-column: span 2;">
+                        style="margin: 0; padding: 12px; font-size: 13px; border-radius: 12px; font-weight: bold; grid-column: span 2; border-color: rgba(253, 224, 71, 0.4); color: #fde047; background: rgba(253, 224, 71, 0.05);">
                     🧘 Vila
                 </button>
             `;
