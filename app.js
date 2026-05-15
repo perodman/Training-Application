@@ -422,7 +422,6 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
     let html = `
         <div style="text-align: center; margin-bottom: 25px;">
             <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: var(--text-light); font-weight: 600; display: block;">Valt datum</span>
-            
             <h2 class="section-title modern-header" style="margin: 8px 0 20px 0; display: inline-block; font-size: 26px;">
                 ${dateStr}
             </h2>
@@ -450,35 +449,32 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
             w.exercises.forEach(ex => {
                 html += `
                 <div style="font-size: 13px;">
-                    <span style="color: var(--text); font-weight: 600; display: block; margin-bottom: 6px;">${ex.name}</span>
+                    <span style="color: var(--text); font-weight: 600; display: block; margin-bottom: 8px;">${ex.name}</span>
                     <div style="display: flex; flex-direction: column; gap: 6px;">`;
                 
-                /* ... i openDayManager-funktionen, inuti loopen för ex.sets_data ... */
-
-if(ex.sets_data) {
-    ex.sets_data.forEach((s, sIdx) => {
-        const wVal = s.weight || 0;
-        const rVal = s.reps || 0;
-        html += `
-        <div style="background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.2); padding: 6px 12px; border-radius: 8px; margin-bottom: 2px; width: fit-content; display: flex; align-items: center; gap: 8px;">
-            <span style="color: #60a5fa; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">Set ${sIdx+1}</span> 
-            
-            <span style="color: #ffffff; font-size: 13px; font-weight: 600;">${wVal} <small style="color: #60a5fa; font-weight:400;">kg</small></span> 
-            
-            <span style="color: #60a5fa; opacity: 0.6;">×</span> 
-            
-            <span style="color: #ffffff; font-size: 13px; font-weight: 600;">${rVal} <small style="color: #60a5fa; font-weight:400;">reps</small></span>
-        </div>`;
-    });
-} else {
-    /* För de fall där sets_data saknas (t.ex. gamla loggar) */
-    const wVal = ex.weight || 0;
-    const rVal = ex.reps || 0;
-    html += `
-    <div style="background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.2); color: #60a5fa; font-size: 12px; padding: 6px 12px; border-radius: 8px; font-weight: 600; width: fit-content;">
-        ${ex.sets} set <span style="color:#fff;">×</span> ${wVal}kg <span style="color:#fff;">×</span> ${rVal}reps
-    </div>`;
-}
+                if(ex.sets_data) {
+                    ex.sets_data.forEach((s, sIdx) => {
+                        const wVal = s.weight || 0;
+                        const rVal = s.reps || 0;
+                        html += `
+                        <div style="background: rgba(59, 130, 246, 0.08); border: 1px solid var(--primary); padding: 6px 12px; border-radius: 8px; width: fit-content; display: flex; align-items: center; gap: 8px;">
+                            <span style="color: var(--primary); font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">Set ${sIdx+1}</span> 
+                            
+                            <span style="color: #ffffff; font-size: 13px; font-weight: 600;">${wVal} <small style="color: var(--primary); font-weight:400;">kg</small></span> 
+                            
+                            <span style="color: var(--primary); opacity: 0.4;">×</span> 
+                            
+                            <span style="color: #ffffff; font-size: 13px; font-weight: 600;">${rVal} <small style="color: var(--primary); font-weight:400;">reps</small></span>
+                        </div>`;
+                    });
+                } else {
+                    const wVal = ex.weight || 0;
+                    const rVal = ex.reps || 0;
+                    html += `
+                    <div style="background: rgba(59, 130, 246, 0.08); border: 1px solid var(--primary); color: #ffffff; font-size: 12px; padding: 6px 12px; border-radius: 8px; font-weight: 600; width: fit-content;">
+                        ${ex.sets} set <span style="color: var(--primary);">×</span> ${wVal}kg <span style="color: var(--primary);">×</span> ${rVal}reps
+                    </div>`;
+                }
                 html += `</div></div>`;
             });
             html += `</div></div>`;
