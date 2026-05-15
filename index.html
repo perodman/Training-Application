@@ -13,27 +13,50 @@
     </div>
     <div class="app-container">
         <div id="home-view" class="view">
-            <div class="hero-section">
-                <h1 class="main-title">LIFT</h1>
-                <p class="subtitle">Elevate Your Strength</p>
-            </div>
-            
-            <div class="separator"></div>
-
-            <div id="draft-alert" class="hidden" style="margin-bottom: 20px;">
-                <button id="resume-workout-btn" class="mode-btn orange">Fortsätt träningen    ⏱️    </button>
-            </div>
-            <div class="menu-grid">
-                <button id="start-new-btn" class="mode-btn blue main-action">Starta Träningspass    🔥    </button>
-                
-                            <div class="separator"></div>
-                
-                <button id="view-exercises-btn" class="mode-btn glass">  🏋️    Övningar</button>
-                <button id="view-programs-btn" class="mode-btn glass">  📋    Träningsprogram</button>
-                <button id="calendar-mode" class="mode-btn glass">  📅    Dagbok och Schemaläggning</button>
-                <button id="stats-mode" class="mode-btn glass">  📊    Statistik</button>
-            </div>
+    <div class="hero-section">
+        <h1 class="main-title">LIFT</h1>
+        <div class="subtitle-container">
+            <span class="line"></span>
+            <p class="subtitle">Elevate Your Strength</p>
+            <span class="line"></span>
         </div>
+    </div>
+    
+    <div class="separator"></div>
+
+    <div id="draft-alert" class="hidden" style="margin-bottom: 20px;">
+        <button id="resume-workout-btn" class="mode-btn orange">
+            <span class="btn-text">Fortsätt träningen</span>
+            <span class="btn-icon">⏱️</span>
+        </button>
+    </div>
+
+    <div class="menu-grid">
+        <button id="start-new-btn" class="mode-btn blue main-action">
+            <span class="btn-text">Starta Träningspass</span>
+            <span class="btn-icon">🔥</span>
+        </button>
+        
+        <div class="grid-separator"></div>
+        
+        <button id="view-exercises-btn" class="mode-btn glass">
+            <span class="btn-icon">🏋️</span>
+            <span class="btn-text">Övningar</span>
+        </button>
+        <button id="view-programs-btn" class="mode-btn glass">
+            <span class="btn-icon">📋</span>
+            <span class="btn-text">Program</span>
+        </button>
+        <button id="calendar-mode" class="mode-btn glass">
+            <span class="btn-icon">📅</span>
+            <span class="btn-text">Dagbok</span>
+        </button>
+        <button id="stats-mode" class="mode-btn glass">
+            <span class="btn-icon">📊</span>
+            <span class="btn-text">Statistik</span>
+        </button>
+    </div>
+</div>
 
         <div id="calendar-view" class="view hidden">
             <h2 class="section-title modern-header">Träningsschema</h2>
