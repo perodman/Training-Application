@@ -1,168 +1,159 @@
 <!DOCTYPE html>
 <html lang="sv">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>LIFT - Premium Workout Companion</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>LIFT Tracker Pro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@800;900&family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="background-glows">
-        <div class="glow cyan"></div>
-        <div class="glow violet"></div>
+    <div class="global-header">
+        <div id="global-home" class="circle-ctrl">  🏠  </div>
+    </div>
+    <div class="app-container">
+        <div id="home-view" class="view">
+    <div class="hero-section">
+        <h1 class="main-title">LIFT</h1>
+        <div class="subtitle-container">
+            <span class="line"></span>
+            <p class="subtitle">Elevate Your Strength</p>
+            <span class="line"></span>
+        </div>
+    </div>
+    
+    <div class="separator"></div>
+
+    <div id="draft-alert" class="hidden" style="margin-bottom: 20px;">
+        <button id="resume-workout-btn" class="mode-btn orange">
+            <span class="btn-main-text">Fortsätt träningen</span>
+            <span class="btn-icon">⏱️</span>
+        </button>
     </div>
 
-    <main class="app-container">
-        <!-- HOME VIEW -->
-        <section id="home-view" class="view">
-            <header class="hero-section">
-                <h1 class="main-title">LIFT</h1>
-                <div class="subtitle-container">
-                    <span class="line"></span>
-                    <p class="subtitle">PREMIUM WORKOUT</p>
-                    <span class="line"></span>
-                </div>
-            </header>
+    <div class="menu-grid">
+        <button id="start-new-btn" class="mode-btn blue main-action">
+            <span class="btn-icon">🔥</span>
+            <span class="btn-main-text">Starta Träningspass</span>
+            <span class="btn-sub-text">Nu kör vi!</span>
+        </button>        
+        <button id="view-exercises-btn" class="mode-btn glass">
+            <span class="btn-icon">🏋️</span>
+            <span class="btn-main-text">ÖVNINGAR</span>
+            <span class="btn-sub-text">Bibliotek</span>
+        </button>
 
-            <div id="draft-alert" class="card glass hidden">
-                <div class="draft-badge">PÅGÅENDE PASS</div>
-                <h3>Du har ett aktivt utkast</h3>
-                <p>Fortsätt där du slutade eller avsluta passet.</p>
-                <button id="resume-workout-btn" class="mode-btn green glow-green">Återuppta pass 🔥</button>
-            </div>
+        <button id="view-programs-btn" class="mode-btn glass">
+            <span class="btn-icon">📋</span>
+            <span class="btn-main-text">TRÄNINGSPROGRAM</span>
+            <span class="btn-sub-text">Mina Pass</span>
+        </button>
 
-            <button id="start-new-btn" class="mode-btn blue glow-blue hero-action-btn">
-                <span class="btn-icon">⚡</span> STARTA TRÄNINGSPASSET
-            </button>
+        <button id="calendar-mode" class="mode-btn glass">
+            <span class="btn-icon">📅</span>
+            <span class="btn-main-text">TRÄNINGSDAGBOK</span>
+            <span class="btn-sub-text">Schemaläggning</span>
+        </button>
 
-            <div class="menu-grid">
-                <button id="calendar-mode" class="mode-btn glass-border">
-                    <span class="mode-icon">📅</span>
-                    <div class="mode-text-wrapper">
-                        <span class="mode-title">Kalender</span>
-                        <span class="mode-desc">Planera & logga</span>
-                    </div>
-                </button>
-                <button id="view-exercises-btn" class="mode-btn glass-border">
-                    <span class="mode-icon">💪</span>
-                    <div class="mode-text-wrapper">
-                        <span class="mode-title">Övningar</span>
-                        <span class="mode-desc">Se din bank</span>
-                    </div>
-                </button>
-                <button id="view-programs-btn" class="mode-btn glass-border">
-                    <span class="mode-icon">📋</span>
-                    <div class="mode-text-wrapper">
-                        <span class="mode-title">Träningspass</span>
-                        <span class="mode-desc">Skapa & redigera</span>
-                    </div>
-                </button>
-                <button id="stats-mode" class="mode-btn glass-border">
-                    <span class="mode-icon">📊</span>
-                    <div class="mode-text-wrapper">
-                        <span class="mode-title">Statistik</span>
-                        <span class="mode-desc">Följ din utveckling</span>
-                    </div>
-                </button>
-            </div>
-        </section>
+        <button id="stats-mode" class="mode-btn glass">
+            <span class="btn-icon">📊</span>
+            <span class="btn-main-text">STATISTIK</span>
+            <span class="btn-sub-text">Framsteg</span>
+        </button>
+    </div> 
+</div>
 
-        <!-- CALENDAR VIEW -->
-        <section id="calendar-view" class="view hidden">
-            <div class="view-header">
-                <button class="icon-btn" onclick="renderHome()">« Meny</button>
-                <h2 id="calendar-month-title" onclick="openMonthPicker()" class="clickable-title">Maj 2026 ▾</h2>
-                <div class="nav-arrows">
-                    <button onclick="changeMonth(-1)">◀</button>
-                    <button onclick="changeMonth(1)">▶</button>
-                </div>
-            </div>
+        <div id="calendar-view" class="view hidden">
+            <h2 class="section-title modern-header">Träningsschema</h2>
+            <div id="calendar-info-box"></div>
             
-            <div class="calendar-container card glass">
-                <div class="weekdays-grid">
-                    <div>Mån</div><div>Tis</div><div>Ons</div><div>Tors</div><div>Fre</div><div>Lör</div><div>Sön</div>
+            <div class="calendar-nav">
+                <button onclick="changeMonth(-1)" class="nav-arrow">  ❮  </button>
+                <h2 id="month-label" onclick="openMonthPicker()" style="cursor:pointer;"></h2>
+                <button onclick="changeMonth(1)" class="nav-arrow">  ❯  </button>
+            </div>
+            <div class="card calendar-card glass-light">
+                <div class="calendar-weekdays">
+                    <div>Mån</div><div>Tis</div><div>Ons</div><div>Tor</div><div>Fre</div><div>Lör</div><div>Sön</div>
                 </div>
-                <div id="calendar-days" class="days-grid"></div>
+                <div class="calendar-grid" id="calendar-grid"></div>
+                <div class="legend">
+                    <div class="legend-item"><div class="legend-color planned"></div> Planerat</div>
+                    <div class="legend-item"><div class="legend-color ongoing"></div> Pågående</div>
+                    <div class="legend-item"><div class="legend-color completed"></div> Genomfört</div>
+                </div>
             </div>
+        </div>
+
+        <div id="exercises-view" class="view hidden">
+            <h2 class="section-title modern-header">Övningar</h2>
             
-            <div class="calendar-legend card glass">
-                <div class="legend-item"><span class="dot green"></span>Klar</div>
-                <div class="legend-item"><span class="dot primary"></span>Planerad</div>
-                <div class="legend-item"><span class="dot yellow"></span>Ändrad</div>
-                <div class="legend-item"><span class="dot gray"></span>Vila</div>
+            <div id="category-menu" class="category-grid">
+                <button class="cat-btn glass" data-cat="Ben" onclick="filterExercises('Ben')"><span class="cat-icon"> 🦵 </span> Ben</button>
+                <button class="cat-btn glass" data-cat="Bröst" onclick="filterExercises('Bröst')"><span class="cat-icon"> 🏋️ </span> Bröst</button>
+                <button class="cat-btn glass" data-cat="Rygg" onclick="filterExercises('Rygg')"><span class="cat-icon"> 🪵 </span> Rygg</button>
+                <button class="cat-btn glass" data-cat="Axlar" onclick="filterExercises('Axlar')"><span class="cat-icon"> 👐 </span> Axlar</button>
+                <button class="cat-btn glass" data-cat="Armar" onclick="filterExercises('Armar')"><span class="cat-icon"> 💪 </span> Armar</button>
+                <button class="cat-btn glass" data-cat="Bål" onclick="filterExercises('Bål')"><span class="cat-icon"> 🧘 </span> Bål</button>
             </div>
-        </section>
 
-        <!-- WORKOUT VIEW -->
-        <section id="workout-view" class="view hidden">
-            <div class="view-header">
-                <h2 id="active-title" class="modern-header">Pass</h2>
-                <div id="workout-timer" class="timer-badge">00:00:00</div>
+            <div style="display: flex; align-items: center; gap: 15px; margin: 35px 0 20px 0; opacity: 0.8;">
+                <div style="flex-grow: 1; height: 1px; background: linear-gradient(to right, transparent, var(--primary), transparent);"></div>
+                <div style="width: 8px; height: 8px; background: var(--primary); transform: rotate(45deg); border-radius: 2px; box-shadow: 0 0 10px var(--primary);"></div>
+                <div style="flex-grow: 1; height: 1px; background: linear-gradient(to left, transparent, var(--primary), transparent);"></div>
             </div>
-            <div id="exercise-list" class="exercise-cards-container"></div>
-            <div class="workout-footer card glass">
-                <button id="pause-workout-btn" class="mode-btn glass-border">Spara utkast 💾</button>
-                <button id="save-workout-btn" class="mode-btn green glow-green">Slutför pass 🎉</button>
-            </div>
-        </section>
 
-        <!-- EXERCISES BANK VIEW -->
-        <section id="exercises-view" class="view hidden">
-            <div class="view-header">
-                <button class="icon-btn" onclick="renderHome()">« Meny</button>
-                <h2 class="modern-header">Övningsbank</h2>
-                <span></span>
+            <div style="display: flex; justify-content: flex-end; margin-bottom: 15px; padding-right: 17px;">
+                <button class="add-inline-btn" onclick="openCreateExerciseModal()" 
+                        style="position: static; transform: none; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; font-size: 17px; padding: 0; line-height: 1;">
+                    +
+                </button>
             </div>
-            <div id="exercise-bank-categories" class="category-scroll"></div>
-            <div id="exercise-bank-list" class="bank-list-container"></div>
-        </section>
 
-        <!-- PROGRAMS VIEW -->
-        <section id="programs-view" class="view hidden">
-            <div class="view-header">
-                <button class="icon-btn" onclick="renderHome()">« Meny</button>
-                <h2 class="modern-header">Dina Pass</h2>
-                <button id="add-custom-pass-btn" class="icon-btn primary-text">+ Nytt</button>
-            </div>
-            <div id="pass-selector-list" class="program-grid"></div>
-            <div id="program-details-area" class="card glass hidden" style="margin-top:20px; padding:20px;">
-                <div id="program-exercise-list"></div>
-            </div>
-        </section>
+            <div id="exercise-results" class="exercise-bank-list"></div>
+        </div>
 
-        <!-- STATS VIEW -->
-        <section id="stats-view" class="view hidden">
-            <div class="view-header">
-                <button class="icon-btn" onclick="renderHome()">« Meny</button>
-                <h2 class="modern-header">Statistik</h2>
-                <span></span>
+        <div id="programs-view" class="view hidden">
+            <h2 class="section-title modern-header">Träningsprogram</h2>
+            <div id="pass-selector-list" class="program-modern-grid"></div>
+            <div id="program-details-area" class="hidden">
+                <div class="separator" style="margin: 30px 0;"></div>
+                <div id="program-exercise-list" class="card glass-modern"></div>
             </div>
-            <div class="card glass" style="padding:20px; text-align:center;">
-                <p class="subtitle" style="margin-bottom:20px;">Träningspass per månad</p>
-                <div id="chart-container" class="chart-flex"></div>
-            </div>
-        </section>
-    </main>
+            <button id="add-custom-pass-btn" class="mode-btn glass-border" style="margin-top:20px;">+ Skapa Nytt Pass</button>
+        </div>
 
-    <!-- GLOBAL MODAL BACKDROP -->
-    <div id="global-modal" class="modal-backdrop hidden" onclick="closeModal()">
-        <div class="modal-content glass" onclick="event.stopPropagation()">
-            <button class="modal-close" onclick="closeModal()">×</button>
-            <div id="modal-body"></div>
+        <div id="stats-view" class="view hidden">
+            <h2 class="section-title modern-header">Statistik</h2>
+            <div class="card glass">
+                <h3 style="text-align:center; margin-bottom:20px;">Pass per månad</h3>
+                <div id="chart-container" class="chart-wrapper"></div>
+            </div>
+        </div>
+
+        <div id="workout-view" class="view hidden">
+            <h2 id="active-title" class="section-title modern-header" style="margin-bottom:10px;"></h2>
+            <div class="card glass" style="margin-bottom: 20px; padding: 15px;">
+                <div id="workout-timer" class="timer-display">00:00:00</div>
+                <div style="display: flex; gap: 10px;">
+                    <button id="timer-toggle-btn" class="mode-btn glass-border" style="margin-bottom:0; padding:10px;">Pausa ⏸️</button>
+                </div>
+            </div>
+            <div id="exercise-list"></div>
+            <div class="workout-footer">
+                <button id="pause-workout-btn" class="mode-btn glass-border">Spara utkast</button>
+                <button id="save-workout-btn" class="mode-btn green">Avsluta pass</button>
+            </div>
         </div>
     </div>
 
-    <!-- BOTTOM GLOBAL NAV BAR -->
-    <nav class="bottom-nav-bar">
-        <button id="global-home" class="nav-item">
-            <span class="nav-icon">🏠</span>
-            <span class="nav-label">Hem</span>
-        </button>
-    </nav>
+    <div id="workout-modal" class="modal hidden">
+        <div class="modal-content">
+            <div id="modal-body"></div>
+            <button class="mode-btn glass-border" onclick="closeModal()" style="margin-top: 20px;">Stäng</button>
+        </div>
+    </div>
 
-    <script src="app.js"></script>
+    <script src="app.js?v=1.0.1"></script>
 </body>
 </html>
