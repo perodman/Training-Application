@@ -402,3 +402,29 @@ select.log-input { font-size: 16px !important; text-align-last: center; appearan
     font-size: 9px;
     margin-top: 2px;
 }
+
+/* --- ISOLERAD EFFEKT FÖR SMÅ KNAPPAR PÅ STARTSIDAN --- */
+#home-view .menu-grid .mode-btn:not(.main-action) {
+    background: rgba(255, 255, 255, 0.03); /* Mycket subtil bas */
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    position: relative;
+    overflow: hidden;
+}
+
+/* En ljusare kant i överkant för att skapa en "kant-reflektion" */
+#home-view .menu-grid .mode-btn:not(.main-action)::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+}
+
+/* Effekt när man hovrar eller trycker (Active fungerar bäst på mobil) */
+#home-view .menu-grid .mode-btn:not(.main-action):active {
+    background: rgba(255, 255, 255, 0.07);
+    border-color: rgba(255, 255, 255, 0.3);
+    transform: scale(0.96);
+}
