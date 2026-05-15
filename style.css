@@ -30,13 +30,12 @@ body {
 
 .app-container { 
     width: 100%;
-    max-width: 600px; 
+    max-width: 500px; /* Ändrade tillbaka till 500px så det inte känns för brett på mobilen */
     margin: 0 auto; 
-    padding: 60px 20px 20px; 
+    padding: 60px 20px 20px; /* 20px padding på sidorna skapar avståndet till kanten */
     position: relative; 
     z-index: 1; 
-    /* --- HÄR ÄR TILLÄGGET SOM FIXAR BILDEN --- */
-    box-sizing: border-box;
+    box-sizing: border-box; 
 }
 
 .hidden { display: none !important; }
@@ -127,9 +126,12 @@ body {
 /* --- MENY-GRID & SPECIFIK CENTRERING --- */
 .menu-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 14px;
+    grid-template-columns: 1fr 1fr; /* Skapar de två kolumnerna */
+    gap: 15px;
     width: 100%;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
 .menu-grid .mode-btn {
@@ -187,7 +189,8 @@ body {
 
 /* Startknappen */
 .main-action {
-    grid-column: span 2;
+    grid-column: span 2; /* Gör att den täcker båda kolumnerna */
+    width: 100% !important;
     background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%) !important;
     color: #0f172a !important;
     border: none !important;
@@ -195,9 +198,7 @@ body {
     justify-content: center !important;
     box-shadow: 0 15px 35px rgba(34, 211, 238, 0.25) !important;
     margin-bottom: 15px;
-    /* --- HÄR ÄR TILLÄGGEN SOM FIXAR BILDEN --- */
-    width: 100%;
-    box-sizing: border-box;
+    box-sizing: border-box; /* Hindrar att den kapas */
     font-weight: 800;
 }
 
