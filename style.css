@@ -415,33 +415,37 @@ select.log-input { font-size: 16px !important; text-align-last: center; appearan
     margin-top: 2px;
 }
 
-/* --- ENBART KNAPPAR PÅ FRAMSIDAN --- */
 
-.menu-grid .mode-btn {
-    /* Tvingar glaskänslan enbart här */
-    background: rgba(255, 255, 255, 0.06) !important;
-    backdrop-filter: blur(10px);
+/* --- FIX FÖR GLASS-KNAPPARNA PÅ FRAMSIDAN --- */
+
+/* Detta påverkar Övningar, Program, Dagbok och Statistik */
+.menu-grid .mode-btn.glass {
+    background: rgba(255, 255, 255, 0.06) !important; /* Halvgenomskinlig */
+    backdrop-filter: blur(10px); /* Frostat glas-effekt */
     
-    /* Ljusreflektionen på kanten */
-    border: 1px solid rgba(255, 255, 255, 0.12) !important;
-    border-top: 1px solid rgba(255, 255, 255, 0.3) !important;
+    /* Ljusreflektionen på överkanten */
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.3) !important; 
     
-    /* Det subtila skenet */
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4), inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+    /* Skenet bakom knappen */
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4), inset 0 0 0 1px rgba(255, 255, 255, 0.05) !important;
     
-    /* Fjädrande animation */
     transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
 }
 
-.menu-grid .mode-btn:active {
-    transform: scale(0.94) !important;
-    background: rgba(255, 255, 255, 0.15) !important;
-    border-color: rgba(34, 211, 238, 0.5) !important;
-    box-shadow: 0 0 25px rgba(34, 211, 238, 0.2) !important;
+/* Vad som händer när du trycker på dem */
+.menu-grid .mode-btn.glass:active {
+    transform: scale(0.95) !important;
+    background: rgba(255, 255, 255, 0.12) !important;
+    border-color: rgba(34, 211, 238, 0.4) !important; /* Lyser upp lite blått */
 }
 
-/* Undantag: Se till att färgade knappar (som main-action) inte blir bleka */
-.menu-grid .main-action {
-    background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%) !important;
-    border-top: none !important;
+/* Snyggare ikoner och text för glass-knapparna */
+.menu-grid .mode-btn.glass .btn-icon {
+    filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.2));
+}
+
+.menu-grid .mode-btn.glass .btn-sub-text {
+    color: var(--primary); /* Gör undertexten (t.ex. "Bibliotek") ljusblå */
+    opacity: 1;
 }
