@@ -450,15 +450,29 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
             w.exercises.forEach(ex => {
                 html += `
                 <div style="font-size: 13px;">
-                    <span style="color: var(--text); font-weight: 600; display: block; margin-bottom: 4px;">${ex.name}</span>
-                    <div style="display: flex; flex-wrap: wrap; gap: 5px;">`;
+                    <span style="color: var(--text); font-weight: 600; display: block; margin-bottom: 6px;">${ex.name}</span>
+                    <div style="display: flex; flex-direction: column; gap: 6px;">`;
                 
                 if(ex.sets_data) {
                     ex.sets_data.forEach((s, sIdx) => {
-                        html += `<span style="background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.2); color: #60a5fa; font-size: 11px; padding: 3px 8px; border-radius: 6px; font-weight: 700;">S${sIdx+1}: ${s.weight}kg × ${s.reps}</span>`;
+                        // JUSTERING: || 0 ser till att det står 0 om inget är registrerat
+                        const wVal = s.weight || 0;
+                        const rVal = s.reps || 0;
+                        html += `
+                        <div style="background: rgba(59, 130, 246, 0.08); border: 1px solid rgba(59, 130, 246, 0.15); color: #60a5fa; font-size: 12px; padding: 5px 10px; border-radius: 8px; font-weight: 600; width: fit-content;">
+                            <span style="opacity: 0.7; margin-right: 5px;">SET ${sIdx+1}</span> 
+                            <span style="color: #fff;">${wVal} kg</span> 
+                            <span style="margin: 0 4px; opacity: 0.5;">×</span> 
+                            <span style="color: #fff;">${rVal} reps</span>
+                        </div>`;
                     });
                 } else {
-                    html += `<span style="background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.2); color: #60a5fa; font-size: 11px; padding: 3px 8px; border-radius: 6px; font-weight: 700;">${ex.sets} set × ${ex.weight}kg × ${ex.reps}r</span>`;
+                    const wVal = ex.weight || 0;
+                    const rVal = ex.reps || 0;
+                    html += `
+                    <div style="background: rgba(59, 130, 246, 0.08); border: 1px solid rgba(59, 130, 246, 0.15); color: #60a5fa; font-size: 12px; padding: 5px 10px; border-radius: 8px; font-weight: 600; width: fit-content;">
+                        ${ex.sets} set × ${wVal} kg × ${rVal} reps
+                    </div>`;
                 }
                 html += `</div></div>`;
             });
