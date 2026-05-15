@@ -338,3 +338,89 @@ select.log-input { font-size: 16px !important; text-align-last: center; appearan
     font-weight: 700;
     color: var(--text);
 }
+
+/* ============================================================
+   MODERN FRONT PAGE OVERRIDE 
+   Detta skriver över enbart framsidans design
+   ============================================================ */
+
+/* 1. Fixa Hero-sektionen (Rubriken) */
+.hero-section {
+    padding: 40px 20px 20px;
+    background: radial-gradient(circle at top left, rgba(34, 211, 238, 0.15), transparent);
+    border-radius: 0 0 40px 40px;
+    text-align: center;
+}
+
+/* 2. Fixa det nya Status-kortet */
+#home-status-card {
+    margin-bottom: 25px;
+}
+
+.modern-status-card {
+    background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%);
+    border: 1px solid var(--glass-border);
+    border-radius: 24px;
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    backdrop-filter: blur(10px);
+}
+
+/* 3. Gör om knapp-gridet till 2 kolumner */
+.menu-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr) !important; /* Tvingar 2 kolumner */
+    gap: 12px !important;
+    padding: 0 20px;
+}
+
+/* 4. Tvinga Start-knappen att ta hela bredden */
+#start-new-btn.main-action {
+    grid-column: span 2 !important;
+    padding: 22px 18px !important;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%) !important;
+}
+
+/* 5. Styla de nya delarna inuti knapparna (ikoner & text) */
+.menu-grid .mode-btn {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    text-align: left !important;
+    height: auto !important;
+    padding: 15px 18px !important;
+    margin-bottom: 0 !important;
+}
+
+.btn-icon {
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    margin-right: 12px;
+    flex-shrink: 0;
+}
+
+.btn-text-wrapper {
+    display: flex;
+    flex-direction: column;
+}
+
+.btn-sub-text {
+    font-size: 9px;
+    text-transform: uppercase;
+    color: var(--text-light);
+    font-weight: 700;
+}
+
+.btn-main-text {
+    font-size: 14px;
+    font-weight: 800;
+}
+    
