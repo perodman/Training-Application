@@ -103,11 +103,10 @@ body {
     padding: 24px 10px; 
     border-radius: 22px; 
     
-    /* En ljusare kantlinje (0.2 istället för 0.1) skapar "glass"-känslan */
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    border-top: 1px solid rgba(255, 255, 255, 0.3); /* Extra ljus kant upptill */
-    
+    /* Vi sätter en neutral bas här */
+    border: 1px solid rgba(255, 255, 255, 0.1);
     background: var(--card);
+    
     color: white; 
     font-weight: 700; 
     cursor: pointer; 
@@ -115,12 +114,9 @@ body {
     flex-direction: column;
     align-items: center; 
     justify-content: center; 
-    
-    /* Mjuk övergång för både skugga och storlek */
     transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); 
-
-    /* Ett mycket svagt vitt sken bakom knappen */
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.05);
+    position: relative;
+    overflow: hidden;
 }
 
 .mode-btn:active {
@@ -239,7 +235,6 @@ body {
 /* --- PROGRAM & KATEGORIER --- */
 .section-title { text-align: center; font-weight: 800; margin-bottom: 25px; font-size: 1.4rem; width: 100%; }
 .modern-header { font-family: 'Montserrat', sans-serif; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; background: linear-gradient(to right, #fff, var(--primary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 1.6rem; margin-top: 10px; }
-.glass { background: var(--card); backdrop-filter: blur(12px); border: 1px solid var(--glass-border); border-radius: 24px; }
 .glass-light { background: var(--card-light); backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.2); border-radius: 24px; }
 .card { padding: 20px; margin-bottom: 15px; }
 .program-modern-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
@@ -416,36 +411,33 @@ select.log-input { font-size: 16px !important; text-align-last: center; appearan
 }
 
 
-/* --- FIX FÖR GLASS-KNAPPARNA PÅ FRAMSIDAN --- */
+/* --- SPECIALDESIGN FÖR STARTSIDAN --- */
 
-/* Detta påverkar Övningar, Program, Dagbok och Statistik */
+/* Specifik regel för glasknapparna i menyn */
 .menu-grid .mode-btn.glass {
-    background: rgba(255, 255, 255, 0.06) !important; /* Halvgenomskinlig */
-    backdrop-filter: blur(10px); /* Frostat glas-effekt */
+    background: rgba(255, 255, 255, 0.05) !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px);
     
-    /* Ljusreflektionen på överkanten */
+    /* Den ljusa kanten i toppen */
     border: 1px solid rgba(255, 255, 255, 0.1) !important;
-    border-top: 1px solid rgba(255, 255, 255, 0.3) !important; 
+    border-top: 1px solid rgba(255, 255, 255, 0.35) !important;
     
-    /* Skenet bakom knappen */
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4), inset 0 0 0 1px rgba(255, 255, 255, 0.05) !important;
-    
-    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+    /* Skugga och inre lyster */
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4), 
+                inset 0 0 0 1px rgba(255, 255, 255, 0.03) !important;
 }
 
-/* Vad som händer när du trycker på dem */
-.menu-grid .mode-btn.glass:active {
-    transform: scale(0.95) !important;
-    background: rgba(255, 255, 255, 0.12) !important;
-    border-color: rgba(34, 211, 238, 0.4) !important; /* Lyser upp lite blått */
-}
-
-/* Snyggare ikoner och text för glass-knapparna */
-.menu-grid .mode-btn.glass .btn-icon {
-    filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.2));
-}
-
+/* Fixar textfärgen på undertexten så den poppar */
 .menu-grid .mode-btn.glass .btn-sub-text {
-    color: var(--primary); /* Gör undertexten (t.ex. "Bibliotek") ljusblå */
-    opacity: 1;
+    color: var(--primary) !important;
+    opacity: 1 !important;
+    text-shadow: 0 0 10px rgba(34, 211, 238, 0.3);
+}
+
+/* Säkerställer att Start-knappen inte påverkas av glasmekaniken */
+.menu-grid .mode-btn.main-action {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%) !important;
+    border: none !important;
+    box-shadow: 0 10px 25px rgba(34, 211, 238, 0.3) !important;
 }
