@@ -74,12 +74,49 @@ body {
     text-decoration: none !important;
 }
 
+/* Gör om meny-knapparna till informativa kort */
 .menu-grid .mode-btn {
-    font-family: 'Inter', sans-serif;
-    font-weight: 800;
-    letter-spacing: -0.2px;
-    text-transform: none;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+    display: flex;
+    align-items: center;
+    justify-content: flex-start; /* Texten till vänster istället för centrerat */
+    padding: 16px 20px;
+    height: auto;
+    text-align: left;
+    background: var(--card); /* Glas-effekt */
+    border: 1px solid var(--glass-border);
+}
+
+/* Styla ikonen inuti knappen */
+.menu-grid .mode-btn .btn-icon {
+    width: 40px;
+    height: 40px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    margin-right: 15px;
+    flex-shrink: 0;
+}
+
+/* Styla text-behållaren */
+.btn-text-wrapper {
+    display: flex;
+    flex-direction: column;
+}
+
+.btn-main-text {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text);
+}
+
+.btn-sub-text {
+    font-size: 10px;
+    color: var(--text-light);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 .main-action {
