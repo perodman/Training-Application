@@ -29,20 +29,20 @@ body {
 
 .app-container { 
     max-width: 500px; 
-    margin: 0 auto; /* Centrerar hela appen på skärmen */
+    margin: 0 auto; 
     padding: 60px 20px 20px 20px; 
     display: flex;
     flex-direction: column;
-    align-items: center; /* Centrerar allt innehåll horisontellt */
+    align-items: center; 
 }
 
 .hidden { display: none !important; }
 
-/* --- NY DESIGN FÖR RUBRIK & LOGGA --- */
+/* --- HEADER & HERO --- */
 .hero-section {
     text-align: center;
     padding-bottom: 10px;
-    margin-bottom: 10px; /* Skapar luft mot separatorn */
+    margin-bottom: 10px; 
 }
 
 .main-title { 
@@ -66,16 +66,15 @@ body {
     text-transform: uppercase; 
     font-size: 10px; 
     letter-spacing: 6px; 
-    margin-top: 15px; /* Ökad marginal för mer luft */
+    margin-top: 15px; 
     opacity: 0.9;
 }
 
-/* Den designfulla linjen (Separator) */
 .separator { 
     height: 1px; 
     background: linear-gradient(90deg, transparent, var(--glass-border), var(--primary), var(--glass-border), transparent); 
     width: 100%; 
-    margin: 30px 0 40px 0; /* Ökad marginal för att minska kompaktheten */
+    margin: 30px 0 40px 0; 
     opacity: 0.6;
 }
 
@@ -88,78 +87,80 @@ body {
     to { opacity: 1; transform: translateY(0); }
 }
 
+/* --- ALLMÄNNA KNAPPAR (LIGGER HÖGT UPP SÅ DE KAN SKRIVAS ÖVER) --- */
+.mode-btn { 
+    width: 100%; 
+    padding: 20px; 
+    border-radius: 20px; 
+    border: none; 
+    color: white; 
+    font-weight: 700; 
+    cursor: pointer; 
+    margin-bottom: 12px; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    gap: 10px; 
+    font-size: 1.05rem; 
+    font-family: 'Inter', sans-serif; 
+    transition: all 0.2s ease; 
+}
+
 .mode-btn:active, .prog-card:active, .cat-btn:active, .circle-ctrl:active {
     transform: scale(0.96);
     filter: brightness(1.1);
     box-shadow: 0 2px 8px rgba(0,0,0,0.2) !important;
 }
 
-.timer-display {
-    font-family: 'Montserrat', sans-serif;
-    font-size: 2rem;
-    font-weight: 900;
-    text-align: center;
-    margin: 10px 0;
-    color: var(--primary);
-    text-shadow: 0 0 15px rgba(34, 211, 238, 0.3);
-}
+.blue { background: linear-gradient(135deg, #22d3ee 0%, #0ea5e9 100%); color: #0f172a; box-shadow: 0 6px 15px rgba(14, 165, 233, 0.3); }
+.green { background: linear-gradient(135deg, #10b981 0%, #059669 100%); box-shadow: 0 6px 15px rgba(16, 185, 129, 0.3); }
+.orange { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); box-shadow: 0 6px 15px rgba(245, 158, 11, 0.3); }
 
-#month-label {
-    font-size: 1.1rem;
-    font-weight: 700;
-    letter-spacing: 0.5px;
-    color: var(--text);
-    background: rgba(255,255,255,0.05);
-    padding: 8px 16px;
-    border-radius: 12px;
-    border: 1px solid var(--glass-border);
-    text-decoration: none !important;
-}
+.glass-border { background: transparent; border: 2px solid var(--glass-border); color: white; }
+.btn-disabled { opacity: 0.8; cursor: not-allowed; pointer-events: none; background: rgba(255,255,255,0.05) !important; color: rgba(255,255,255,0.3) !important; }
 
-/* --- MENY-GRIND MED SUB-LABELS --- */
-.menu-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 14px; /* Lite mer gap för luftighet */
-    width: 100%;
-}
-
-/* Centrerar knapparna i gridden */
+/* --- MENY-GRID & SPECIFIK CENTRERING --- */
 .menu-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 14px;
     width: 100%;
-    justify-content: center;
 }
 
-/* Fixa texten inuti knapparna så de inte ser "vänstertunga" ut */
 .menu-grid .mode-btn {
-    justify-content: center; /* Ändrat från flex-start till center */
-    text-align: center;      /* Centrerar texten */
-}
-
-.btn-text-wrapper {
-    align-items: center;    /* Centrerar raderna internt */
+    display: flex;
+    flex-direction: column; 
+    align-items: center;
+    justify-content: center;
+    padding: 20px 10px;
+    height: auto;
+    width: 100%;
+    text-align: center;
+    background: linear-gradient(145deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.03) 100%);
+    border: 1px solid var(--glass-border);
+    border-radius: 22px;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+    margin-bottom: 0; /* Förhindrar dubbelmarginal i grid */
 }
 
 .btn-icon {
-    width: 40px;
-    height: 40px;
+    width: 44px;
+    height: 44px;
     background: rgba(255,255,255,0.05);
     border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 18px;
-    margin-right: 12px;
-    flex-shrink: 0;
+    font-size: 20px;
+    margin-right: 0 !important; 
+    margin-bottom: 8px;
 }
 
 .btn-text-wrapper {
     display: flex;
     flex-direction: column;
-    line-height: 1.2;
+    align-items: center; 
+    line-height: 1.3;
 }
 
 .btn-main-text {
@@ -187,35 +188,34 @@ body {
     padding: 26px 20px !important;
     justify-content: center !important;
     box-shadow: 0 15px 35px rgba(34, 211, 238, 0.25) !important;
-    margin-bottom: 15px; /* Skapar luft mot de 4 korten under */
+    margin-bottom: 15px;
 }
 
 .main-action .btn-main-text { font-size: 18px; color: #0f172a; font-weight: 800; letter-spacing: -0.5px; }
 .main-action .btn-sub-text { color: rgba(15, 23, 42, 0.6); }
 
-/* --- FORTSÄTTNING URSPRUNGALIG KOD (BEVARAD) --- */
-.section-title { text-align: center; font-weight: 800; margin-bottom: 25px; font-size: 1.4rem; width: 100%; }
-.modern-header { font-family: 'Montserrat', sans-serif; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; background: linear-gradient(to right, #fff, var(--primary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 1.6rem; margin-top: 10px; }
-.glass { background: var(--card); backdrop-filter: blur(12px); border: 1px solid var(--glass-border); border-radius: 24px; }
-.glass-light { background: var(--card-light); backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.2); border-radius: 24px; }
-.card { padding: 20px; margin-bottom: 15px; }
-.program-modern-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-.prog-card { background: linear-gradient(135deg, rgba(34, 211, 238, 0.1) 0%, rgba(129, 140, 248, 0.1) 100%); border: 1px solid var(--glass-border); border-radius: 20px; padding: 20px; text-align: center; cursor: pointer; position: relative; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-.prog-card.active { border-color: var(--primary); background: linear-gradient(135deg, rgba(34, 211, 238, 0.25) 0%, rgba(129, 140, 248, 0.25) 100%); box-shadow: 0 10px 25px rgba(34, 211, 238, 0.2); }
-.prog-card h4 { margin: 10px 0 0; font-size: 1.1rem; font-weight: 800; }
-.glass-modern { background: rgba(30, 41, 59, 0.7); border: 1px solid var(--glass-border); border-radius: 24px; box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1); backdrop-filter: blur(5px); }
+/* --- KALENDER & DISPLAY --- */
+.timer-display {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 2rem;
+    font-weight: 900;
+    text-align: center;
+    margin: 10px 0;
+    color: var(--primary);
+    text-shadow: 0 0 15px rgba(34, 211, 238, 0.3);
+}
 
-/* --- KNAPPAR (ALLMÄNNA) --- */
-.mode-btn { width: 100%; padding: 20px; border-radius: 20px; border: none; color: white; font-weight: 700; cursor: pointer; margin-bottom: 12px; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 1.05rem; font-family: 'Inter', sans-serif; transition: all 0.2s ease; }
+#month-label {
+    font-size: 1.1rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    color: var(--text);
+    background: rgba(255,255,255,0.05);
+    padding: 8px 16px;
+    border-radius: 12px;
+    border: 1px solid var(--glass-border);
+}
 
-.blue { background: linear-gradient(135deg, #22d3ee 0%, #0ea5e9 100%); color: #0f172a; box-shadow: 0 6px 15px rgba(14, 165, 233, 0.3); }
-.green { background: linear-gradient(135deg, #10b981 0%, #059669 100%); box-shadow: 0 6px 15px rgba(16, 185, 129, 0.3); }
-.orange { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); box-shadow: 0 6px 15px rgba(245, 158, 11, 0.3); }
-
-.glass-border { background: transparent; border: 2px solid var(--glass-border); color: white; }
-.btn-disabled { opacity: 0.8; cursor: not-allowed; pointer-events: none; background: rgba(255,255,255,0.05) !important; color: rgba(255,255,255,0.3) !important; }
-
-/* --- KALENDER --- */
 .calendar-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
 .nav-arrow { background: var(--card); border: 1px solid var(--glass-border); color: white; padding: 10px 15px; border-radius: 12px; cursor: pointer; }
 .calendar-weekdays { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; font-size: 11px; margin-bottom: 10px; color: var(--text-light); }
@@ -253,11 +253,24 @@ body {
 .legend-color.ongoing { border: 2px solid var(--warning); }
 .legend-color.completed { background: var(--success); }
 
-/* --- KATEGORIER & KONTROLLER --- */
+/* --- PROGRAM & KATEGORIER --- */
+.section-title { text-align: center; font-weight: 800; margin-bottom: 25px; font-size: 1.4rem; width: 100%; }
+.modern-header { font-family: 'Montserrat', sans-serif; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; background: linear-gradient(to right, #fff, var(--primary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 1.6rem; margin-top: 10px; }
+.glass { background: var(--card); backdrop-filter: blur(12px); border: 1px solid var(--glass-border); border-radius: 24px; }
+.glass-light { background: var(--card-light); backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.2); border-radius: 24px; }
+.card { padding: 20px; margin-bottom: 15px; }
+.program-modern-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+
+.prog-card { background: linear-gradient(135deg, rgba(34, 211, 238, 0.1) 0%, rgba(129, 140, 248, 0.1) 100%); border: 1px solid var(--glass-border); border-radius: 20px; padding: 20px; text-align: center; cursor: pointer; position: relative; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+.prog-card.active { border-color: var(--primary); background: linear-gradient(135deg, rgba(34, 211, 238, 0.25) 0%, rgba(129, 140, 248, 0.25) 100%); box-shadow: 0 10px 25px rgba(34, 211, 238, 0.2); }
+.prog-card h4 { margin: 10px 0 0; font-size: 1.1rem; font-weight: 800; }
+.glass-modern { background: rgba(30, 41, 59, 0.7); border: 1px solid var(--glass-border); border-radius: 24px; box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1); backdrop-filter: blur(5px); }
+
 .category-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
 .cat-btn { display: flex; flex-direction: column; align-items: center; padding: 15px 5px; border-radius: 20px; font-size: 14px; font-weight: 700; color: var(--text-light); cursor: pointer; border: 1px solid var(--glass-border); background: var(--card); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
 .cat-btn .cat-icon { font-size: 24px; margin-bottom: 5px; }
 .cat-btn.active { background: rgba(34, 211, 238, 0.15); border-color: var(--primary); color: var(--primary); box-shadow: 0 4px 15px rgba(34, 211, 238, 0.1); }
+
 .circle-ctrl { background: var(--card); border: 1px solid var(--glass-border); backdrop-filter: blur(10px); width: 45px; height: 45px; border-radius: 15px; display: flex; align-items: center; justify-content: center; position: fixed; top: 20px; right: 20px; z-index: 1000; cursor: pointer; color: white; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
 
 /* --- MODAL --- */
@@ -267,15 +280,15 @@ body {
 .log-input { width: 100%; padding: 12px; border-radius: 12px; border: 1px solid var(--glass-border); background: rgba(0,0,0,0.2); color: white; text-align: center; font-weight: 700; margin: 5px 0 15px; font-size: 16px !important; }
 select.log-input { font-size: 16px !important; text-align-last: center; appearance: none; }
 
-/* --- ÖVRIGT --- */
+/* --- ÖVRIGT & SPECIALREGLER --- */
 .edit-item-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; background: linear-gradient(90deg, rgba(255,255,255,0.03), rgba(255,255,255,0.07)); border: 1px solid var(--glass-border); padding: 12px; border-radius: 16px; }
 .add-inline-btn { position: absolute; right: 0; background: var(--primary); border: none; color: #333; width: 32px; height: 32px; border-radius: 10px; font-weight: 900; cursor: pointer; font-size: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
 .reorder-btn { background: rgba(34, 211, 238, 0.1); border: 1px solid rgba(34, 211, 238, 0.2); color: var(--primary); border-radius: 8px; width: 32px; height: 32px; cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center; }
 .reorder-btn:active { background: var(--primary); color: #000; }
+
 .chart-wrapper { display: flex; align-items: flex-end; gap: 10px; height: 150px; padding-top: 20px; }
 .chart-bar { flex: 1; background: var(--primary); border-radius: 6px 6px 0 0; position: relative; }
 
-/* --- DINA SPECIAL-REGLER --- */
 .save-draft-btn {
     background: linear-gradient(135deg, #64748b 0%, #475569 100%) !important;
     border: 1px solid rgba(255,255,255,0.1);
@@ -356,7 +369,6 @@ select.log-input { font-size: 16px !important; text-align-last: center; appearan
     filter: grayscale(1);
 }
 
-/* Nytt Status-kort för framsidan */
 .modern-status-card {
     background: var(--card);
     border: 1px solid var(--glass-border);
