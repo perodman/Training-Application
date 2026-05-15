@@ -17,7 +17,7 @@
 
 body { 
     font-family: 'Inter', sans-serif; 
-    background: #0f172a; 
+    background: radial-gradient(circle at top center, #1e293b 0%, #0f172a 100%);
     color: var(--text); 
     margin: 0; 
     min-height: 100vh; 
@@ -143,13 +143,13 @@ body {
 }
 
 .btn-sub-text {
-    font-size: 8px;
+    font-size: 9px;              
     color: var(--primary);
     text-transform: uppercase;
-    letter-spacing: 1px;
+    letter-spacing: 1.5px;       
     font-weight: 600;
     margin-top: 4px;
-    opacity: 0.8;
+    opacity: 0.5;               
 }
 
 /* Den stora "Starta Träningspass"-knappen */
@@ -162,6 +162,7 @@ body {
     box-shadow: 0 15px 30px rgba(34, 211, 238, 0.2) !important;
     margin-bottom: 10px;
     border: none !important;
+    box-shadow: 0 10px 25px rgba(34, 211, 238, 0.3);
 }
 
 .main-action .btn-main-text { 
