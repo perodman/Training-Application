@@ -74,82 +74,99 @@ body {
     text-decoration: none !important;
 }
 
-/* --- JUSTERING FÖR NYA MENYN (FIXAD) --- */
+/* --- JUSTERING FÖR NYA MENYN (UPPDATERAD DESIGN) --- */
 .menu-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 12px;
-    width: 100%; /* Säkerställer att den tar hela appens bredd */
+    width: 100%;
 }
 
 .menu-grid .mode-btn {
     display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    padding: 16px 18px;
-    height: auto;
-    width: 100%; /* Tvingar knappen att fylla sin kolumn */
+    flex-direction: column; /* Ändrat till kolumn för bättre balans */
+    align-items: flex-start;
+    justify-content: flex-end;
+    padding: 20px;
+    min-height: 110px; /* Ger rutorna en fastare form */
+    width: 100%;
     text-align: left;
-    background: var(--card);
+    background: linear-gradient(145deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.02) 100%);
     border: 1px solid var(--glass-border);
+    border-radius: 24px; /* Lite mjukare hörn */
     font-family: 'Inter', sans-serif;
-    font-weight: 800;
-    letter-spacing: -0.2px;
-    text-transform: none;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.2), inset 0 1px 1px rgba(255,255,255,0.1);
     margin-bottom: 0;
 }
 
 /* Element inuti knapparna */
 .btn-icon {
-    width: 40px;
-    height: 40px;
-    background: rgba(255,255,255,0.05);
-    border-radius: 12px;
+    width: 42px;
+    height: 42px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 14px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 20px;
-    margin-right: 12px;
+    font-size: 22px;
+    margin-bottom: auto; /* Trycker upp ikonen i toppen */
+    margin-right: 0;
     flex-shrink: 0;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
 }
 
 .btn-text-wrapper {
     display: flex;
     flex-direction: column;
     line-height: 1.2;
+    margin-top: 10px;
 }
 
 .btn-main-text {
     font-size: 15px;
-    font-weight: 700;
+    font-weight: 800;
     color: var(--text);
+    letter-spacing: -0.2px;
 }
 
 .btn-sub-text {
     font-size: 9px;
-    color: var(--text-light);
+    color: var(--primary); /* Get lite färg på undertiteln */
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.8px;
+    font-weight: 700;
+    opacity: 0.8;
 }
 
+/* Startknappen som sticker ut ordentligt */
 .main-action {
-    grid-column: span 2; /* Tvingar Start-knappen att ta hela bredden */
+    grid-column: span 2;
+    flex-direction: row !important; /* Behåll rad-layout för den breda knappen */
+    align-items: center !important;
+    justify-content: center !important;
+    min-height: 85px !important;
     background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%) !important;
     color: #0f172a !important;
     border: none !important;
     padding: 22px 18px !important;
+    box-shadow: 0 15px 30px rgba(34, 211, 238, 0.3) !important;
 }
 
-.main-action .btn-main-text { color: #0f172a; }
+.main-action .btn-icon {
+    margin-bottom: 0 !important;
+    margin-right: 15px;
+    background: rgba(15, 23, 42, 0.1);
+}
+
+.main-action .btn-main-text { font-size: 18px; color: #0f172a; }
 .main-action .btn-sub-text { color: rgba(15, 23, 42, 0.6); }
 
 /* --- FORTSÄTTNING URSPRUNGALIG KOD --- */
 .section-title { text-align: center; font-weight: 800; margin-bottom: 25px; font-size: 1.4rem; width: 100%; }
 .modern-header { font-family: 'Montserrat', sans-serif; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; background: linear-gradient(to right, #fff, var(--primary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 1.6rem; margin-top: 10px; }
 .hero-section { padding: 20px 0; }
-.main-title { font-family: 'Montserrat', sans-serif; font-size: 56px; font-weight: 900; text-align: center; margin: 0; letter-spacing: -2px; }
-.subtitle { text-align: center; color: var(--primary); font-weight: 700; text-transform: uppercase; font-size: 12px; letter-spacing: 4px; margin-bottom: 40px; }
+.main-title { font-family: 'Montserrat', sans-serif; font-size: 72px; font-weight: 900; text-align: center; margin: 0; letter-spacing: -4px; line-height: 0.9; }
+.subtitle { text-align: center; color: var(--primary); font-weight: 700; text-transform: uppercase; font-size: 12px; letter-spacing: 6px; margin-bottom: 40px; opacity: 0.8; }
 .glass { background: var(--card); backdrop-filter: blur(12px); border: 1px solid var(--glass-border); border-radius: 24px; }
 .glass-light { background: var(--card-light); backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.2); border-radius: 24px; }
 .card { padding: 20px; margin-bottom: 15px; }
@@ -331,5 +348,6 @@ select.log-input { font-size: 16px !important; text-align-last: center; appearan
     align-items: center;
     gap: 15px;
     margin-bottom: 25px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
 }
 .status-icon-circle { width: 44px; height: 44px; border-radius: 12px; background: rgba(34, 211, 238, 0.1); display: flex; align-items: center; justify-content: center; font-size: 20px; border: 1px solid rgba(34, 211, 238, 0.2); }
