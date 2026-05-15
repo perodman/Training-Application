@@ -41,13 +41,12 @@ body {
 /* --- HEADER & HERO --- */
 .hero-section {
     text-align: center;
-    padding-bottom: 10px;
-    margin-bottom: 10px; 
+    padding-top: 20px;
 }
 
 .main-title { 
     font-family: 'Montserrat', sans-serif; 
-    font-size: 72px; 
+    font-size: 72px; /* Mycket större som i designen */
     font-weight: 900; 
     margin: 0; 
     letter-spacing: -4px; 
@@ -72,6 +71,7 @@ body {
 
 .separator { 
     height: 1px; 
+    /* Tonad linje som försvinner ut i kanterna */
     background: linear-gradient(90deg, transparent, var(--glass-border), var(--primary), var(--glass-border), transparent); 
     width: 100%; 
     margin: 30px 0 40px 0; 
