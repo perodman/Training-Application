@@ -74,18 +74,18 @@ body {
     text-decoration: none !important;
 }
 
-.menu-grid .mode-btn {
-    font-family: 'Inter', sans-serif;
-    font-weight: 800;
-    letter-spacing: -0.2px;
-    text-transform: none;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+.menu-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* Två kolumner */
+    gap: 15px;
+    padding: 0 20px;
 }
 
+/* Gör Start-knappen stor (tar hela bredden) */
 .main-action {
-    background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-    color: #0f172a;
-    border: none;
+    grid-column: span 2;
+    padding: 25px !important;
+    font-size: 1.2rem !important;
 }
 
 .section-title { text-align: center; font-weight: 800; margin-bottom: 25px; font-size: 1.4rem; width: 100%; }
