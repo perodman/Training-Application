@@ -28,12 +28,13 @@ body {
 }
 
 .app-container { 
-    max-width: 500px; 
-    margin: 0 auto; 
-    padding: 60px 20px 20px 20px; 
-    display: flex;
-    flex-direction: column;
-    align-items: center; 
+    /* Vi ökar max-width eller tar bort den helt för att fylla skärmen bättre */
+    max-width: 600px; 
+    margin: auto; 
+    /* Vi återställer padding till ett minimum så att innehållet kan breda ut sig */
+    padding: 40px 10px 20px; 
+    position: relative; 
+    z-index: 1; 
 }
 
 .hidden { display: none !important; }
@@ -132,7 +133,8 @@ body {
     flex-direction: column; 
     align-items: center;
     justify-content: center;
-    padding: 20px 10px;
+    padding: 24px 20px; 
+    font-size: 1.1rem;
     height: auto;
     width: 100%;
     text-align: center;
@@ -140,7 +142,7 @@ body {
     border: 1px solid var(--glass-border);
     border-radius: 22px;
     box-shadow: 0 10px 20px rgba(0,0,0,0.2);
-    margin-bottom: 0; /* Förhindrar dubbelmarginal i grid */
+    margin-bottom: 15px; 
 }
 
 .btn-icon {
@@ -219,20 +221,25 @@ body {
 .calendar-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
 .nav-arrow { background: var(--card); border: 1px solid var(--glass-border); color: white; padding: 10px 15px; border-radius: 12px; cursor: pointer; }
 .calendar-weekdays { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; font-size: 11px; margin-bottom: 10px; color: var(--text-light); }
-.calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
+.calendar-grid { 
+    display: grid; 
+    grid-template-columns: repeat(7, 1fr); 
+    gap: 10px; /* Mer luft mellan dagarna */
+    width: 100% !important; 
+}
 
 .calendar-cell { 
     aspect-ratio: 1 / 1; 
-    border-radius: 12px; 
-    background: rgba(255,255,255,0.05); 
+    border-radius: 14px; /* Lite mjukare hörn som i Bild 1 */
+    background: rgba(255,255,255,0.07); 
     display: flex; 
     flex-direction: column; 
     align-items: center; 
     justify-content: center; 
-    font-size: 14px; 
-    border: 1px solid transparent; 
+    font-size: 16px; /* Större siffra */
+    font-weight: 700;
     cursor: pointer;
-    overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.05);
 }
 
 .cell-info { 
