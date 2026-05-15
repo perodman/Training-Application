@@ -128,14 +128,14 @@ body {
 }
 
 .btn-main-text {
-    font-size: 18px;
+    font-size: 14px;
     font-weight: 700;
     color: var(--text);
     letter-spacing: 0.2px;
 }
 
 .btn-sub-text {
-    font-size: 12px;
+    font-size: 8px;
     color: var(--primary);
     text-transform: uppercase;
     letter-spacing: 1px;
