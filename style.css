@@ -403,48 +403,25 @@ select.log-input { font-size: 16px !important; text-align-last: center; appearan
     margin-top: 2px;
 }
 
-/* --- ISOLERAD EFFEKT FÖR SMÅ KNAPPAR PÅ STARTSIDAN --- */
-#home-view .menu-grid .mode-btn:not(.main-action) {
-    background: rgba(255, 255, 255, 0.03); /* Mycket subtil bas */
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    position: relative;
-    overflow: hidden;
+/* DENNA REGEL VINNER ÖVER ALLT ANNAT */
+#home-view .mode-btn.home-card {
+    background: rgba(255, 255, 255, 0.15) !important; /* Gjorde den lite ljusare så du SKA se skillnad */
+    border: 1px solid rgba(255, 255, 255, 0.3) !important;
+    backdrop-filter: blur(15px) !important;
+    position: relative !important;
+    overflow: hidden !important;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.4) !important;
 }
 
-/* En ljusare kant i överkant för att skapa en "kant-reflektion" */
-#home-view .menu-grid .mode-btn:not(.main-action)::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-}
-
-/* Effekt när man hovrar eller trycker (Active fungerar bäst på mobil) */
-#home-view .menu-grid .mode-btn:not(.main-action):active {
-    background: rgba(255, 255, 255, 0.07);
-    border-color: rgba(255, 255, 255, 0.3);
-    transform: scale(0.96);
-}
-
-/* --- FORCE RESET FÖR STARTSIDANS KNAPPAR --- */
-.mode-btn.home-card {
-    background: rgba(255, 255, 255, 0.05) !important;
-    border: 1px solid rgba(255, 255, 255, 0.2) !important;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3) !important;
-    backdrop-filter: blur(10px) !important;
-}
-
-/* En ljus rand i toppen som SKA synas */
-.mode-btn.home-card::before {
+/* Den vita linjen i toppen */
+#home-view .mode-btn.home-card::before {
     content: "" !important;
     position: absolute !important;
     top: 0 !important;
     left: 0 !important;
     right: 0 !important;
     height: 2px !important;
-    background: rgba(255, 255, 255, 0.4) !important;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.8), transparent) !important;
     display: block !important;
+    z-index: 5 !important;
 }
