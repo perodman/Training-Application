@@ -146,14 +146,19 @@ body {
 
 /* Den stora "Starta Träningspass"-knappen */
 .main-action {
-    grid-column: span 2; 
-    width: 100% !important;
-    box-sizing: border-box !important;
+    grid-column: span 2; /* Detta säger åt knappen att ta upp båda kolumnerna i gridden */
+    width: 100%; 
+    display: flex;
+    flex-direction: row; /* Lägger ikon och text bredvid varandra */
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    padding: 20px !important; 
+    margin: 0 0 10px 0; 
     background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%) !important;
-    padding: 30px 20px !important; 
-    box-shadow: 0 15px 30px rgba(34, 211, 238, 0.2) !important;
-    margin-bottom: 10px;
+    border-radius: 22px; /* Samma som dina andra knappar för enhetlighet */
     border: none !important;
+    box-shadow: 0 10px 25px rgba(34, 211, 238, 0.3);
 }
 
 .main-action .btn-main-text { 
