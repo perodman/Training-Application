@@ -25,16 +25,18 @@ body {
     min-height: 100vh; 
     padding-bottom: 40px; 
     overflow-x: hidden; 
+    width: 100%;
 }
 
 .app-container { 
-    /* Vi ökar max-width eller tar bort den helt för att fylla skärmen bättre */
+    width: 100%;
     max-width: 600px; 
-    margin: auto; 
-    /* Vi återställer padding till ett minimum så att innehållet kan breda ut sig */
-    padding: 40px 10px 20px; 
+    margin: 0 auto; 
+    padding: 60px 20px 20px; 
     position: relative; 
     z-index: 1; 
+    /* --- HÄR ÄR TILLÄGGET SOM FIXAR BILDEN --- */
+    box-sizing: border-box;
 }
 
 .hidden { display: none !important; }
@@ -91,20 +93,22 @@ body {
 /* --- ALLMÄNNA KNAPPAR (LIGGER HÖGT UPP SÅ DE KAN SKRIVAS ÖVER) --- */
 .mode-btn { 
     width: 100%; 
-    padding: 20px; 
-    border-radius: 20px; 
+    padding: 24px 20px; 
+    border-radius: 22px; 
     border: none; 
     color: white; 
     font-weight: 700; 
     cursor: pointer; 
     margin-bottom: 12px; 
     display: flex; 
+    flex-direction: column;
     align-items: center; 
     justify-content: center; 
     gap: 10px; 
-    font-size: 1.05rem; 
+    font-size: 1.1rem; 
     font-family: 'Inter', sans-serif; 
     transition: all 0.2s ease; 
+    box-sizing: border-box;
 }
 
 .mode-btn:active, .prog-card:active, .cat-btn:active, .circle-ctrl:active {
@@ -191,6 +195,10 @@ body {
     justify-content: center !important;
     box-shadow: 0 15px 35px rgba(34, 211, 238, 0.25) !important;
     margin-bottom: 15px;
+    /* --- HÄR ÄR TILLÄGGEN SOM FIXAR BILDEN --- */
+    width: 100%;
+    box-sizing: border-box;
+    font-weight: 800;
 }
 
 .main-action .btn-main-text { font-size: 18px; color: #0f172a; font-weight: 800; letter-spacing: -0.5px; }
