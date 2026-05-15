@@ -74,7 +74,7 @@ body {
     height: 1px; 
     background: linear-gradient(90deg, transparent, var(--primary), transparent); 
     width: 100%; 
-    margin: 20px 0 50px 0; 
+    margin: 20px 0 20px 0; 
     opacity: 0.3;
 }
 
