@@ -30,12 +30,52 @@ body {
 .app-container { 
     max-width: 500px; 
     margin: auto; 
-    padding: 80px 20px 20px; 
+    padding: 60px 20px 20px; 
     position: relative; 
     z-index: 1; 
 }
 
 .hidden { display: none !important; }
+
+/* --- NY DESIGN FÖR RUBRIK & LOGGA --- */
+.hero-section {
+    text-align: center;
+    padding-bottom: 10px;
+}
+
+.main-title { 
+    font-family: 'Montserrat', sans-serif; 
+    font-size: 72px; 
+    font-weight: 900; 
+    margin: 0; 
+    letter-spacing: -4px; 
+    line-height: 0.8;
+    text-transform: uppercase;
+    background: linear-gradient(to bottom, #fff 40%, var(--text-light));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 0 10px rgba(34, 211, 238, 0.2));
+}
+
+.subtitle { 
+    text-align: center; 
+    color: var(--primary); 
+    font-weight: 800; 
+    text-transform: uppercase; 
+    font-size: 10px; 
+    letter-spacing: 6px; 
+    margin-top: 10px;
+    opacity: 0.9;
+}
+
+/* Den designfulla linjen (Separator) */
+.separator { 
+    height: 1px; 
+    background: linear-gradient(90deg, transparent, var(--glass-border), var(--primary), var(--glass-border), transparent); 
+    width: 100%; 
+    margin: 25px 0 35px 0; 
+    opacity: 0.6;
+}
 
 .view {
     animation: fadeIn 0.4s ease-out;
@@ -74,7 +114,7 @@ body {
     text-decoration: none !important;
 }
 
-/* --- JUSTERING FÖR NYA MENYN (ÅTERSTÄLLD PASSFORM) --- */
+/* --- MENY-GRIND MED SUB-LABELS --- */
 .menu-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -84,9 +124,9 @@ body {
 
 .menu-grid .mode-btn {
     display: flex;
-    align-items: center; /* Tillbaka till horisontell linjering */
+    align-items: center;
     justify-content: flex-start;
-    padding: 16px 14px; /* Optimerad padding för små skärmar */
+    padding: 18px 15px;
     height: auto;
     width: 100%;
     text-align: left;
@@ -94,45 +134,43 @@ body {
     border: 1px solid var(--glass-border);
     border-radius: 20px;
     font-family: 'Inter', sans-serif;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.05);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.2), inset 0 1px 1px rgba(255,255,255,0.05);
     margin-bottom: 0;
 }
 
-/* Element inuti knapparna */
 .btn-icon {
-    width: 36px; /* Något mindre för att spara plats */
-    height: 36px;
+    width: 38px;
+    height: 38px;
     background: rgba(255,255,255,0.05);
-    border-radius: 10px;
+    border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 18px;
-    margin-right: 10px;
+    margin-right: 12px;
     flex-shrink: 0;
 }
 
 .btn-text-wrapper {
     display: flex;
     flex-direction: column;
-    line-height: 1.1;
-    overflow: hidden; /* Förhindrar text-overflow */
+    line-height: 1.2;
 }
 
 .btn-main-text {
-    font-size: 13px; /* Justerad storlek för att passa din skärm */
-    font-weight: 700;
+    font-size: 13px;
+    font-weight: 800;
     color: var(--text);
-    white-space: normal; /* Tillåter radbrytning om det behövs */
+    letter-spacing: -0.2px;
 }
 
 .btn-sub-text {
     font-size: 8px;
     color: var(--primary);
     text-transform: uppercase;
-    letter-spacing: 0.5px;
-    font-weight: 800;
-    opacity: 0.7;
+    letter-spacing: 0.8px;
+    font-weight: 700;
+    margin-top: 2px;
 }
 
 /* Startknappen */
@@ -141,24 +179,21 @@ body {
     background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%) !important;
     color: #0f172a !important;
     border: none !important;
-    padding: 20px 18px !important;
+    padding: 24px 20px !important;
     justify-content: center !important;
-    box-shadow: 0 8px 25px rgba(34, 211, 238, 0.25) !important;
+    box-shadow: 0 15px 35px rgba(34, 211, 238, 0.25) !important;
+    margin-bottom: 8px;
 }
 
-.main-action .btn-main-text { font-size: 16px; color: #0f172a; font-weight: 800; }
+.main-action .btn-main-text { font-size: 18px; color: #0f172a; font-weight: 800; letter-spacing: -0.5px; }
 .main-action .btn-sub-text { color: rgba(15, 23, 42, 0.6); }
 
 /* --- FORTSÄTTNING URSPRUNGALIG KOD --- */
 .section-title { text-align: center; font-weight: 800; margin-bottom: 25px; font-size: 1.4rem; width: 100%; }
 .modern-header { font-family: 'Montserrat', sans-serif; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; background: linear-gradient(to right, #fff, var(--primary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 1.6rem; margin-top: 10px; }
-.hero-section { padding: 20px 0; }
-.main-title { font-family: 'Montserrat', sans-serif; font-size: 56px; font-weight: 900; text-align: center; margin: 0; letter-spacing: -2px; }
-.subtitle { text-align: center; color: var(--primary); font-weight: 700; text-transform: uppercase; font-size: 12px; letter-spacing: 4px; margin-bottom: 40px; }
 .glass { background: var(--card); backdrop-filter: blur(12px); border: 1px solid var(--glass-border); border-radius: 24px; }
 .glass-light { background: var(--card-light); backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.2); border-radius: 24px; }
 .card { padding: 20px; margin-bottom: 15px; }
-.separator { height: 1px; background: linear-gradient(90deg, transparent, var(--glass-border), transparent); width: 100%; margin: 30px 0; }
 .program-modern-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
 .prog-card { background: linear-gradient(135deg, rgba(34, 211, 238, 0.1) 0%, rgba(129, 140, 248, 0.1) 100%); border: 1px solid var(--glass-border); border-radius: 20px; padding: 20px; text-align: center; cursor: pointer; position: relative; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
 .prog-card.active { border-color: var(--primary); background: linear-gradient(135deg, rgba(34, 211, 238, 0.25) 0%, rgba(129, 140, 248, 0.25) 100%); box-shadow: 0 10px 25px rgba(34, 211, 238, 0.2); }
