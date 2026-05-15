@@ -74,11 +74,12 @@ body {
     text-decoration: none !important;
 }
 
-/* --- JUSTERING FÖR NYA MENYN --- */
+/* --- JUSTERING FÖR NYA MENYN (FIXAD) --- */
 .menu-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 12px;
+    width: 100%; /* Säkerställer att den tar hela appens bredd */
 }
 
 .menu-grid .mode-btn {
@@ -87,6 +88,7 @@ body {
     justify-content: flex-start;
     padding: 16px 18px;
     height: auto;
+    width: 100%; /* Tvingar knappen att fylla sin kolumn */
     text-align: left;
     background: var(--card);
     border: 1px solid var(--glass-border);
@@ -95,7 +97,7 @@ body {
     letter-spacing: -0.2px;
     text-transform: none;
     box-shadow: 0 8px 20px rgba(0,0,0,0.25);
-    margin-bottom: 0; /* Förhindrar dubbel-marginal i grid */
+    margin-bottom: 0;
 }
 
 /* Element inuti knapparna */
@@ -132,7 +134,7 @@ body {
 }
 
 .main-action {
-    grid-column: span 2;
+    grid-column: span 2; /* Tvingar Start-knappen att ta hela bredden */
     background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%) !important;
     color: #0f172a !important;
     border: none !important;
