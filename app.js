@@ -1368,3 +1368,23 @@ function confirmDiscardActiveWorkout() {
     `;
     openModal();
 }
+
+function renderHomeStatus() {
+    const container = document.getElementById("home-status-card");
+    if (!container) return;
+
+    // Här kan vi anpassa vad som visas. 
+    // Just nu hårdkodar vi ett exempel för att se att designen sitter:
+    container.innerHTML = `
+        <div class="modern-status-card">
+            <div class="status-icon-circle">🔥</div>
+            <div>
+                <span class="status-label">Dagens utmaning</span>
+                <span class="status-value">Underkropp & Bål</span>
+            </div>
+        </div>
+    `;
+}
+
+// Glöm inte att anropa funktionen:
+renderHomeStatus();
