@@ -12,9 +12,7 @@
 }
 
 * { 
-    box-sizing: border-box; 
-    -webkit-tap-highlight-color: transparent; 
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); 
+    box-sizing: border-box !important; 
 }
 
 body { 
@@ -29,13 +27,14 @@ body {
 }
 
 .app-container { 
-    width: 100%;
-    max-width: 500px; /* Ändrade tillbaka till 500px så det inte känns för brett på mobilen */
+    width: 100vw; /* Tvingar bredden till 100% av mobilskärmen */
+    max-width: 500px; 
     margin: 0 auto; 
-    padding: 60px 20px 20px; /* 20px padding på sidorna skapar avståndet till kanten */
+    padding: 60px 20px 20px; /* 20px på sidorna garanterar att det inte nuddar kanten */
     position: relative; 
     z-index: 1; 
-    box-sizing: border-box; 
+    box-sizing: border-box;
+    overflow-x: hidden; /* Stoppar allt som försöker sticka ut till höger */
 }
 
 .hidden { display: none !important; }
@@ -189,8 +188,7 @@ body {
 
 /* Startknappen */
 .main-action {
-    grid-column: span 2; /* Gör att den täcker båda kolumnerna */
-    width: 100% !important;
+    grid-column: span 2;
     background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%) !important;
     color: #0f172a !important;
     border: none !important;
@@ -198,8 +196,11 @@ body {
     justify-content: center !important;
     box-shadow: 0 15px 35px rgba(34, 211, 238, 0.25) !important;
     margin-bottom: 15px;
-    box-sizing: border-box; /* Hindrar att den kapas */
-    font-weight: 800;
+    /* FIXAR MOBILEN: */
+    width: 100% !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    box-sizing: border-box !important;
 }
 
 .main-action .btn-main-text { font-size: 18px; color: #0f172a; font-weight: 800; letter-spacing: -0.5px; }
