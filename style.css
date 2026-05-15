@@ -42,7 +42,7 @@ body {
 /* --- HEADER & HERO --- */
 .hero-section {
     text-align: center;
-    padding: 40px 0 20px;
+    padding: 40px 0 0;
 }
 
 .main-title { 
