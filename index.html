@@ -45,7 +45,7 @@
                 <div class="calendar-weekdays">
                     <div>Mån</div><div>Tis</div><div>Ons</div><div>Tor</div><div>Fre</div><div>Lör</div><div>Sön</div>
                 </div>
-                <div id="calendar-grid" class="calendar-grid"></div>
+                <div class="calendar-grid" id="calendar-grid"></div>
                 <div class="legend">
                     <div class="legend-item"><div class="legend-color planned"></div> Planerat</div>
                     <div class="legend-item"><div class="legend-color ongoing"></div> Pågående</div>
@@ -56,6 +56,7 @@
 
         <div id="exercises-view" class="view hidden">
             <h2 class="section-title modern-header">Övningar</h2>
+            
             <div id="category-menu" class="category-grid">
                 <button class="cat-btn glass" data-cat="Ben" onclick="filterExercises('Ben')"><span class="cat-icon"> 🦵 </span> Ben</button>
                 <button class="cat-btn glass" data-cat="Bröst" onclick="filterExercises('Bröst')"><span class="cat-icon"> 🏋️ </span> Bröst</button>
@@ -67,13 +68,17 @@
 
             <div style="display: flex; align-items: center; gap: 15px; margin: 35px 0 20px 0; opacity: 0.8;">
                 <div style="flex-grow: 1; height: 1px; background: linear-gradient(to right, transparent, var(--primary), transparent);"></div>
-                <div style="width: 8px; height: 8px; background: var(--primary); transform: rotate(45deg); border-radius: 2px;"></div>
+                <div style="width: 8px; height: 8px; background: var(--primary); transform: rotate(45deg); border-radius: 2px; box-shadow: 0 0 10px var(--primary);"></div>
                 <div style="flex-grow: 1; height: 1px; background: linear-gradient(to left, transparent, var(--primary), transparent);"></div>
             </div>
 
             <div style="display: flex; justify-content: flex-end; margin-bottom: 15px; padding-right: 17px;">
-                <button class="add-inline-btn" onclick="openCreateExerciseModal()" style="position: static; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center;">+</button>
+                <button class="add-inline-btn" onclick="openCreateExerciseModal()" 
+                        style="position: static; transform: none; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; font-size: 17px; padding: 0; line-height: 1;">
+                    +
+                </button>
             </div>
+
             <div id="exercise-results" class="exercise-bank-list"></div>
         </div>
 
@@ -90,15 +95,18 @@
         <div id="stats-view" class="view hidden">
             <h2 class="section-title modern-header">Statistik</h2>
             <div class="card glass">
+                <h3 style="text-align:center; margin-bottom:20px;">Pass per månad</h3>
                 <div id="chart-container" class="chart-wrapper"></div>
             </div>
         </div>
 
         <div id="workout-view" class="view hidden">
-            <h2 id="active-title" class="section-title modern-header"></h2>
-            <div class="card glass">
+            <h2 id="active-title" class="section-title modern-header" style="margin-bottom:10px;"></h2>
+            <div class="card glass" style="margin-bottom: 20px; padding: 15px;">
                 <div id="workout-timer" class="timer-display">00:00:00</div>
-                <button id="timer-toggle-btn" class="mode-btn glass-border">Pausa ⏸️</button>
+                <div style="display: flex; gap: 10px;">
+                    <button id="timer-toggle-btn" class="mode-btn glass-border" style="margin-bottom:0; padding:10px;">Pausa ⏸️</button>
+                </div>
             </div>
             <div id="exercise-list"></div>
             <div class="workout-footer">
