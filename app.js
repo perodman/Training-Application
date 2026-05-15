@@ -6,7 +6,7 @@ let calendarOverrides = JSON.parse(localStorage.getItem("calendarOverrides") || 
 let currentViewDate = new Date();
 let currentExerciseCategory = "Ben";
 
-// Timer-variabler
+// Timer-variablerr
 let timerInterval = null;
 let secondsElapsed = 0;
 let isTimerRunning = false;
