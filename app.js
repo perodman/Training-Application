@@ -275,7 +275,6 @@ function openEditExerciseModal(id) {
     if(!ex) return;
     const body = document.getElementById("modal-body");
     
-    // Vi sätter nuvarande kategori som vald från start
     let selectedCategory = ex.target; 
 
     const categories = [
@@ -288,23 +287,24 @@ function openEditExerciseModal(id) {
     ];
 
     body.innerHTML = `
-        <h3 style="text-align:center; margin-bottom: 20px;">Redigera Övning</h3>
+        <h3 style="text-align:center; margin-bottom: 15px;">Redigera Övning</h3>
         
-        <div style="display: flex; flex-direction: column; align-items: center; gap: 10px;">
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
+            
             <div style="width: 100%; max-width: 300px;">
-                <label style="font-size:11px; color:var(--text-light); text-transform: uppercase; letter-spacing: 1px; display:block; margin-bottom: 8px; text-align: center;">Namn på övning</label>
-                <input type="text" id="edit-ex-name" class="log-input" value="${ex.name}" style="text-align: center;">
+                <label style="font-size:11px; color:var(--text-light); text-transform: uppercase; letter-spacing: 1px; display:block; margin-bottom: 4px; text-align: center;">Namn på övning</label>
+                <input type="text" id="edit-ex-name" class="log-input" value="${ex.name}" style="text-align: center; margin: 0;">
             </div>
 
             <div style="width: 100%;">
-                <label style="font-size:11px; color:var(--text-light); text-transform: uppercase; letter-spacing: 1px; display:block; margin-bottom: 12px; text-align: center;">Välj Kategori</label>
+                <label style="font-size:11px; color:var(--text-light); text-transform: uppercase; letter-spacing: 1px; display:block; margin-bottom: 8px; text-align: center;">Välj Kategori</label>
                 
                 <div id="edit-category-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 0 10px;">
                     ${categories.map(cat => `
                         <div class="cat-select-item ${cat.id === selectedCategory ? 'active' : ''}" 
                              onclick="window.selectEditModalCategory('${cat.id}')"
                              id="edit-modal-cat-${cat.id}"
-                             style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 12px 5px; border-radius: 12px; text-align: center; cursor: pointer; transition: all 0.2s ease;">
+                             style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 10px 5px; border-radius: 12px; text-align: center; cursor: pointer; transition: all 0.2s ease;">
                             <div style="font-size: 20px; margin-bottom: 4px;">${cat.icon}</div>
                             <div style="font-size: 10px; font-weight: 700; color: var(--text-light);">${cat.id}</div>
                         </div>
@@ -312,8 +312,8 @@ function openEditExerciseModal(id) {
                 </div>
             </div>
 
-            <button class="mode-btn blue" style="width: 100%; max-width: 300px; margin-top: 10px;" onclick="handleUpdateExercise(${id})">Uppdatera</button>
-            <button class="mode-btn" style="color:var(--danger); background:none; font-size:13px; margin-top: 5px;" onclick="deleteMasterExercise(${id})">Radera övning permanent</button>
+            <button class="mode-btn blue" style="width: 100%; max-width: 300px; margin: 5px 0 0 0;" onclick="handleUpdateExercise(${id})">Uppdatera</button>
+            <button class="mode-btn" style="color:var(--danger); background:none; font-size:13px; margin: 0; padding: 0;" onclick="deleteMasterExercise(${id})">Radera övning permanent</button>
         </div>
 
         <style>
@@ -325,23 +325,20 @@ function openEditExerciseModal(id) {
         </style>
     `;
 
-    // Funktion för att byta kategori i redigeringsvyn
     window.selectEditModalCategory = (catId) => {
         selectedCategory = catId;
         document.querySelectorAll('#edit-category-grid .cat-select-item').forEach(el => el.classList.remove('active'));
         document.getElementById(`edit-modal-cat-${catId}`).classList.add('active');
     };
 
-    // Ny hjälpfunktion för att skicka med den valda kategorin till din befintliga updateExercise
     window.handleUpdateExercise = (exId) => {
         const nameInput = document.getElementById("edit-ex-name").value.trim();
         if(!nameInput) return alert("Namnet får inte vara tomt!");
         
-        // Uppdatera övningen direkt i master-listan
         const exIndex = masterExercises.findIndex(e => e.id == exId);
         if(exIndex !== -1) {
             masterExercises[exIndex].name = nameInput;
-            masterExercises[exIndex].target = selectedCategory; // Här används den nya valda kategorin
+            masterExercises[exIndex].target = selectedCategory;
             saveAll();
             closeModal();
             filterExercises(currentExerciseCategory);
