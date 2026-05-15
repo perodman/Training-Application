@@ -411,33 +411,56 @@ select.log-input { font-size: 16px !important; text-align-last: center; appearan
 }
 
 
-/* --- SPECIALDESIGN FÖR STARTSIDAN --- */
+/* --- ENBART KNAPPAR PÅ FRAMSIDAN (menu-grid) --- */
 
-/* Specifik regel för glasknapparna i menyn */
+/* 1. Basstilen för de fyra mindre knapparna */
 .menu-grid .mode-btn.glass {
-    background: rgba(255, 255, 255, 0.05) !important;
-    backdrop-filter: blur(12px) !important;
-    -webkit-backdrop-filter: blur(12px);
+    /* Vi byter ut var(--card) mot en halvgenomskinlig vit */
+    background: rgba(255, 255, 255, 0.03) !important;
+    backdrop-filter: blur(15px) !important;
+    -webkit-backdrop-filter: blur(15px);
     
-    /* Den ljusa kanten i toppen */
-    border: 1px solid rgba(255, 255, 255, 0.1) !important;
-    border-top: 1px solid rgba(255, 255, 255, 0.35) !important;
+    /* Här kommer den "magiska" ramen */
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.3) !important; /* Denna skapar "repan" i toppen */
     
-    /* Skugga och inre lyster */
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4), 
+    border-radius: 22px !important;
+    
+    /* Skugga som ger djup mot den mörka bakgrunden */
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4), 
                 inset 0 0 0 1px rgba(255, 255, 255, 0.03) !important;
+    
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
 }
 
-/* Fixar textfärgen på undertexten så den poppar */
+/* 2. Effekt när man hovrar eller trycker (Gör dem lite ljusare) */
+.menu-grid .mode-btn.glass:active {
+    transform: scale(0.96);
+    background: rgba(255, 255, 255, 0.08) !important;
+    border-top-color: rgba(255, 255, 255, 0.5) !important;
+}
+
+/* 3. Texten inuti knapparna */
+.menu-grid .mode-btn.glass .btn-main-text {
+    color: #ffffff !important;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
 .menu-grid .mode-btn.glass .btn-sub-text {
-    color: var(--primary) !important;
+    color: var(--primary) !important; /* Den turkosa färgen */
     opacity: 1 !important;
-    text-shadow: 0 0 10px rgba(34, 211, 238, 0.3);
+    font-weight: 700;
+    text-shadow: 0 0 10px rgba(34, 211, 238, 0.2);
 }
 
-/* Säkerställer att Start-knappen inte påverkas av glasmekaniken */
+/* 4. Startknappen (Ska INTE vara glasig på samma sätt) */
 .menu-grid .mode-btn.main-action {
     background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%) !important;
     border: none !important;
     box-shadow: 0 10px 25px rgba(34, 211, 238, 0.3) !important;
+    grid-column: 1 / span 2;
+    flex-direction: row !important;
+    justify-content: flex-start !important;
+    padding: 18px 25px !important;
 }
