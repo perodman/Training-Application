@@ -312,8 +312,8 @@ function openEditExerciseModal(id) {
                 </div>
             </div>
 
-            <button class="mode-btn blue" style="width: 100%; max-width: 300px; margin: 5px 0 0 0;" onclick="handleUpdateExercise(${id})">Uppdatera</button>
-            <button class="mode-btn" style="color:var(--danger); background:none; font-size:13px; margin: 0; padding: 0;" onclick="deleteMasterExercise(${id})">Radera övning permanent</button>
+            <button class="mode-btn blue" style="width: 100%; max-width: 300px; margin-top: 10px;" onclick="handleUpdateExercise(${id})">Uppdatera</button>
+            <button class="mode-btn" style="color:var(--danger); background:none; font-size:13px; margin-top: 15px; padding: 5px;" onclick="deleteMasterExercise(${id})">Radera övning permanent</button>
         </div>
 
         <style>
