@@ -130,9 +130,10 @@ document.getElementById("timer-toggle-btn").onclick = () => {
 // --- ÖVNINGAR & INSTÄLLNINGAR ---
 function openCreateExerciseModal(callback = null) {
     const body = document.getElementById("modal-body");
-    let selectedCategory = "Ben"; // Standardval
+    
+    // ÄNDRING 1: Istället för att alltid välja "Ben", kollar vi vad du har valt i vyn just nu
+    let selectedCategory = currentExerciseCategory || "Ben"; 
 
-    // Definiera kategorierna med deras ikoner
     const categories = [
         { id: "Ben", icon: "🦵" },
         { id: "Bröst", icon: "🏋️" },
@@ -182,12 +183,9 @@ function openCreateExerciseModal(callback = null) {
         </style>
     `;
 
-    // Funktion för att hantera valet av kategori i modalen
     window.selectModalCategory = (catId) => {
         selectedCategory = catId;
-        // Återställ alla till standardstil
         document.querySelectorAll('.cat-select-item').forEach(el => el.classList.remove('active'));
-        // Aktivera den valda
         document.getElementById(`modal-cat-${catId}`).classList.add('active');
     };
 
@@ -209,7 +207,8 @@ function openCreateExerciseModal(callback = null) {
         if(callback) callback(newEx);
         else { 
             closeModal(); 
-            filterExercises(currentExerciseCategory); 
+            // ÄNDRING 2: Vi filtrerar på 'selectedCategory' så att vyn hoppar till den nya övningens kategori
+            filterExercises(selectedCategory); 
         }
     };
     
