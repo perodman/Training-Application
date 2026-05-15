@@ -146,17 +146,19 @@ body {
 
 /* Den stora "Starta Träningspass"-knappen */
 .main-action {
-    grid-column: span 2; /* Detta säger åt knappen att ta upp båda kolumnerna i gridden */
-    width: 100%; 
+    grid-column: 1 / span 2; /* Tvingar den att starta i kolumn 1 och spänna över båda */
+    width: auto !important;   /* VIKTIGT: Ändra från 100% till auto */
     display: flex;
-    flex-direction: row; /* Lägger ikon och text bredvid varandra */
+    flex-direction: row !important;
     align-items: center;
     justify-content: center;
     gap: 15px;
-    padding: 20px !important; 
-    margin: 0 0 10px 0; 
+    
+    padding: 22px !important; 
+    margin: 0 !important;      /* Tar bort alla marginaler som kan knuffa in kanterna */
+    
     background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%) !important;
-    border-radius: 22px; /* Samma som dina andra knappar för enhetlighet */
+    border-radius: 22px; 
     border: none !important;
     box-shadow: 0 10px 25px rgba(34, 211, 238, 0.3);
 }
