@@ -144,36 +144,13 @@ body {
     opacity: 0.8;
 }
 
-/* Den stora "Starta Träningspass"-knappen */
-.main-action {
-    grid-column: 1 / span 2; /* Tvingar den att starta i kolumn 1 och spänna över båda */
-    width: auto !important;   /* VIKTIGT: Ändra från 100% till auto */
+
+
+.btn-text-container {
     display: flex;
-    flex-direction: row !important;
-    align-items: center;
-    justify-content: center;
-    gap: 15px;
-    
-    padding: 22px !important; 
-    margin: 0 !important;      /* Tar bort alla marginaler som kan knuffa in kanterna */
-    
-    background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%) !important;
-    border-radius: 22px; 
-    border: none !important;
-    box-shadow: 0 10px 25px rgba(34, 211, 238, 0.3);
-}
-
-.main-action .btn-main-text { 
-    font-size: 20px; 
-    color: #0f172a; 
-    font-weight: 900; 
-    letter-spacing: -0.5px;
-    text-transform: uppercase;
-}
-
-.main-action .btn-sub-text { 
-    color: rgba(15, 23, 42, 0.7); 
-    font-weight: 800;
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
 }
 
 .blue { background: linear-gradient(135deg, #22d3ee 0%, #0ea5e9 100%); color: #0f172a; }
@@ -376,16 +353,6 @@ select.log-input { font-size: 16px !important; text-align-last: center; appearan
 }
 .status-icon-circle { width: 44px; height: 44px; border-radius: 12px; background: rgba(34, 211, 238, 0.1); display: flex; align-items: center; justify-content: center; font-size: 20px; border: 1px solid rgba(34, 211, 238, 0.2); }
 
-/* 1. Gör knappen smalare och lägg allt på en rad */
-.main-action {
-    flex-direction: row !important; 
-    justify-content: flex-start !important; /* Starta från vänster */
-    padding: 15px 25px !important; 
-    width: 90% !important; 
-    margin: 0 auto 15px auto !important;
-    gap: 20px; /* Mellanrum mellan eld och text */
-}
-
 /* 2. Den nya "lådan" som staplar texterna */
 .btn-text-container {
     display: flex;
@@ -394,14 +361,44 @@ select.log-input { font-size: 16px !important; text-align-last: center; appearan
     text-align: left;
 }
 
-/* 3. Justera elden så den inte har marginal neråt längre */
+/* --- SAMLAD KOD FÖR HUVUDKNAPPEN --- */
+
+/* 1. Själva knappen (Här styr vi bredden så den blir rak!) */
+.main-action {
+    grid-column: 1 / span 2 !important; 
+    width: 100% !important; 
+    margin: 0 0 15px 0 !important; 
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center;
+    justify-content: flex-start !important; 
+    gap: 20px;
+    padding: 18px 25px !important; 
+    background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%) !important;
+    border-radius: 22px !important;
+    border: none !important;
+    box-shadow: 0 10px 25px rgba(34, 211, 238, 0.3);
+}
+
+/* 2. Ikonen (Elden) */
 .main-action .btn-icon {
     margin-bottom: 0 !important;
     font-size: 24px;
 }
 
-/* 4. Gör texten lite mindre så den får plats på en rad i mobilen */
+/* 3. Den stora texten */
 .main-action .btn-main-text {
     font-size: 16px !important;
+    color: #0f172a;
+    font-weight: 900;
+    text-transform: uppercase;
     line-height: 1.2 !important;
+}
+
+/* 4. Den lilla undertexten */
+.main-action .btn-sub-text {
+    color: rgba(15, 23, 42, 0.6);
+    font-weight: 800;
+    font-size: 9px;
+    margin-top: 2px;
 }
