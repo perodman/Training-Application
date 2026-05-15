@@ -428,3 +428,15 @@ select.log-input { font-size: 16px !important; text-align-last: center; appearan
     border-color: rgba(255, 255, 255, 0.3);
     transform: scale(0.96);
 }
+
+/* Denna kod rör ENDAST de knappar där du skrivit 'home-card' */
+.home-card {
+    background: rgba(255, 255, 255, 0.04) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.1); /* Ger en subtil kant i toppen */
+}
+
+.home-card:active {
+    background: rgba(255, 255, 255, 0.1) !important;
+    transform: scale(0.95);
+}
