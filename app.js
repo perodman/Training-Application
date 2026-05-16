@@ -1337,11 +1337,25 @@ function editLoggedWorkout(date, idx) {
 }
 
 // ==========================================================================
-// ALLA RADERINGSMODALER (ENHETLIG PREMIUM-STIL)
+// ALLA RADERINGSMODALER (ENHETLIG PREMIUM-STIL UTAN "STÄNG"-KNAPP)
 // ==========================================================================
+
+// Hjälpfunktion för att dölja den fasta "Stäng"-knappen i HTML
+function hideDefaultCloseButton(hide) {
+    // Letar upp stängknappen som ligger direkt efter #modal-body i din index.html
+    const closeBtn = document.querySelector("#workout-modal .modal-content > button");
+    if (closeBtn) {
+        if (hide) {
+            closeBtn.style.display = "none"; // Gömmer knappen helt
+        } else {
+            closeBtn.style.display = "block"; // Visar den igen (standard)
+        }
+    }
+}
 
 // 1. RADERA ÖVNING PERMANENT
 function deleteMasterExercise(id) {
+    hideDefaultCloseButton(true); // Dölj "Stäng"
     const body = document.getElementById("modal-body");
     body.innerHTML = `
         <div style="text-align:center; padding:10px;">
@@ -1360,6 +1374,7 @@ function deleteMasterExercise(id) {
 
 // 2. RADERA TRÄNINGSPASS/RUTIN PERMANENT
 function deleteEntireProgram(idx) {
+    hideDefaultCloseButton(true); // Dölj "Stäng"
     const body = document.getElementById("modal-body");
     body.innerHTML = `
         <div style="text-align:center; padding:10px;">
@@ -1376,8 +1391,9 @@ function deleteEntireProgram(idx) {
     openModal();
 }
 
-// 3. RADERA LOGGAT PASS FRÅN HISTORIKEN (Din befintliga – nu med snyggare röd knapp)
+// 3. RADERA LOGGAT PASS FRÅN HISTORIKEN
 function openConfirmDeleteModal(date, idx) {
+    hideDefaultCloseButton(true); // Dölj "Stäng"
     const body = document.getElementById("modal-body");
     body.innerHTML = `
         <div style="text-align:center; padding:10px;">
@@ -1391,8 +1407,9 @@ function openConfirmDeleteModal(date, idx) {
     openModal();
 }
 
-// 4. RADERA PÅGÅENDE UTKAST (Din befintliga – nu med snyggare röd knapp)
+// 4. RADERA PÅGÅENDE UTKAST
 function confirmDiscardActiveWorkout() {
+    hideDefaultCloseButton(true); // Dölj "Stäng"
     const body = document.getElementById("modal-body");
     body.innerHTML = `
         <div style="text-align:center; padding:10px;">
@@ -1405,4 +1422,3 @@ function confirmDiscardActiveWorkout() {
     `;
     openModal();
 }
-
