@@ -889,18 +889,21 @@ function renderActiveWorkout() {
     pauseBtn.className = "mode-btn save-draft-btn";
     // --- SLUT: Din befintliga logik ---
 
-    // HÄR ÄR UPPDATERINGEN: Hämta eller skapa ui_state-objektet säkert
+    // HÄR ÄR UPPDATERINGEN: Kontrollera om ui_state och openExercises saknas helt i minnet
     if (!activeDraft.ui_state) {
-        activeDraft.ui_state = { openExercises: [] };
+        activeDraft.ui_state = {};
     }
     
-    let openExercises = activeDraft.ui_state.openExercises;
-
-    // Om listan över öppna övningar är helt tom (t.ex. vid nystartat pass), 
-    // öppna automatiskt den allra första övningen (index 0)
-    if (openExercises.length === 0 && activeDraft.workout.exercises.length > 0) {
-        openExercises.push(0);
+    // Om openExercises inte alls existerar i activeDraft (vilket betyder att passet precis har startat),
+    // skapar vi listan och lägger till index 0 (första övningen) permanent i minnet direkt.
+    if (!activeDraft.ui_state.hasOwnProperty('openExercises') && activeDraft.workout.exercises.length > 0) {
+        activeDraft.ui_state.openExercises = [0];
+        saveAll(); // Sparar till localStorage så appen vet att den första är öppen avsiktligt
+    } else if (!activeDraft.ui_state.openExercises) {
+        activeDraft.ui_state.openExercises = [];
     }
+    
+    const openExercises = activeDraft.ui_state.openExercises;
 
     activeDraft.workout.exercises.forEach((ex, i) => {
         const exerciseData = activeDraft.data[i];
