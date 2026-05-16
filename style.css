@@ -475,7 +475,7 @@ select.log-input { font-size: 16px !important; text-align-last: center; appearan
     box-shadow: 0 8px 20px rgba(0,0,0,0.4) !important;
 }
 
-/* --- DEN VITA LINJEN I TOPPEN (Helt intakt) --- */
+/* --- DEN VITA LINJEN I TOPPEN AV KNAPPARNA (Helt intakt) --- */
 #home-view .mode-btn.home-card::before {
     content: "" !important;
     position: absolute !important;
@@ -483,7 +483,7 @@ select.log-input { font-size: 16px !important; text-align-last: center; appearan
     left: 0 !important;
     right: 0 !important;
     height: 2px !important;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent) !important;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.7), transparent) !important;
     display: block !important;
     z-index: 5 !important;
 }
