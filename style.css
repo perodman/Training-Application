@@ -363,9 +363,9 @@ select.log-input { font-size: 16px !important; text-align-last: center; appearan
     text-align: left;
 }
 
-/* --- SAMLAD KOD FÖR HUVUDKNAPPEN --- */
+/* --- SAMLAD KOD FÖR HUVUDKNAPPEN (MED PREMIUM-EFFEKTER) --- */
 
-/* 1. Själva knappen (Här styr vi bredden så den blir rak!) */
+/* 1. Själva knappen */
 .main-action {
     grid-column: span 2;
     margin: 0 0 15px 0 !important; 
@@ -378,12 +378,55 @@ select.log-input { font-size: 16px !important; text-align-last: center; appearan
     border-radius: 22px !important;
     border: none !important;
     box-shadow: 0 10px 25px rgba(34, 211, 238, 0.3);
+    
+    /* NYTT: Krävs för att de nya effekterna ska hålla sig inuti knappen */
+    position: relative !important;
+    overflow: hidden !important;
+}
+
+/* NYTT: Den eleganta linjen i toppen (anpassad med ljus cyan/cyan-vit) */
+.main-action::before {
+    content: "" !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    height: 2px !important;
+    background: linear-gradient(90deg, 
+        transparent, 
+        rgba(255, 255, 255, 0.6), 
+        transparent) !important;
+    display: block !important;
+    z-index: 5 !important;
+}
+
+/* NYTT: Den rökiga/flammande ljusslöjan inuti knappen */
+.main-action::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    /* Vi använder en ljusare variant av knappens egna färger för röken */
+    background: linear-gradient(135deg, 
+        transparent 20%, 
+        rgba(255, 255, 255, 0.25) 50%, 
+        transparent 80%
+    );
+    filter: blur(8px); 
+    z-index: 1;
+    pointer-events: none;
+    /* Rör sig lite snabbare än småknapparna (5s) för att ge mer "energi" åt eld-temat */
+    animation: mainSmokyMove 5s ease-in-out infinite;
 }
 
 /* 2. Ikonen (Elden) */
 .main-action .btn-icon {
     margin-bottom: 0 !important;
     font-size: 24px;
+    position: relative;
+    z-index: 2; /* Lägger ikonen ovanpå rökslöjan */
 }
 
 /* 3. Den stora texten */
@@ -393,6 +436,8 @@ select.log-input { font-size: 16px !important; text-align-last: center; appearan
     font-weight: 900;
     text-transform: uppercase;
     line-height: 1.2 !important;
+    position: relative;
+    z-index: 2; /* Lägger texten ovanpå rökslöjan */
 }
 
 /* 4. Den lilla undertexten */
@@ -401,6 +446,22 @@ select.log-input { font-size: 16px !important; text-align-last: center; appearan
     font-weight: 800;
     font-size: 9px;
     margin-top: 2px;
+}
+
+/* NYTT: Animationen som flyttar röken i huvudknappen */
+@keyframes mainSmokyMove {
+    0% {
+        transform: scale(1) translateX(-30%);
+        opacity: 0.3;
+    }
+    50% {
+        transform: scale(1.1) translateX(30%);
+        opacity: 0.9;
+    }
+    100% {
+        transform: scale(1) translateX(-30%);
+        opacity: 0.3;
+    }
 }
 
 /* --- BASEN FÖR KNAPPARNA (Helt intakt enligt dina önskemål) --- */
