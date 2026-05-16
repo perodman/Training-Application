@@ -427,35 +427,40 @@ select.log-input { font-size: 16px !important; text-align-last: center; appearan
     z-index: 5 !important;
 }
 
-/* --- DET FLAMMANDE / RÖRLIGA LAGRET --- */
+/* --- DET RÖKIGA / PULSERANDE LAGRET --- */
 #home-view .mode-btn.home-card::after {
     content: "";
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 200%; /* Gör lagret dubbelt så brett för att kunna röras */
-    height: 100%;
-    /* En mjuk ljusglimt i mitten av gradienten */
-    background: linear-gradient(90deg, 
-        rgba(255, 255, 255, 0), 
-        rgba(255, 255, 255, 0.15), 
-        rgba(255, 255, 255, 0)
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    /* En mjuk, rundad ljusglöd i mitten som tonar ut till helt osynlig */
+    background: radial-gradient(circle, 
+        rgba(255, 255, 255, 0.08) 0%, 
+        rgba(255, 255, 255, 0.03) 40%, 
+        transparent 70%
     );
+    /* Denna rad gör att gradienten blir "rökig" och mjuk i kanterna */
+    filter: blur(30px); 
     z-index: 1;
     pointer-events: none;
-    /* Kör animationen här istället, utan !important-blockering */
-    animation: flameMove 4s ease-in-out infinite;
+    /* Ökat till 8 sekunder för en mycket mer diskret och långsam rörelse */
+    animation: smokyFlame 8s ease-in-out infinite;
 }
 
-/* --- ANIMATIONEN SOM FLYTTAR LJUSGLIMTEN --- */
-@keyframes flameMove {
+/* --- ANIMATIONEN FÖR EN DISKRET, RÖKIG GLÖD --- */
+@keyframes smokyFlame {
     0% {
-        transform: translateX(-100%);
+        transform: translate(-10%, -10%) scale(1);
+        opacity: 0.5;
     }
     50% {
-        transform: translateX(50%);
+        transform: translate(10%, 10%) scale(1.15); /* Rör sig pyttelite och växer */
+        opacity: 1; /* Blir svagt starkare */
     }
     100% {
-        transform: translateX(-100%);
+        transform: translate(-10%, -10%) scale(1);
+        opacity: 0.5;
     }
 }
