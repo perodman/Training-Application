@@ -889,14 +889,24 @@ function renderActiveWorkout() {
     pauseBtn.className = "mode-btn save-draft-btn";
     // --- SLUT: Din befintliga logik ---
 
-    // HÄR ÄR UPPDATERINGEN: Vi hämtar en lista (array) istället för ett enskilt index
-    const openExercises = activeDraft.ui_state?.openExercises || [];
+    // HÄR ÄR UPPDATERINGEN: Hämta eller skapa ui_state-objektet säkert
+    if (!activeDraft.ui_state) {
+        activeDraft.ui_state = { openExercises: [] };
+    }
+    
+    let openExercises = activeDraft.ui_state.openExercises;
+
+    // Om listan över öppna övningar är helt tom (t.ex. vid nystartat pass), 
+    // öppna automatiskt den allra första övningen (index 0)
+    if (openExercises.length === 0 && activeDraft.workout.exercises.length > 0) {
+        openExercises.push(0);
+    }
 
     activeDraft.workout.exercises.forEach((ex, i) => {
         const exerciseData = activeDraft.data[i];
         const isDone = exerciseData.isCompleted;
         
-        // HÄR ÄR UPPDATERINGEN: Vi kollar om nuvarande index finns i listan över öppna
+        // Vi kollar om nuvarande index finns i listan över öppna
         const isOpen = openExercises.includes(i);
         
         const div = document.createElement("div");
