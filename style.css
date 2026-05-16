@@ -527,29 +527,6 @@ select.log-input { font-size: 16px !important; text-align-last: center; appearan
 }
 
 /* ==========================================================================
-   ÖVNINGSVY: ENBART TOPPLINJE PÅ KATEGORIKNAPPARNA
-   ========================================================================== */
-
-/* Vi säkerställer att knapparna tillåter att linjen läggs ovanpå */
-#category-menu .cat-btn.glass {
-    position: relative !important;
-    overflow: hidden !important;
-}
-
-/* Den eleganta linjen i toppen av övningsknapparna */
-#category-menu .cat-btn.glass::before {
-    content: "" !important;
-    position: absolute !important;
-    top: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
-    height: 2px !important;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.8), transparent) !important;
-    display: block !important;
-    z-index: 5 !important;
-}
-
-/* ==========================================================================
    ÖVNINGSVY: ENBART TOPPLINJE PÅ DE SPECIFIKA ÖVNINGSKORTEN
    ========================================================================== */
 
@@ -577,7 +554,7 @@ select.log-input { font-size: 16px !important; text-align-last: center; appearan
     left: 0 !important;
     right: 0 !important;
     height: 2px !important;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.8), transparent) !important;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent) !important;
     display: block !important;
     z-index: 5 !important;
 }
