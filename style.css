@@ -624,28 +624,35 @@ background: linear-gradient(90deg, transparent, rgba(34, 211, 238, 0.4), transpa
 }
 
 /* ==========================================================================
-   MJUKA ÖVERGÅNGAR (FADE & SLIDE) FÖR LISTELEMENT OCH KALENDERDAGAR
+   MJUKA ÖVERGÅNGAR (FADE & SLIDE) FÖR ÖVNINGAR, KALENDER OCH TRÄNINGSPROGRAM
    ========================================================================== */
 
-/* 1. Triggar animationen på de specifika övningskorten när de skapas */
+/* 1. ÖVNINGSVY: Triggar animationen på specifika övningskort när de skapas */
 #exercise-results > *, 
-.exercise-item, 
-.workout-card {
+.exercise-item {
     animation: softAppear 0.35s ease-out forwards !important;
 }
 
-/* 2. Triggar animationen på kalenderdagarna (och ev. text) när de ritas om */
+/* 2. KALENDERVY: Triggar animationen på kalenderdagarna när de ritas om */
 #calendar-grid > *,
 .calendar-day {
     animation: softAppear 0.35s ease-out forwards !important;
 }
 
+/* 3. NYTT – TRÄNINGSPROGRAM: Triggar animationen när du skiftar mellan Pass A, B osv. */
+#workout-exercises > *,
+#program-results > *,
+.workout-program-content > *,
+.workout-card {
+    animation: softAppear 0.35s ease-out forwards !important;
+}
 
-/* --- SJÄLVA ANIMATIONEN (Helt intakt, men med !important-skydd) --- */
+
+/* --- SJÄLVA ANIMATIONEN (Helt intakt för ett enhetligt UI) --- */
 @keyframes softAppear {
     0% {
         opacity: 0;
-        transform: translateY(6px); /* Något mindre rörelse för ett rappare gränssnitt */
+        transform: translateY(6px); /* Ger den där subtila rörelsen uppåt */
     }
     100% {
         opacity: 1;
