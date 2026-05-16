@@ -659,6 +659,13 @@ background: linear-gradient(90deg, transparent, rgba(34, 211, 238, 0.4), transpa
     animation: softAppear 0.35s ease-out forwards !important;
 }
 
+/* 4. MODALER: När du öppnar "Skapa ny övning" eller "Redigera övning"
+   Genom att trigga animationen när överbehållaren inte längre är dold (.hidden) 
+   får vi fönstret att glida upp fantastiskt mjukt på skärmen. */
+#workout-modal:not(.hidden) .modal-content {
+    animation: softAppear 0.35s ease-out forwards !important;
+}
+
 
 /* --- SJÄLVA ANIMATIONEN (Helt enhetlig över hela appen) --- */
 @keyframes softAppear {
