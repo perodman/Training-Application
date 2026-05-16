@@ -527,55 +527,54 @@ select.log-input { font-size: 16px !important; text-align-last: center; appearan
 }
 
 
-/* --- EXTRA SYNLIG RÖKGLÖD BAKOM HUVUDRUBRIKEN LIFT --- */
+/* --- EXTRA SUBTIL OCH GLESARE DIMMA FÖR HUVUDRUBRIKEN LIFT --- */
 #home-view .main-title {
     font-family: 'Montserrat', sans-serif !important;
     font-weight: 900 !important;
     text-transform: uppercase !important;
-    color: #ffffff !important; /* Vi sätter texten till solid vit så den är knivskarp */
+    color: #ffffff !important;
     position: relative !important;
-    display: inline-block !important; /* Krävs för att effekten ska hålla sig runt texten */
-    
-    /* En skarp textskugga som lyfter fram bokstäverna */
+    display: inline-block !important;
     text-shadow: 0 4px 20px rgba(0, 0, 0, 0.8) !important;
 }
 
-/* SJÄLVA RÖKMOLNET BAKOM TEXTEN */
+/* DEN UTLESADE OCH TUNNA DIMMAN */
 #home-view .main-title::after {
     content: "" !important;
     position: absolute !important;
-    top: 15% !important;
-    left: 10% !important;
-    width: 80% !important;
-    height: 70% !important;
+    top: 0 !important;
+    left: -10% !important;
+    width: 120% !important; /* Gör ytan bredare så dimman kan spridas ut */
+    height: 100% !important;
     
-    /* En mjuk, rökig ljusslöja (cyan-vit) som matchar din huvudknapp */
+    /* En mycket svagare och glesare radial gradient */
     background: radial-gradient(circle, 
-        rgba(34, 211, 238, 0.25) 0%, 
-        rgba(255, 255, 255, 0.08) 40%, 
-        transparent 75%
+        rgba(255, 255, 255, 0.12) 0%, 
+        rgba(34, 211, 238, 0.05) 30%, 
+        transparent 70%
     ) !important;
     
-    /* Kraftigt blurr för att förvandla det till rök/dimma */
-    filter: blur(20px) !important;
-    z-index: -1 !important; /* Lägger röken BAKOM texten */
+    /* Dubbelt så mycket blurr (40px) för att tunna ut och göra känslan "gles" */
+    filter: blur(40px) !important;
+    z-index: 2 !important; /* Låter den ligga kvar som en slöja på texten eftersom du gillade det */
+    pointer-events: none !important;
     
-    /* Startar en långsam, pulserande och flammande rörelse */
-    animation: titleSmokyGlow 6s ease-in-out infinite !important;
+    /* 8 sekunder för en extremt lugn och diskret puls */
+    animation: titleSuperSubtleGlow 8s ease-in-out infinite !important;
 }
 
-/* --- ANIMATIONEN SOM FÅR RÖKEN ATT ANDAS OCH RÖRA SIG --- */
-@keyframes titleSmokyGlow {
+/* --- ANIMATIONEN FÖR DEN SUBTILA DIMMAN --- */
+@keyframes titleSuperSubtleGlow {
     0% {
-        transform: scale(1) translate(-5px, -2px);
-        opacity: 0.6;
+        transform: scale(0.9) translate(-2px, -1px);
+        opacity: 0.3; /* Mycket transparent bas */
     }
     50% {
-        transform: scale(1.2) translate(5px, 3px); /* Molnet växer och flyttar sig svagt */
-        opacity: 1; /* Glöden blir starkare */
+        transform: scale(1.1) translate(2px, 1px);
+        opacity: 0.6; /* Går bara upp till hälften av tidigare styrka */
     }
     100% {
-        transform: scale(1) translate(-5px, -2px);
-        opacity: 0.6;
+        transform: scale(0.9) translate(-2px, -1px);
+        opacity: 0.3;
     }
 }
