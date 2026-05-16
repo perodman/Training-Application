@@ -894,11 +894,9 @@ function renderActiveWorkout() {
         activeDraft.ui_state = {};
     }
     
-    // Om openExercises inte alls existerar i activeDraft (vilket betyder att passet precis har startat),
-    // skapar vi listan och lägger till index 0 (första övningen) permanent i minnet direkt.
     if (!activeDraft.ui_state.hasOwnProperty('openExercises') && activeDraft.workout.exercises.length > 0) {
         activeDraft.ui_state.openExercises = [0];
-        saveAll(); // Sparar till localStorage så appen vet att den första är öppen avsiktligt
+        saveAll(); 
     } else if (!activeDraft.ui_state.openExercises) {
         activeDraft.ui_state.openExercises = [];
     }
@@ -909,7 +907,6 @@ function renderActiveWorkout() {
         const exerciseData = activeDraft.data[i];
         const isDone = exerciseData.isCompleted;
         
-        // Vi kollar om nuvarande index finns i listan över öppna
         const isOpen = openExercises.includes(i);
         
         const div = document.createElement("div");
@@ -920,9 +917,10 @@ function renderActiveWorkout() {
         const completedSets = exerciseData.sets_data.filter(s => s.userConfirmed).length;
         const totalSets = exerciseData.sets_data.length;
 
+        // JUSTERING: Ändrat text-align till left och lagt till padding-left: 5px på SET-rubriken
         let setsHtml = `<div style="margin-top:10px;">
             <div style="display:grid; grid-template-columns: 40px 1fr 1fr 30px; gap:8px; margin-bottom:5px; align-items:center;">
-                <small style="text-align:center; color:var(--text-light); font-size:9px;">SET</small>
+                <small style="text-align:left; padding-left:5px; color:var(--text-light); font-size:9px; font-weight:700;">SET</small>
                 <small style="text-align:center; color:var(--text-light); font-size:9px;">KG</small>
                 <small style="text-align:center; color:var(--text-light); font-size:9px;">REPS</small>
                 <span></span>
@@ -952,6 +950,14 @@ function renderActiveWorkout() {
                 <input type="text" inputmode="decimal" id="r-${i}-${sIdx}" class="log-input" style="margin:0; padding:12px; font-size:18px; opacity: ${isCurrent ? '1' : '0.3'};" value="${set.reps || ''}" ${isLocked ? 'readonly' : ''} oninput="updateSetDataOnly(${i}, ${sIdx})">
                 <button onclick="removeSetFromExercise(${i}, ${sIdx})" style="background:none; border:none; color:var(--danger); font-size:16px; opacity: ${isLocked || showSuccess ? '0.1' : '0.8'};" ${isLocked ? 'disabled' : ''}>×</button>
             </div>`;
+
+            // JUSTERING: Om detta är det aktiva setet, skjut in en supertunn, snygg hjälprad under inputfälten
+            if (isCurrent) {
+                setsHtml += `
+                <div style="grid-column: 2 / span 2; margin:-4px 0 8px 0; padding-left:2px; opacity:0.8; font-size:10px; color:var(--primary); font-weight:600; letter-spacing:0.3px;">
+                    💡 Klicka på ${statusContent} för att låsa & gå vidare
+                </div>`;
+            }
         });
 
         div.innerHTML = `
