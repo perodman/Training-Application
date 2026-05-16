@@ -186,7 +186,7 @@ body {
 }
 
 /* ==========================================================================
-   TRÄNINGSDAGBOK: MOBILOPTIMERAD KALENDER MED DAGENS DATUM-MARKERING
+   TRÄNINGSDAGBOK: MOBILOPTIMERAD KALENDER MED HELGARDERAD DATUM-MARKERING
    ========================================================================== */
 
 .calendar-nav { 
@@ -251,22 +251,19 @@ body {
 }
 
 /* ==========================================================================
-   NYTT: MARKERING FÖR DAGENS DATUM
-   (Träffar rutan om ditt script ger den klassen 'today' eller 'is-today')
+   MARKERING FÖR DAGENS DATUM (HELGARDERAD)
+   Denna lyssnar nu på nästan alla tänkbara klassnamn som JS kan ha gett rutan
    ========================================================================== */
 .calendar-cell.today,
-.calendar-cell.is-today {
+.calendar-cell.is-today,
+.calendar-cell.current-day,
+.calendar-cell.active-day,
+.calendar-cell.current {
     border: 2px solid rgba(34, 211, 238, 0.8) !important; /* En tydlig cyanblå ram */
     background: rgba(34, 211, 238, 0.15) !important;     /* En svag cyanblå bakgrundston */
     box-shadow: 0 0 12px rgba(34, 211, 238, 0.3) !important; /* Ett exklusivt, mjukt glödande sken */
+    color: #ffffff !important;                             /* Gör siffran extra krispigt vit */
 }
-
-/* Gör även siffran i dagens datum lite extra krispig */
-.calendar-cell.today,
-.calendar-cell.is-today {
-    color: #ffffff !important;
-}
-
 
 /* --- ANIMATIONEN --- */
 @keyframes calendarCellAppear {
