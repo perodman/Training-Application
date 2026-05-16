@@ -312,11 +312,43 @@ body {
 .modern-header { font-family: 'Montserrat', sans-serif; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; background: linear-gradient(to right, #fff, var(--primary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 1.6rem; margin-top: 10px; }
 .glass-light { background: var(--card-light); backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.2); border-radius: 24px; }
 .card { padding: 20px; margin-bottom: 15px; }
-.program-modern-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+/* ==========================================================================
+   UPPDATERAD: TRÄNINGSPROGRAM (KOMPAKT 3-STEGS-LAYOUT FÖR PASS A, B, C)
+   ========================================================================== */
+.program-modern-grid { 
+    display: grid; 
+    grid-template-columns: repeat(3, 1fr); /* Ändrad från 1fr 1fr till 3 kolumner */
+    gap: 10px; /* Något tätare mellanrum för mobilen */
+}
 
-.prog-card { background: linear-gradient(135deg, rgba(34, 211, 238, 0.1) 0%, rgba(129, 140, 248, 0.1) 100%); border: 1px solid var(--glass-border); border-radius: 20px; padding: 20px; text-align: center; cursor: pointer; position: relative; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-.prog-card.active { border-color: var(--primary); background: linear-gradient(135deg, rgba(34, 211, 238, 0.25) 0%, rgba(129, 140, 248, 0.25) 100%); box-shadow: 0 10px 25px rgba(34, 211, 238, 0.2); }
-.prog-card h4 { margin: 10px 0 0; font-size: 1.1rem; font-weight: 800; }
+.prog-card { 
+    background: linear-gradient(135deg, rgba(34, 211, 238, 0.1) 0%, rgba(129, 140, 248, 0.1) 100%); 
+    border: 1px solid var(--glass-border); 
+    border-radius: 16px; /* Något stramare hörn för den mindre storleken */
+    padding: 12px 6px; /* Slimmad padding (tidigare 20px) så texten får plats */
+    text-align: center; 
+    cursor: pointer; 
+    position: relative; 
+    overflow: hidden; 
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
+}
+
+.prog-card h4 { 
+    margin: 5px 0 0; /* Mindre marginal */
+    font-size: 0.95rem; /* Sänkt från 1.1rem så att "Pass A" etc. inte bryts fult */
+    font-weight: 800; 
+}
+
+.prog-card .btn-icon {
+    font-size: 18px; /* Krymper ikonen/eldflamman inuti pass-kortet */
+    margin-bottom: 4px;
+}
+
+.prog-card.active { 
+    border-color: var(--primary); 
+    background: linear-gradient(135deg, rgba(34, 211, 238, 0.25) 0%, rgba(129, 140, 248, 0.25) 100%); 
+    box-shadow: 0 8px 20px rgba(34, 211, 238, 0.2); 
+}
 .glass-modern { background: rgba(30, 41, 59, 0.7); border: 1px solid var(--glass-border); border-radius: 24px; box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1); backdrop-filter: blur(5px); }
 .glass { background: var(--card); backdrop-filter: blur(12px); border: 1px solid var(--glass-border); border-radius: 24px; }
 .category-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
