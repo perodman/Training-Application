@@ -527,54 +527,57 @@ select.log-input { font-size: 16px !important; text-align-last: center; appearan
 }
 
 
-/* --- EXTRA SUBTIL OCH GLESARE DIMMA FÖR HUVUDRUBRIKEN LIFT --- */
+/* --- PREMIUM METALLIC GLOW FÖR HUVUDRUBRIKEN LIFT --- */
 #home-view .main-title {
     font-family: 'Montserrat', sans-serif !important;
     font-weight: 900 !important;
     text-transform: uppercase !important;
-    color: #ffffff !important;
-    position: relative !important;
-    display: inline-block !important;
-    text-shadow: 0 4px 20px rgba(0, 0, 0, 0.8) !important;
-}
-
-/* DEN UTLESADE OCH TUNNA DIMMAN */
-#home-view .main-title::after {
-    content: "" !important;
-    position: absolute !important;
-    top: 0 !important;
-    left: -10% !important;
-    width: 120% !important; /* Gör ytan bredare så dimman kan spridas ut */
-    height: 100% !important;
+    font-size: 48px !important; /* Justera till din önskade storlek om det behövs */
+    letter-spacing: 2px !important;
+    margin-bottom: 5px !important;
+    display: block !important;
+    text-align: center !important;
     
-    /* En mycket svagare och glesare radial gradient */
-    background: radial-gradient(circle, 
-        rgba(255, 255, 255, 0.12) 0%, 
-        rgba(34, 211, 238, 0.05) 30%, 
-        transparent 70%
+    /* 1. Vi skapar en skarp gradient: Ljust silver i basen med en super-vit ljusglimt i mitten */
+    background: linear-gradient(to right, 
+        #e2e8f0 0%, 
+        #e2e8f0 40%, 
+        #ffffff 50%, 
+        #e2e8f0 60%, 
+        #e2e8f0 100%
     ) !important;
     
-    /* Dubbelt så mycket blurr (40px) för att tunna ut och göra känslan "gles" */
-    filter: blur(40px) !important;
-    z-index: 2 !important; /* Låter den ligga kvar som en slöja på texten eftersom du gillade det */
-    pointer-events: none !important;
+    /* 2. Gör bakgrunden jättebred så att den vita ljusglimten hamnar utanför till vänster från början */
+    background-size: 200% auto !important;
+    background-position: 0% center !important;
     
-    /* 8 sekunder för en extremt lugn och diskret puls */
-    animation: titleSuperSubtleGlow 8s ease-in-out infinite !important;
+    /* 3. Klipp effekten så den BARA existerar inuti bokstäverna */
+    -webkit-background-clip: text !important;
+    background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    
+    /* 4. Startar animationen som drar den vita ljusglimten över texten (Tar 4 sekunder) */
+    animation: metallicSweep 4s ease-in-out infinite !important;
+    
+    /* 5. Ett skarpt drop-shadow så att det ljusa silvret poppar ut från den mörka bakgrunden */
+    filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.6)) !important;
 }
 
-/* --- ANIMATIONEN FÖR DEN SUBTILA DIMMAN --- */
-@keyframes titleSuperSubtleGlow {
+/* VI RENSAR BORT ::AFTER SÅ DEN INTE LIGGER OCH STÖR TEXTEN LÄNGRE */
+#home-view .main-title::after {
+    display: none !important;
+    content: none !important;
+}
+
+/* --- ANIMATIONEN SOM SVEPER LJUSGLIMTEN FRÅN VÄNSTER TILL HÖGER --- */
+@keyframes metallicSweep {
     0% {
-        transform: scale(0.9) translate(-2px, -1px);
-        opacity: 0.3; /* Mycket transparent bas */
+        background-position: -100% center;
     }
     50% {
-        transform: scale(1.1) translate(2px, 1px);
-        opacity: 0.6; /* Går bara upp till hälften av tidigare styrka */
+        background-position: 100% center; /* Sveper ljuset hela vägen till höger */
     }
     100% {
-        transform: scale(0.9) translate(-2px, -1px);
-        opacity: 0.3;
+        background-position: 200% center; /* Fortsätter ut så det blir en naturlig paus innan nästa svep */
     }
 }
