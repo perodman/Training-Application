@@ -452,15 +452,15 @@ select.log-input { font-size: 16px !important; text-align-last: center; appearan
 /* --- ANIMATIONEN SOM FLYTTAR RÖKEN SAKTA --- */
 @keyframes smokyMove {
     0% {
-        transform: scale(1) translateX(-20%);
+        transform: scale(1) translateX(-10%);
         opacity: 0.4;
     }
     50% {
-        transform: scale(1.1) translateX(20%);
-        opacity: 1; /* Blir tydligare i mitten av animationen */
+        transform: scale(1.1) translateX(10%);
+        opacity: 0.4; /* Blir tydligare i mitten av animationen */
     }
     100% {
-        transform: scale(1) translateX(-20%);
+        transform: scale(1) translateX(-10%);
         opacity: 0.4;
     }
 }
