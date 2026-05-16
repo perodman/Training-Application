@@ -403,25 +403,18 @@ select.log-input { font-size: 16px !important; text-align-last: center; appearan
     margin-top: 2px;
 }
 
-/* DENNA REGEL VINNER ÖVER ALLT ANNAT (Med flammande gradient) */
+/* --- BASEN FÖR KNAPPARNA (Helt intakt enligt dina önskemål) --- */
 #home-view .mode-btn.home-card {
-    /* Här skapar vi en rörlig gradient av dina grå/vita nyanser */
-    background: linear-gradient(-45deg, 
-        rgba(255, 255, 255, 0.12), 
-        rgba(255, 255, 255, 0.22), 
-        rgba(255, 255, 255, 0.12)) !important;
-    background-size: 300% 300% !important; /* Gör gradienten större än knappen så den kan flytta på sig */
-    animation: flameEffect 6s ease infinite !important; /* Startar den mjuka, flammande rörelsen */
-    
+    background: rgba(255, 255, 255, 0.15) !important;
     border: 1px solid rgba(255, 255, 255, 0.3) !important;
     backdrop-filter: blur(15px) !important;
-    -webkit-backdrop-filter: blur(15px) !important; /* Säkerställer glaset på iPhone */
+    -webkit-backdrop-filter: blur(15px) !important;
     position: relative !important;
     overflow: hidden !important;
     box-shadow: 0 8px 20px rgba(0,0,0,0.4) !important;
 }
 
-/* Den vita linjen i toppen (Behålls exakt som du ville ha den) */
+/* --- DEN VITA LINJEN I TOPPEN (Helt intakt) --- */
 #home-view .mode-btn.home-card::before {
     content: "" !important;
     position: absolute !important;
@@ -434,15 +427,35 @@ select.log-input { font-size: 16px !important; text-align-last: center; appearan
     z-index: 5 !important;
 }
 
-/* SJÄLVA ANIMATIONEN: Denna styr hur gradienten flyttar sig och skapar det flammande ljuset */
-@keyframes flameEffect {
+/* --- DET FLAMMANDE / RÖRLIGA LAGRET --- */
+#home-view .mode-btn.home-card::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 200%; /* Gör lagret dubbelt så brett för att kunna röras */
+    height: 100%;
+    /* En mjuk ljusglimt i mitten av gradienten */
+    background: linear-gradient(90deg, 
+        rgba(255, 255, 255, 0), 
+        rgba(255, 255, 255, 0.15), 
+        rgba(255, 255, 255, 0)
+    );
+    z-index: 1;
+    pointer-events: none;
+    /* Kör animationen här istället, utan !important-blockering */
+    animation: flameMove 4s ease-in-out infinite;
+}
+
+/* --- ANIMATIONEN SOM FLYTTAR LJUSGLIMTEN --- */
+@keyframes flameMove {
     0% {
-        background-position: 0% 50%;
+        transform: translateX(-100%);
     }
     50% {
-        background-position: 100% 50%;
+        transform: translateX(50%);
     }
     100% {
-        background-position: 0% 50%;
+        transform: translateX(-100%);
     }
 }
