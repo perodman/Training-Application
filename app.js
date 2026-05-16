@@ -1193,12 +1193,24 @@ function moveActiveExercise(i, dir) {
     renderActiveWorkout();
 }
 
-function removeActiveExercise(i) {
-    if(confirm("Ta bort övningen?")) {
-        activeDraft.workout.exercises.splice(i, 1);
-        activeDraft.data.splice(i, 1);
-        renderActiveWorkout();
-    }
+// RADERA EN ÖVNING FRÅN DET PÅGÅENDE PASSET
+function removeActiveExercise(exIdx) {
+    hideDefaultCloseButton(true); // Dölj den fasta "Stäng"-knappen i HTML
+    const body = document.getElementById("modal-body");
+    
+    body.innerHTML = `
+        <div style="text-align:center; padding:10px;">
+            <div style="font-size:40px; margin-bottom:15px;">🗑️</div>
+            <h3 style="color:var(--danger);">Ta bort övningen?</h3>
+            <p style="color:var(--text-light); margin-bottom:25px; font-size:14px;">Är du säker på att du vill ta bort den här övningen från ditt pågående pass?</p>
+            <button class="mode-btn" style="background:linear-gradient(135deg, #ef4444 0%, #b91c1c 100%); color:white; margin-bottom:12px; font-weight:700;" 
+                onclick="activeDraft.workout.exercises.splice(${exIdx}, 1); activeDraft.data.splice(${exIdx}, 1); saveAll(); closeModal(); renderActiveWorkout();">
+                Ja, radera
+            </button>
+            <button class="mode-btn glass-border" onclick="closeModal()">Avbryt</button>
+        </div>
+    `;
+    openModal();
 }
 
 // --- STANDARD-LOGIK ---
