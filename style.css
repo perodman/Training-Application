@@ -527,45 +527,55 @@ select.log-input { font-size: 16px !important; text-align-last: center; appearan
 }
 
 
-/* --- PREMIUM-EFFEKT FÖR HUVUDRUBRIKEN LIFT --- */
+/* --- EXTRA SYNLIG RÖKGLÖD BAKOM HUVUDRUBRIKEN LIFT --- */
 #home-view .main-title {
     font-family: 'Montserrat', sans-serif !important;
     font-weight: 900 !important;
     text-transform: uppercase !important;
+    color: #ffffff !important; /* Vi sätter texten till solid vit så den är knivskarp */
+    position: relative !important;
+    display: inline-block !important; /* Krävs för att effekten ska hålla sig runt texten */
     
-    /* Skapar en snygg silver/vit basgradient för texten */
-    background: linear-gradient(135deg, 
-        #ffffff 0%, 
-        rgba(255, 255, 255, 0.7) 30%, 
-        #ffffff 50%, 
-        rgba(255, 255, 255, 0.6) 70%, 
-        #ffffff 100%
-    ) !important;
-    
-    /* Gör bakgrunden dubbelt så stor så röken kan flytta på sig */
-    background-size: 200% auto !important;
-    
-    /* MAGIN: Denna klipper bakgrunden så den bara syns INUTI bokstäverna */
-    -webkit-background-clip: text !important;
-    background-clip: text !important;
-    -webkit-text-fill-color: transparent !important; /* Gör ursprungstexten genomskinlig så gradienten syns */
-    
-    /* Startar den långsamma rökiga rörelsen (Matchar huvudknappen på 5s) */
-    animation: titleSmokyMove 5s ease-in-out infinite !important;
-    
-    /* Ger bokstäverna ett subtilt djup mot den mörka bakgrunden */
-    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.5)) !important;
+    /* En skarp textskugga som lyfter fram bokstäverna */
+    text-shadow: 0 4px 20px rgba(0, 0, 0, 0.8) !important;
 }
 
-/* --- ANIMATIONEN SOM FLYTTAR RÖKEN INUTI TEXTEN --- */
-@keyframes titleSmokyMove {
+/* SJÄLVA RÖKMOLNET BAKOM TEXTEN */
+#home-view .main-title::after {
+    content: "" !important;
+    position: absolute !important;
+    top: 15% !important;
+    left: 10% !important;
+    width: 80% !important;
+    height: 70% !important;
+    
+    /* En mjuk, rökig ljusslöja (cyan-vit) som matchar din huvudknapp */
+    background: radial-gradient(circle, 
+        rgba(34, 211, 238, 0.25) 0%, 
+        rgba(255, 255, 255, 0.08) 40%, 
+        transparent 75%
+    ) !important;
+    
+    /* Kraftigt blurr för att förvandla det till rök/dimma */
+    filter: blur(20px) !important;
+    z-index: -1 !important; /* Lägger röken BAKOM texten */
+    
+    /* Startar en långsam, pulserande och flammande rörelse */
+    animation: titleSmokyGlow 6s ease-in-out infinite !important;
+}
+
+/* --- ANIMATIONEN SOM FÅR RÖKEN ATT ANDAS OCH RÖRA SIG --- */
+@keyframes titleSmokyGlow {
     0% {
-        background-position: 0% 50%;
+        transform: scale(1) translate(-5px, -2px);
+        opacity: 0.6;
     }
     50% {
-        background-position: 100% 50%;
+        transform: scale(1.2) translate(5px, 3px); /* Molnet växer och flyttar sig svagt */
+        opacity: 1; /* Glöden blir starkare */
     }
     100% {
-        background-position: 0% 50%;
+        transform: scale(1) translate(-5px, -2px);
+        opacity: 0.6;
     }
 }
