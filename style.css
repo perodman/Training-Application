@@ -560,30 +560,31 @@ background: linear-gradient(90deg, transparent, rgba(34, 211, 238, 0.4), transpa
 }
 
 /* ==========================================================================
-   MJUKA ÖVERGÅNGAR (FADE & SLIDE) FÖR LISTOR OCH KALENDER
+   MJUKA ÖVERGÅNGAR (FADE & SLIDE) FÖR LISTELEMENT OCH KALENDERDAGAR
    ========================================================================== */
 
-/* 1. Övningslistan – Aktiveras när du byter muskelgrupp */
-#exercise-results {
-    /* Kör animationen "softAppear" under 0.4 sekunder med en mjuk start/stopp */
-    animation: softAppear 0.4s ease-out forwards;
+/* 1. Triggar animationen på de specifika övningskorten när de skapas */
+#exercise-results > *, 
+.exercise-item, 
+.workout-card {
+    animation: softAppear 0.35s ease-out forwards !important;
 }
 
-/* 2. Kalenderkortet – Aktiveras när du klickar på pilarna (höger/vänster) */
-#calendar-grid {
-    /* Kör samma animation för dagarna i kalendern när månaden skiftar */
-    animation: softAppear 0.4s ease-out forwards;
+/* 2. Triggar animationen på kalenderdagarna (och ev. text) när de ritas om */
+#calendar-grid > *,
+.calendar-day {
+    animation: softAppear 0.35s ease-out forwards !important;
 }
 
 
-/* --- SJÄLVA ANIMATIONEN (Hur övergången ser ut) --- */
+/* --- SJÄLVA ANIMATIONEN (Helt intakt, men med !important-skydd) --- */
 @keyframes softAppear {
     0% {
-        opacity: 0;                 /* Helt osynlig i början */
-        transform: translateY(8px); /* Startar 8 pixlar längre ner */
+        opacity: 0;
+        transform: translateY(6px); /* Något mindre rörelse för ett rappare gränssnitt */
     }
     100% {
-        opacity: 1;                 /* Helt synlig vid slutdestination */
-        transform: translateY(0);   /* Glider upp till sin rätta plats */
+        opacity: 1;
+        transform: translateY(0);
     }
 }
