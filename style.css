@@ -554,7 +554,7 @@ select.log-input { font-size: 16px !important; text-align-last: center; appearan
     left: 0 !important;
     right: 0 !important;
     height: 2px !important;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent) !important;
+background: linear-gradient(90deg, transparent, rgba(34, 211, 238, 0.4), transparent) !important;
     display: block !important;
     z-index: 5 !important;
 }
