@@ -710,3 +710,29 @@ background: linear-gradient(90deg, transparent, rgba(34, 211, 238, 0.4), transpa
         transform: translateY(0);
     }
 }
+
+/* ==========================================================================
+   DESIGNAD RADERINGSMODAL (PREMIUM-STIL)
+   ========================================================================== */
+.modal-content.danger-modal {
+    border-color: rgba(239, 68, 68, 0.3) !important; /* Subtil röd border */
+    text-align: center;
+}
+
+.modal-content.danger-modal h3 {
+    color: var(--danger) !important; /* Röd rubrik */
+    margin-bottom: 15px;
+}
+
+.modal-content.danger-modal p {
+    color: var(--text-light);
+    font-size: 14px;
+    margin-bottom: 25px;
+    line-height: 1.5;
+}
+
+.modal-btn-group {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
