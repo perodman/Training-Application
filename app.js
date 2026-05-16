@@ -389,11 +389,21 @@ function renderCalendar(isFromStartBtn = false) {
     const offset = firstDay === 0 ? 6 : firstDay - 1;
     const daysInMonth = new Date(year, month + 1, 0).getDate();
 
+    // Hämta dagens faktiska datum för att matcha mot loopen
+    const now = new Date();
+    const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+
     for (let i = 0; i < offset; i++) grid.innerHTML += `<div></div>`;
     for (let d = 1; d <= daysInMonth; d++) {
         const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
         const cell = document.createElement("div");
         cell.className = "calendar-cell";
+        
+        // NYTT: Kontrollera om denna ruta är dagens datum – lägg i så fall till klassen "today"
+        if (dateStr === todayStr) {
+            cell.classList.add("today");
+        }
+
         const hasWorkouts = workoutHistory.filter(w => w.date === dateStr);
         const isOngoing = activeDraft && activeDraft.date === dateStr && activeDraft.isStarted;
         const dayOfWeek = new Date(year, month, d).getDay();
