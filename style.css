@@ -427,40 +427,40 @@ select.log-input { font-size: 16px !important; text-align-last: center; appearan
     z-index: 5 !important;
 }
 
-/* --- DET RÖKIGA / PULSERANDE LAGRET --- */
+/* --- DET RÖKIGA LAGRET (Nu med synlig styrka) --- */
 #home-view .mode-btn.home-card::after {
     content: "";
     position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    /* En mjuk, rundad ljusglöd i mitten som tonar ut till helt osynlig */
-    background: radial-gradient(circle, 
-        rgba(255, 255, 255, 0.08) 0%, 
-        rgba(255, 255, 255, 0.03) 40%, 
-        transparent 70%
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    /* En linjär rök-gradient som är lite skarpare i färgerna men mjukas upp av blurret */
+    background: linear-gradient(135deg, 
+        transparent 20%, 
+        rgba(255, 255, 255, 0.18) 50%, 
+        transparent 80%
     );
-    /* Denna rad gör att gradienten blir "rökig" och mjuk i kanterna */
-    filter: blur(30px); 
+    /* Sänkt blurr från 30px till 10px så den inte tunnas ut till intet */
+    filter: blur(10px); 
     z-index: 1;
     pointer-events: none;
-    /* Ökat till 8 sekunder för en mycket mer diskret och långsam rörelse */
-    animation: smokyFlame 8s ease-in-out infinite;
+    /* 7 sekunder för en harmonisk, rökig rörelse */
+    animation: smokyMove 7s ease-in-out infinite;
 }
 
-/* --- ANIMATIONEN FÖR EN DISKRET, RÖKIG GLÖD --- */
-@keyframes smokyFlame {
+/* --- ANIMATIONEN SOM FLYTTAR RÖKEN SAKTA --- */
+@keyframes smokyMove {
     0% {
-        transform: translate(-10%, -10%) scale(1);
-        opacity: 0.5;
+        transform: scale(1) translateX(-20%);
+        opacity: 0.4;
     }
     50% {
-        transform: translate(10%, 10%) scale(1.15); /* Rör sig pyttelite och växer */
-        opacity: 1; /* Blir svagt starkare */
+        transform: scale(1.1) translateX(20%);
+        opacity: 1; /* Blir tydligare i mitten av animationen */
     }
     100% {
-        transform: translate(-10%, -10%) scale(1);
-        opacity: 0.5;
+        transform: scale(1) translateX(-20%);
+        opacity: 0.4;
     }
 }
