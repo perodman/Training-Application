@@ -358,12 +358,6 @@ function updateExercise(id) {
     saveAll(); closeModal(); filterExercises(currentExerciseCategory);
 }
 
-function deleteMasterExercise(id) {
-    if(confirm("Vill du radera denna övning permanent?")) {
-        masterExercises = masterExercises.filter(e => e.id != id);
-        saveAll(); closeModal(); filterExercises(currentExerciseCategory);
-    }
-}
 
 // --- KALENDER ---
 function renderCalendar(isFromStartBtn = false) {
@@ -774,15 +768,6 @@ function openEditProgramModal(idx) {
     openModal();
 }
 
-function deleteEntireProgram(idx) {
-    if(confirm("Vill du radera hela detta pass permanent?")) {
-        programData.routine.splice(idx, 1);
-        saveAll();
-        closeModal();
-        document.getElementById("program-details-area").classList.add("hidden");
-        renderProgramView();
-    }
-}
 
 function createNewExForPass(pIdx) {
     openCreateExerciseModal((newEx) => {
@@ -1351,30 +1336,73 @@ function editLoggedWorkout(date, idx) {
     showView("workout-view");
 }
 
-function openConfirmDeleteModal(date, idx) {
+// ==========================================================================
+// ALLA RADERINGSMODALER (ENHETLIG PREMIUM-STIL)
+// ==========================================================================
+
+// 1. RADERA ÖVNING PERMANENT
+function deleteMasterExercise(id) {
     const body = document.getElementById("modal-body");
     body.innerHTML = `
         <div style="text-align:center; padding:10px;">
             <div style="font-size:40px; margin-bottom:15px;">🗑️</div>
-            <h3>Radera passet?</h3>
-            <p style="color:var(--text-light); margin-bottom:25px;">Detta pass kommer att tas bort permanent från din historik.</p>
-            <button class="mode-btn" style="background:var(--danger); color:white; margin-bottom:12px;" onclick="deleteLoggedWorkout('${date}', ${idx})">Ja, radera</button>
+            <h3 style="color:var(--danger);">Radera övning?</h3>
+            <p style="color:var(--text-light); margin-bottom:25px; font-size:14px;">Vill du radera denna övning permanent?</p>
+            <button class="mode-btn" style="background:linear-gradient(135deg, #ef4444 0%, #b91c1c 100%); color:white; margin-bottom:12px; font-weight:700;" 
+                onclick="masterExercises = masterExercises.filter(e => e.id != ${id}); saveAll(); closeModal(); filterExercises(currentExerciseCategory);">
+                Ja, radera
+            </button>
             <button class="mode-btn glass-border" onclick="closeModal()">Avbryt</button>
         </div>
     `;
     openModal();
 }
 
-function confirmDiscardActiveWorkout() {
+// 2. RADERA TRÄNINGSPASS/RUTIN PERMANENT
+function deleteEntireProgram(idx) {
     const body = document.getElementById("modal-body");
     body.innerHTML = `
         <div style="text-align:center; padding:10px;">
-            <div style="font-size:40px; margin-bottom:15px;">⚠️</div>
-            <h3>Radera passet?</h3>
-            <p style="color:var(--text-light); margin-bottom:25px;">Allt pågående arbete i detta pass kommer att raderas.</p>
-            <button class="mode-btn" style="background:var(--danger); color:white; margin-bottom:12px;" onclick="localStorage.removeItem('activeWorkoutDraft'); location.reload();">Ja, radera!</button>
+            <div style="font-size:40px; margin-bottom:15px;">🗑️</div>
+            <h3 style="color:var(--danger);">Radera permanent?</h3>
+            <p style="color:var(--text-light); margin-bottom:25px; font-size:14px;">Vill du radera hela detta pass permanent? Det här valet går inte att ångra.</p>
+            <button class="mode-btn" style="background:linear-gradient(135deg, #ef4444 0%, #b91c1c 100%); color:white; margin-bottom:12px; font-weight:700;" 
+                onclick="programData.routine.splice(${idx}, 1); saveAll(); closeModal(); document.getElementById('program-details-area').classList.add('hidden'); renderProgramView();">
+                Ja, radera passet
+            </button>
             <button class="mode-btn glass-border" onclick="closeModal()">Avbryt</button>
         </div>
     `;
     openModal();
 }
+
+// 3. RADERA LOGGAT PASS FRÅN HISTORIKEN (Din befintliga – nu med snyggare röd knapp)
+function openConfirmDeleteModal(date, idx) {
+    const body = document.getElementById("modal-body");
+    body.innerHTML = `
+        <div style="text-align:center; padding:10px;">
+            <div style="font-size:40px; margin-bottom:15px;">🗑️</div>
+            <h3 style="color:var(--danger);">Radera passet?</h3>
+            <p style="color:var(--text-light); margin-bottom:25px; font-size:14px;">Detta pass kommer att tas bort permanent från din historik.</p>
+            <button class="mode-btn" style="background:linear-gradient(135deg, #ef4444 0%, #b91c1c 100%); color:white; margin-bottom:12px; font-weight:700;" onclick="deleteLoggedWorkout('${date}', ${idx})">Ja, radera</button>
+            <button class="mode-btn glass-border" onclick="closeModal()">Avbryt</button>
+        </div>
+    `;
+    openModal();
+}
+
+// 4. RADERA PÅGÅENDE UTKAST (Din befintliga – nu med snyggare röd knapp)
+function confirmDiscardActiveWorkout() {
+    const body = document.getElementById("modal-body");
+    body.innerHTML = `
+        <div style="text-align:center; padding:10px;">
+            <div style="font-size:40px; margin-bottom:15px;">⚠️</div>
+            <h3 style="color:var(--danger);">Radera passet?</h3>
+            <p style="color:var(--text-light); margin-bottom:25px; font-size:14px;">Allt pågående arbete i detta pass kommer att raderas.</p>
+            <button class="mode-btn" style="background:linear-gradient(135deg, #ef4444 0%, #b91c1c 100%); color:white; margin-bottom:12px; font-weight:700;" onclick="localStorage.removeItem('activeWorkoutDraft'); location.reload();">Ja, radera!</button>
+            <button class="mode-btn glass-border" onclick="closeModal()">Avbryt</button>
+        </div>
+    `;
+    openModal();
+}
+
