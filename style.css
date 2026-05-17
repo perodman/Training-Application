@@ -309,9 +309,14 @@ body {
 
 /* --- PROGRAM & KATEGORIER --- */
 .section-title { text-align: center; font-weight: 800; margin-bottom: 25px; font-size: 1.4rem; width: 100%; }
-.modern-header { font-family: 'Montserrat', sans-serif; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px; background: linear-gradient(to right, #fff, var(--primary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 1.35rem; margin-top: 10px; padding: 0 60px; box-sizing: border-box; word-break: break-word; }
+.modern-header { font-family: 'Montserrat', sans-serif; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px; background: linear-gradient(to right, #fff, var(--primary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 1.5rem; white-space: nowrap; box-sizing: border-box; 
+    /* AUTOMATISERING: Flytta ner rubriken under hemknappen och ge den full bredd */
+    margin-top: 55px;       /* Skjuter ner rubriken så den hamnar fritt under hemknappen */
+    padding: 0 15px;        /* Ger en naturlig, liten marginal till skärmens ytterkanter */
+}
 .glass-light { background: var(--card-light); backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.2); border-radius: 24px; }
 .card { padding: 20px; margin-bottom: 15px; }
+
 /* ==========================================================================
    UPPDATERAD: TRÄNINGSPROGRAM (KOMPAKT 3-STEGS-LAYOUT FÖR PASS A, B, C)
    ========================================================================== */
