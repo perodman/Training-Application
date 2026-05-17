@@ -168,31 +168,32 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
     else if (isOngoing) {
         html += `
         <div style="padding: 20px 10px; text-align: center;">
-            <button class="mode-btn orange" onclick="closeModal(); startWorkout(activeDraft.workout, activeDraft.data, activeDraft.date)" style="width: 100%; padding: 16px; font-size: 16px; font-weight: bold; border-radius: 14px; box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);">
+            <button class="mode-btn orange ongoing-btn" onclick="closeModal(); startWorkout(activeDraft.workout, activeDraft.data, activeDraft.date)" style="width: 100%; padding: 16px; font-size: 16px; font-weight: bold; border-radius: 14px; box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);">
                 Fortsätt pågående pass 🔥
             </button>
         </div>`;
     } 
     else {
+        // MODERNISERAT STATUS-KORT (Samma rök- och glasomtag som startsidan)
         html += `
-        <div class="card glass" style="padding: 20px; border-radius: 18px; text-align: center; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.08);">
-            <span style="font-size: 11px; text-transform: uppercase; color: var(--text-light); font-weight: 600; letter-spacing: 0.5px;">Status</span>
+        <div class="card status-card" style="padding: 24px; border-radius: 24px; text-align: center; margin-bottom: 20px; background: rgba(255, 255, 255, 0.02); border: 1px solid var(--glass-border); backdrop-filter: blur(10px); box-shadow: 0 10px 30px rgba(0,0,0,0.25);">
+            <span style="font-size: 11px; text-transform: uppercase; color: var(--text-light); font-weight: 800; letter-spacing: 2px; opacity: 0.6; display: block; margin-bottom: 4px;">Status</span>
             
-            <p id="current-planned-label" style="margin: 5px 0 15px 0; font-size: 18px; font-weight: 700; color: var(--text);">
-                ${planned ? `📋 Inplanerat: ${planned.name}` : '🧘 Planerad Vila'}
+            <p id="current-planned-label" style="margin: 0 0 20px 0; font-size: 20px; font-weight: 900; color: #ffffff; text-shadow: 0 2px 10px rgba(0,0,0,0.5);">
+                ${planned ? `📋 Inplanerat: <span style="color: var(--primary); text-shadow: 0 0 15px rgba(34, 211, 238, 0.2);">${planned.name}</span>` : '🧘 Planerad Vila'}
             </p>
             
-            <div id="day-manager-action-btn-container" style="margin-bottom: 10px;">`;
+            <div id="day-manager-action-btn-container" style="margin-bottom: 12px;">`;
             if(planned) {
                 html += `
-                <button class="mode-btn green" onclick="prepareStart('${dateStr}', '${planned.id}')" style="width: 100%; padding: 16px; font-size: 16px; font-weight: bold; border-radius: 14px; box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3); margin-bottom: 10px;">
+                <button class="mode-btn start-planned-btn" onclick="prepareStart('${dateStr}', '${planned.id}')" style="width: 100%; padding: 18px; font-size: 15px; font-weight: 900; border-radius: 18px; text-transform: uppercase; border: none; background: linear-gradient(135deg, var(--success) 0%, #059669 100%) !important; box-shadow: 0 6px 20px rgba(16, 185, 129, 0.3); color: white; position: relative; overflow: hidden; margin-bottom: 12px; cursor: pointer;">
                     Starta ${planned.name} 🔥
                 </button>`;
             }
         html += `
             </div>
             
-            <button class="mode-btn glass-border" onclick="closeModal(); startFreeWorkoutOnDate('${dateStr}')" style="width: 100%; padding: 12px; font-size: 14px; border-radius: 12px; border-style: dashed;">
+            <button class="mode-btn free-workout-btn" onclick="closeModal(); startFreeWorkoutOnDate('${dateStr}')" style="width: 100%; padding: 14px; font-size: 13px; border-radius: 14px; font-weight: 700; border: 1px dashed rgba(34, 211, 238, 0.4) !important; color: var(--primary) !important; background: rgba(34, 211, 238, 0.03) !important; cursor: pointer;">
                 ➕ Starta Fritt Pass
             </button>
         </div>`;
