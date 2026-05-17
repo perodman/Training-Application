@@ -97,7 +97,6 @@ function openModal() {
 }
 
 function openDayManager(dateStr, planned, completed, isOngoing) {
-    // SÄKERHETSÅTGÄRD: Försäkra oss om att stäng-knappen är synlig när vi öppnar kalenderdagarna
     if (typeof hideDefaultCloseButton === 'function') {
         hideDefaultCloseButton(false);
     }
@@ -174,57 +173,36 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
         </div>`;
     } 
     else {
-        // HÄR STARTAR DET MAXADE PREMIUMKORTET
-        const iconHtml = planned 
-            ? `<div style="width: 56px; height: 56px; border-radius: 18px; background: linear-gradient(135deg, rgba(34, 211, 238, 0.2), rgba(59, 130, 246, 0.05)); border: 1px solid rgba(34, 211, 238, 0.3); display: flex; align-items: center; justify-content: center; font-size: 24px; margin: 0 auto 16px auto; box-shadow: 0 8px 20px rgba(34, 211, 238, 0.15); animation: pulseGlow 3s infinite alternate;">⚡</div>`
-            : `<div style="width: 56px; height: 56px; border-radius: 18px; background: linear-gradient(135deg, rgba(253, 224, 71, 0.15), rgba(253, 224, 71, 0.02)); border: 1px solid rgba(253, 224, 71, 0.2); display: flex; align-items: center; justify-content: center; font-size: 24px; margin: 0 auto 16px auto; box-shadow: 0 8px 20px rgba(253, 224, 71, 0.05);">🧘</div>`;
+        // RENA KLASSER UTAN INTERNA STYLE-ATTRIBUT SOM KAN KROCKA
+        const auraClass = planned ? "status-aura aura-planned" : "status-aura aura-rest";
+        const sphereClass = planned ? "status-icon-sphere sphere-planned" : "status-icon-sphere sphere-rest";
+        const iconEmoji = planned ? "⚡" : "🧘";
 
         html += `
-        <style>
-            @keyframes pulseGlow {
-                0% { box-shadow: 0 8px 20px rgba(34, 211, 238, 0.15); transform: scale(1); }
-                100% { box-shadow: 0 8px 25px rgba(34, 211, 238, 0.3); transform: scale(1.02); }
-            }
-            @keyframes buttonPulse {
-                0% { box-shadow: 0 4px 15px rgba(34, 197, 94, 0.2); }
-                100% { box-shadow: 0 6px 25px rgba(34, 197, 94, 0.45); }
-            }
-        </style>
-
-        <div class="modern-status-card day-manager-status-box" 
-             style="display: block !important; text-align: center !important; padding: 28px 24px 24px 24px !important; border-radius: 28px !important; 
-                    background: radial-gradient(circle at top, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.01) 100%) !important; 
-                    border: 1px solid rgba(255, 255, 255, 0.08) !important;
-                    border-top: 1px solid rgba(255, 255, 255, 0.18) !important; /* Extra krispig övre kantlinje */
-                    backdrop-filter: blur(25px) !important; -webkit-backdrop-filter: blur(25px) !important; 
-                    box-shadow: 0 20px 45px rgba(0, 0, 0, 0.6), inset 0 1px 0px rgba(255, 255, 255, 0.15) !important; 
-                    margin-bottom: 30px !important; position: relative; overflow: hidden;">
+        <div class="modern-status-card day-manager-status-box">
+            <div class="${auraClass}"></div>
             
-            <div style="position: absolute; top: -50px; left: 50%; transform: translateX(-50%); width: 120px; height: 100px; background: ${planned ? 'rgba(34, 211, 238, 0.08)' : 'rgba(253, 224, 71, 0.04)'}; filter: blur(40px); pointer-events: none; border-radius: 50%;"></div>
+            <div class="${sphereClass}">${iconEmoji}</div>
             
-            ${iconHtml}
-            
-            <div style="display: inline-block; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255,255,255,0.05); padding: 4px 12px; border-radius: 100px; margin-bottom: 12px;">
-                <span class="status-box-title" style="font-size: 10px !important; text-transform: uppercase !important; color: var(--text-light) !important; font-weight: 800 !important; letter-spacing: 1.5px !important; opacity: 0.8 !important; margin: 0 !important; display: inline-block;">STATUS JUST NU</span>
+            <div class="status-badge-container">
+                <span class="status-box-title">STATUS JUST NU</span>
             </div>
             
-            <p id="current-planned-label" class="status-box-text" style="margin: 0 0 24px 0 !important; font-size: 21px !important; font-weight: 900 !important; color: #ffffff !important; text-shadow: 0 2px 12px rgba(0,0,0,0.6) !important; letter-spacing: -0.3px;">
-                ${planned ? `📋 Inplanerat:<br><span class="status-highlight-text" style="color: var(--primary) !important; text-shadow: 0 0 20px rgba(34, 211, 238, 0.4) !important; font-size: 23px; display: inline-block; margin-top: 4px;">${planned.name}</span>` : '🧘 Planerad Vila'}
+            <p id="current-planned-label" class="status-box-text">
+                ${planned ? `📋 Inplanerat:<br><span class="status-highlight-text">${planned.name}</span>` : '🧘 Planerad Vila'}
             </p>
             
             <div id="day-manager-action-btn-container" class="status-btn-container">`;
             if(planned) {
                 html += `
-                <button class="mode-btn premium-action-btn premium-green-btn" 
-                        onclick="prepareStart('${dateStr}', '${planned.id}')"
-                        style="animation: buttonPulse 2s infinite alternate; border: 1px solid rgba(34, 197, 94, 0.5) !important; background: linear-gradient(135deg, rgba(34, 197, 94, 0.35) 0%, rgba(16, 185, 129, 0.15) 100%) !important;">
+                <button class="mode-btn premium-action-btn premium-green-btn" onclick="prepareStart('${dateStr}', '${planned.id}')">
                     Starta ${planned.name} 🔥
                 </button>`;
             }
         html += `
             </div>
             
-            <button class="mode-btn premium-action-btn premium-free-btn" onclick="closeModal(); startFreeWorkoutOnDate('${dateStr}')" style="margin-top: 4px !important;">
+            <button class="mode-btn premium-action-btn premium-free-btn" onclick="closeModal(); startFreeWorkoutOnDate('${dateStr}')">
                 ➕ Starta ett tomt/fritt pass
             </button>
         </div>`;
@@ -809,7 +787,6 @@ function setOverrideSilent(date, val) {
     const btnContainer = document.getElementById('day-manager-action-btn-container');
     const statusTextElem = document.getElementById('current-planned-label');
     
-    // Uppdatera hela vyn dynamiskt om användaren klickar på en annan dag, så att ikoner och stilar hänger med
     openDayManager(date, val === 'none' ? null : programData.routine.find(x => x.id === val), [], false);
     renderCalendar(false); 
 }
