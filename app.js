@@ -1472,34 +1472,36 @@ window.addEventListener("load", () => {
     // 2. Kolla om vi har en sparad vy i webbläsarens minne
     const savedView = localStorage.getItem("currentActiveView");
     
-    // 3. Om det finns en sparad vy (och det inte är workout-view) – hoppa direkt dit!
+    // 3. Om det finns en sparad vy (och det inte är workout-view) – återställ vyn korrekt
     if (savedView && savedView !== "workout-view") {
-        showView(savedView);
         
-        // --- AUTOMATISERING: Rita ut data baserat på vilken vy vi landar på ---
-        
-        // Om vi landar på Övningar
-        if (savedView === "exercises-view" && typeof currentExerciseCategory !== 'undefined' && currentExerciseCategory) {
-            filterExercises(currentExerciseCategory);
-        }
-        
-        // Om vi landar på Träningsprogram
+        // --- LOGIK FÖR TRÄNINGSPROGRAM ---
         if (savedView === "programs-view") {
-            // Kontrollera vad din funktion heter. Den heter oftast renderPrograms() eller renderPasses()
-            if (typeof renderPrograms === 'function') renderPrograms();
-            else if (typeof renderPasses === 'function') renderPasses();
+            // Kör din funktion för att rita upp programmen (den sköter showView själv)
+            renderProgramView();
         }
         
-        // Om vi landar på Träningsdagbok / Schema
-        if (savedView === "calendar-view") {
-            // Kontrollera vad din funktion heter. Den heter oftast renderCalendar() eller initCalendar()
-            if (typeof renderCalendar === 'function') renderCalendar();
-            else if (typeof initCalendar === 'function') initCalendar();
+        // --- LOGIK FÖR KALENDER / TRÄNINGSSCHEMA ---
+        else if (savedView === "calendar-view") {
+            // Kör din funktion för att rita upp kalendern (den sköter showView själv)
+            renderCalendar();
         }
         
-        // Om vi landar på Statistik
-        if (savedView === "stats-view" && typeof renderCharts === 'function') {
-            renderCharts(); 
+        // --- LOGIK FÖR ÖVNINGAR ---
+        else if (savedView === "exercises-view") {
+            showView(savedView);
+            // Om du hade en aktiv kategori vald, ladda om den listan också
+            if (typeof currentExerciseCategory !== 'undefined' && currentExerciseCategory) {
+                filterExercises(currentExerciseCategory);
+            }
+        }
+        
+        // --- LOGIK FÖR ÖVRIGA VYER (T.EX. STATISTIK) ---
+        else {
+            showView(savedView);
+            if (savedView === "stats-view" && typeof renderCharts === 'function') {
+                renderCharts(); 
+            }
         }
 
     } else {
