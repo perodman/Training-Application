@@ -1465,41 +1465,67 @@ function confirmDiscardActiveWorkout() {
 }
 
 // ==========================================================================
-// AUTOMATISK ÅTERSTÄLLNING AV VY VID SIDUMLADDNING (KLICK-SIMULERING)
+// AUTOMATISK ÅTERSTÄLLNING AV VY VID SIDUMLADDNING (BLINKSFRI & MED AKTIVT PASS)
 // ==========================================================================
 window.addEventListener("load", () => {
-    // 1. Se till att startsidan alltid är förberedd i bakgrunden
+    // Hämta appens huvudsakliga container för skärmen
+    const appContainer = document.querySelector(".app-container");
+    
+    // 1. Dölj appen temporärt så startsidan inte hinner "blinka till" under laddningen
+    if (appContainer) {
+        appContainer.style.opacity = "0";
+        appContainer.style.transition = "opacity 0.15s ease-in-out";
+    }
+
+    // 2. Se till att startsidan alltid är förberedd i bakgrunden (linjer, utkast-knappar etc.)
     if (typeof renderHome === 'function') {
         renderHome();
     }
 
-    // 2. Hämta vilken vy användaren stod på innan omladdningen
+    // 3. Hämta vilken vy användaren stod på innan omladdningen
     const savedView = localStorage.getItem("currentActiveView");
     
-    // Om minnet är tomt, eller om man var mitt i ett pass, stanna på startsidan
-    if (!savedView || savedView === "home-view" || savedView === "workout-view") {
+    // Fallback: Om minnet är tomt, gå till startsidan direkt
+    if (!savedView || savedView === "home-view") {
         if (typeof showView === 'function') showView("home-view");
+        if (appContainer) appContainer.style.opacity = "1";
         return;
     }
 
-    // 3. SÄKERHETS-TRIGGER: Simulera ett klick på rätt menyknapp
-    // Detta gör att appen laddar all data i exakt rätt ordning, precis som när du trycker själv!
+    // 4. SÄKERHETS-TRIGGER: Återställ rätt vy baserat på minnet
     setTimeout(() => {
-        if (savedView === "programs-view") {
+        
+        // --- LOGIK FÖR PÅGÅENDE TRÄNINGSPASS ---
+        if (savedView === "workout-view") {
+            const resumeBtn = document.getElementById("resume-workout-btn");
+            // Om det finns ett aktivt utkast, simulera ett tryck på "Fortsätt träningen"
+            if (resumeBtn && !document.getElementById("draft-alert").classList.contains("hidden")) {
+                resumeBtn.click();
+            } else {
+                // Om inget utkast hittades, fall tillbaka säkert på startsidan
+                if (typeof showView === 'function') showView("home-view");
+            }
+        } 
+        
+        // --- LOGIK FÖR TRÄNINGSPROGRAM ---
+        else if (savedView === "programs-view") {
             const btn = document.getElementById("view-programs-btn");
             if (btn) btn.click();
             else if (typeof renderProgramView === 'function') renderProgramView();
         } 
+        
+        // --- LOGIK FÖR TRÄNINGSSCHEMA ---
         else if (savedView === "calendar-view") {
             const btn = document.getElementById("calendar-mode");
             if (btn) btn.click();
             else if (typeof renderCalendar === 'function') renderCalendar();
         } 
+        
+        // --- LOGIK FÖR ÖVNINGAR ---
         else if (savedView === "exercises-view") {
             const btn = document.getElementById("view-exercises-btn");
             if (btn) {
                 btn.click();
-                // Återställ eventuell aktiv kategori efter klicket
                 if (typeof currentExerciseCategory !== 'undefined' && currentExerciseCategory && typeof filterExercises === 'function') {
                     filterExercises(currentExerciseCategory);
                 }
@@ -1507,10 +1533,18 @@ window.addEventListener("load", () => {
                 showView("exercises-view");
             }
         } 
+        
+        // --- LOGIK FÖR STATISTIK ---
         else if (savedView === "stats-view") {
             const btn = document.getElementById("stats-mode");
             if (btn) btn.click();
             else if (typeof showView === 'function') showView("stats-view");
         }
-    }, 100); // 100ms fördröjning garanterar att DOM:en och knapparna är 100% redo att klickas på
+
+        // 5. Tona mjukt fram appen igen när allt är på rätt plats (inget blink!)
+        setTimeout(() => {
+            if (appContainer) appContainer.style.opacity = "1";
+        }, 50);
+
+    }, 100); // 100ms fördröjning ger appen tid att bygga alla variabler i bakgrunden
 });
