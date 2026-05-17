@@ -611,6 +611,11 @@ function renderCalendar(isFromStartBtn = false) {
 }
 
 function openDayManager(dateStr, planned, completed, isOngoing) {
+    // SÄKERHETSÅTGÄRD: Försäkra oss om att stäng-knappen är synlig när vi öppnar kalenderdagarna
+    if (typeof hideDefaultCloseButton === 'function') {
+        hideDefaultCloseButton(false);
+    }
+
     const body = document.getElementById("modal-body");
     
     let html = `
@@ -677,31 +682,32 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
     else if (isOngoing) {
         html += `
         <div style="padding: 20px 10px; text-align: center;">
-            <button class="mode-btn orange" onclick="closeModal(); startWorkout(activeDraft.workout, activeDraft.data, activeDraft.date)" style="width: 100%; padding: 16px; font-size: 16px; font-weight: bold; border-radius: 14px; box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);">
+            <button class="mode-btn orange ongoing-btn" onclick="closeModal(); startWorkout(activeDraft.workout, activeDraft.data, activeDraft.date)" style="width: 100%; padding: 16px; font-size: 16px; font-weight: bold; border-radius: 14px; box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);">
                 Fortsätt pågående pass 🔥
             </button>
         </div>`;
     } 
     else {
+        // DET NYA PREMIUMSTATUS-KORTET
         html += `
-        <div class="card glass" style="padding: 20px; border-radius: 18px; text-align: center; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.08);">
-            <span style="font-size: 11px; text-transform: uppercase; color: var(--text-light); font-weight: 600; letter-spacing: 0.5px;">Status</span>
+        <div class="modern-status-card day-manager-status-box">
+            <span class="status-box-title">Status</span>
             
-            <p id="current-planned-label" style="margin: 5px 0 15px 0; font-size: 18px; font-weight: 700; color: var(--text);">
-                ${planned ? `📋 Inplanerat: ${planned.name}` : '🧘 Planerad Vila'}
+            <p id="current-planned-label" class="status-box-text">
+                ${planned ? `📋 Inplanerat: <span class="status-highlight-text">${planned.name}</span>` : '🧘 Planerad Vila'}
             </p>
             
-            <div id="day-manager-action-btn-container" style="margin-bottom: 10px;">`;
+            <div id="day-manager-action-btn-container" class="status-btn-container">`;
             if(planned) {
                 html += `
-                <button class="mode-btn green" onclick="prepareStart('${dateStr}', '${planned.id}')" style="width: 100%; padding: 16px; font-size: 16px; font-weight: bold; border-radius: 14px; box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3); margin-bottom: 10px;">
+                <button class="mode-btn premium-action-btn premium-green-btn" onclick="prepareStart('${dateStr}', '${planned.id}')">
                     Starta ${planned.name} 🔥
                 </button>`;
             }
         html += `
             </div>
             
-            <button class="mode-btn glass-border" onclick="closeModal(); startFreeWorkoutOnDate('${dateStr}')" style="width: 100%; padding: 12px; font-size: 14px; border-radius: 12px; border-style: dashed;">
+            <button class="mode-btn premium-action-btn premium-free-btn" onclick="closeModal(); startFreeWorkoutOnDate('${dateStr}')">
                 ➕ Starta Fritt Pass
             </button>
         </div>`;
@@ -726,7 +732,7 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
 
                 html += `
                 <div style="display: flex; flex-direction: column; gap: 5px;">
-                    <button class="mode-btn glass-border plan-override-btn ${isSelected ? 'active-choice' : ''}" 
+                    <button class="mode-btn plan-override-btn ${isSelected ? 'active-choice' : ''}" 
                             id="btn-ovr-${p.id}" 
                             onclick="setOverrideSilent('${dateStr}', '${p.id}')"
                             style="margin: 0; padding: 12px; font-size: 13px; border-radius: 12px; font-weight: 600; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; width:100%;">
@@ -746,7 +752,7 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
             
             const isRestSelected = !planned;
             html += `
-                <button class="mode-btn glass-border plan-override-btn override-rest-btn ${isRestSelected ? 'active-choice' : ''}" 
+                <button class="mode-btn plan-override-btn override-rest-btn ${isRestSelected ? 'active-choice' : ''}" 
                         id="btn-ovr-none"
                         onclick="setOverrideSilent('${dateStr}', 'none')"
                         style="margin: 0; padding: 12px; font-size: 13px; border-radius: 12px; font-weight: bold; grid-column: span 2; border-color: rgba(253, 224, 71, 0.4); color: #fde047; background: rgba(253, 224, 71, 0.05);">
@@ -783,13 +789,15 @@ function setOverrideSilent(date, val) {
         // Hitta passets namn
         const p = programData.routine.find(x => x.id === val);
         
-        // Uppdatera texten i statuskortet direkt
-        if(statusTextElem) statusTextElem.textContent = `📋 Inplanerat: ${p.name}`;
+        // Uppdatera texten i statuskortet direkt med vår nya spanklass
+        if(statusTextElem) {
+            statusTextElem.innerHTML = `📋 Inplanerat: <span class="status-highlight-text">${p.name}</span>`;
+        }
         
-        // Uppdatera den stora startknappen direkt
+        // UTBYTE: Här skapar vi nu den NYA premiumknappen istället för den gamla tråkiga gröna!
         if(btnContainer) {
             btnContainer.innerHTML = `
-                <button class="mode-btn green" onclick="prepareStart('${date}', '${p.id}')" style="width: 100%; padding: 16px; font-size: 16px; font-weight: bold; border-radius: 14px; box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3); margin-bottom: 10px;">
+                <button class="mode-btn premium-action-btn premium-green-btn" onclick="prepareStart('${date}', '${p.id}')">
                     Starta ${p.name} 🔥
                 </button>`;
         }
@@ -1093,13 +1101,9 @@ function startWorkout(workout, data = null, date = null, isImmediateStart = fals
 
 function renderActiveWorkout() {
     // --- SÄKERHETSKONTROLL ---
-    // Vi kör en säker lagning här som AUTOMATISKT lagar felet om du lägger till en ny övning under passets gång.
-    // Den letar efter övningar som har 0 avklarade set men där rådatan har gamla bockar, och nollställer bara då.
     if (activeDraft && activeDraft.data) {
         activeDraft.data.forEach((exerciseData, i) => {
             if (!exerciseData.isCompleted && exerciseData.sets_data) {
-                // Kolla om detta är en nyligen tillagd historisk övning som smugit med sig bockar från start
-                // (Om alla set är sanna, men användaren inte har rört övningen i det här passet än)
                 const hasInputValues = exerciseData.sets_data.some(s => s.weight || s.reps);
                 const isBrandNewAndGhostChecked = exerciseData.sets_data.every(s => s.userConfirmed === true) && !activeDraft.ui_state?.openExercises?.includes(i);
                 
@@ -1153,7 +1157,6 @@ function renderActiveWorkout() {
     activeDraft.workout.exercises.forEach((ex, i) => {
         const exerciseData = activeDraft.data[i];
         const isDone = exerciseData.isCompleted;
-        
         const isOpen = openExercises.includes(i);
         
         const div = document.createElement("div");
