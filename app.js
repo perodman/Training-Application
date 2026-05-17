@@ -104,9 +104,9 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
     const body = document.getElementById("modal-body");
     
     let html = `
-        <div style="text-align: center; margin-bottom: 25px;">
-            <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: var(--text-light); font-weight: 600; display: block;">Valt datum</span>
-            <h2 class="section-title modern-header" style="margin: 8px 0 12px 0; display: inline-block; font-size: 26px;">
+        <div class="day-manager-header-area">
+            <span class="day-manager-sub-date">Valt datum</span>
+            <h2 class="section-title modern-header day-manager-main-date">
                 ${dateStr}
             </h2>
         </div>
@@ -184,11 +184,11 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
             <div class="${sphereClass}">${iconEmoji}</div>
             
             <div class="status-badge-container">
-                <span class="status-box-title">STATUS</span>
+                <span class="status-box-title">STATUS JUST NU</span>
             </div>
             
             <p id="current-planned-label" class="status-box-text">
-                ${planned ? `📋:<br><span class="status-highlight-text">${planned.name}</span>` : '🧘 Planerad Vila'}
+                ${planned ? `<span class="status-highlight-text">${planned.name}</span>` : '<span class="status-highlight-text rest-color">Planerad Vila</span>'}
             </p>
             
             <div id="day-manager-action-btn-container" class="status-btn-container">`;
@@ -207,16 +207,15 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
         </div>`;
 
         html += `
-        <div style="margin-top: 25px;">
-            <div style="display: flex; align-items: center; justify-content: center; gap: 15px; margin-bottom: 20px;">
-                <div style="flex-grow: 1; height: 1px; background: linear-gradient(90deg, transparent, rgba(56, 189, 248, 0.3));"></div>
-                <div class="status-badge-container" style="margin-bottom: 0;">
-                    <span class="status-box-title">ÄNDRA PLANERING</span>
-                </div>
-                <div style="flex-grow: 1; height: 1px; background: linear-gradient(90deg, rgba(56, 189, 248, 0.3), transparent);"></div>
+        <div class="section-divider-container">
+            <div class="divider-line"></div>
+            <div class="status-badge-container alternative-badge">
+                <span class="status-box-title">ÄNDRA PLANERING</span>
             </div>
-            
-            <div class="plan-override-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">`;
+            <div class="divider-line"></div>
+        </div>
+        
+        <div class="plan-override-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">`;
             
             programData.routine.forEach(p => {
                 const isSelected = planned && p.id === planned.id;
@@ -779,7 +778,7 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
     openModal();
 }
 
-function setOverrideSilent(date, val) {
+(date, val) {
     calendarOverrides[date] = val;
     saveAll();
     
