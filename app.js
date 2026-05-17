@@ -1052,6 +1052,7 @@ function getExerciseHistory(exerciseName) {
 }
 
 // --- AKTIVT PASS ---
+// --- AKTIVT PASS ---
 function startWorkout(workout, data = null, date = null, isImmediateStart = false) {
     if(!activeDraft || !activeDraft.secondsElapsed) {
         secondsElapsed = 0;
@@ -1063,7 +1064,17 @@ function startWorkout(workout, data = null, date = null, isImmediateStart = fals
         data = workout.exercises.map(ex => {
             const history = getExerciseHistory(ex.name);
             if (history) {
-                return { sets_data: JSON.parse(JSON.stringify(history)), isCompleted: false };
+                // Skapa en kopia av historiken
+                const historyCopy = JSON.parse(JSON.stringify(history));
+                
+                // AUTOMATISERING: Nollställ de gamla "Klar"-bockarna så att övningen startar som ogjord
+                if (Array.isArray(historyCopy)) {
+                    historyCopy.forEach(set => {
+                        set.userConfirmed = false;
+                    });
+                }
+                
+                return { sets_data: historyCopy, isCompleted: false };
             }
             return { sets_data: [{ weight: "", reps: "" }, { weight: "", reps: "" }, { weight: "", reps: "" }], isCompleted: false };
         });
@@ -1234,7 +1245,6 @@ function renderActiveWorkout() {
     showView("workout-view");
 }
 
-// Denna sparar bara siffrorna medan du skriver (ingen omladdning = inget hoppande tangentbord)
 function updateSetDataOnly(exIdx, setIdx) {
     const wVal = document.getElementById(`w-${exIdx}-${setIdx}`).value;
     const rVal = document.getElementById(`r-${exIdx}-${setIdx}`).value;
@@ -1244,18 +1254,12 @@ function updateSetDataOnly(exIdx, setIdx) {
 }
 
 function confirmSet(exIdx, setIdx) {
-    // 1. Spara nuvarande rullningsposition
     const scrollPos = window.scrollY;
-
     const currentState = activeDraft.data[exIdx].sets_data[setIdx].userConfirmed;
     activeDraft.data[exIdx].sets_data[setIdx].userConfirmed = !currentState;
     
     localStorage.setItem("activeWorkoutDraft", JSON.stringify(activeDraft));
-    
-    // 2. Rita om vyn
     renderActiveWorkout();
-
-    // 3. Hoppa direkt tillbaka till där du var
     window.scrollTo(0, scrollPos);
 }
 
