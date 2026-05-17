@@ -1091,15 +1091,18 @@ function startWorkout(workout, data = null, date = null, isImmediateStart = fals
 }
 
 function renderActiveWorkout() {
-    // --- SÄKERHETSÅTGÄRD FÖR FRITT PASS OCH NYA ÖVNINGAR ---
-    // Gå igenom alla övningar i utkastet och se till att gamla historiska bockar rensas bort automatiskt
+    // --- SÄKERHETSKONTROLL ---
+    // Vi kör en säker lagning här som AUTOMATISKT lagar felet om du lägger till en ny övning under passets gång.
+    // Den letar efter övningar som har 0 avklarade set men där rådatan har gamla bockar, och nollställer bara då.
     if (activeDraft && activeDraft.data) {
-        activeDraft.data.forEach(exerciseData => {
+        activeDraft.data.forEach((exerciseData, i) => {
             if (!exerciseData.isCompleted && exerciseData.sets_data) {
-                // Om övningen INTE är markerad som helt klar, men enskilda set har gamla bockar...
-                const allConfirmedBeforeStart = exerciseData.sets_data.every(s => s.userConfirmed === true);
-                if (allConfirmedBeforeStart && exerciseData.sets_data.length > 0) {
-                    // ...så nollställer vi bockarna så att passet startar fräscht!
+                // Kolla om detta är en nyligen tillagd historisk övning som smugit med sig bockar från start
+                // (Om alla set är sanna, men användaren inte har rört övningen i det här passet än)
+                const hasInputValues = exerciseData.sets_data.some(s => s.weight || s.reps);
+                const isBrandNewAndGhostChecked = exerciseData.sets_data.every(s => s.userConfirmed === true) && !activeDraft.ui_state?.openExercises?.includes(i);
+                
+                if (isBrandNewAndGhostChecked && exerciseData.sets_data.length > 0) {
                     exerciseData.sets_data.forEach(set => {
                         set.userConfirmed = false;
                     });
