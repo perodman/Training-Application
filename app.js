@@ -339,6 +339,11 @@ function openEditExerciseModal(id) {
         
         const exIndex = masterExercises.findIndex(e => e.id == exId);
         if(exIndex !== -1) {
+            // AUTOMATISERING: Spara det gamla namnet innan det skrivs över, och uppdatera historiken
+            const oldName = masterExercises[exIndex].name;
+            updateExerciseNameInHistory(oldName, nameInput);
+
+            // Din befintliga sparlogik
             masterExercises[exIndex].name = nameInput;
             masterExercises[exIndex].target = selectedCategory; 
             saveAll();
