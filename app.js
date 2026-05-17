@@ -768,9 +768,10 @@ function openEditProgramModal(idx) {
     openModal();
 }
 
-
 function createNewExForPass(pIdx) {
     openCreateExerciseModal((newEx) => {
+        // Kontrollera om en övning med samma namn (men gammal stavning) fanns här innan, 
+        // eller om du döper om via banken – då körs uppdateringen i historiken.
         programData.routine[pIdx].exercises.push({ name: newEx.name, target: newEx.target, defaultSets: 3 });
         openEditProgramModal(pIdx);
     });
@@ -787,6 +788,11 @@ function moveExercise(pIdx, eIdx, dir) {
 function removeExFromPass(pIdx, eIdx) {
     programData.routine[pIdx].exercises.splice(eIdx, 1);
     openEditProgramModal(pIdx);
+}
+
+function saveProgramEdit(idx) {
+    programData.routine[idx].name = document.getElementById("edit-pass-name").value;
+    saveAll(); closeModal(); renderProgramView(idx); showProgramDetails(idx);
 }
 
 function saveProgramEdit(idx) {
@@ -813,6 +819,32 @@ function saveNewProgram() {
     saveAll();
     const newIdx = programData.routine.length - 1;
     openEditProgramModal(newIdx);
+}
+
+// --- SÖK OCH ERSÄTT ÖVNINGSNAMN I TRÄNINGSHISTORIKEN ---
+function updateExerciseNameInHistory(oldName, newName) {
+    if (!oldName || !newName || oldName === newName) return;
+
+    let updatedCount = 0;
+
+    // Gå igenom hela träningshistoriken
+    workoutHistory.forEach(workout => {
+        if (workout.exercises && Array.isArray(workout.exercises)) {
+            // Leta efter övningar som har det gamla namnet
+            workout.exercises.forEach(exercise => {
+                if (exercise.name === oldName) {
+                    exercise.name = newName; // Byt till det nya namnet!
+                    updatedCount++;
+                }
+            });
+        }
+    });
+
+    // Om vi ändrade namn, spara till localStorage
+    if (updatedCount > 0) {
+        localStorage.setItem("workoutHistory", JSON.stringify(workoutHistory));
+        console.log(`Historiken uppdaterad: Ändrade "${oldName}" till "${newName}" på ${updatedCount} ställen.`);
+    }
 }
 
 // --- LOGIK FÖR HISTORIK ---
