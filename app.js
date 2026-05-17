@@ -1233,13 +1233,10 @@ document.getElementById("stats-mode").onclick = renderStats;
 document.getElementById("add-custom-pass-btn").onclick = openCreateProgramModal;
 
 function renderHome() {
-    // JUSTERING: Vi har tagit bort den blinda showView("home-view") härifrån 
-    // så att vi kan styra vyn mer flexibelt vid sidomladdningar!
+    showView("home-view");
     
     // Punkt 1: Permanent avgränsande linje på startsidan
     const homeView = document.getElementById("home-view");
-    if (!homeView) return; // Säkerhetsspärr
-    
     const headerP = homeView.querySelector("header p");
     
     // Ta bort ev gamla kopior först för att undvika dubletter vid omladdning
