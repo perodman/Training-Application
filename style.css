@@ -1005,3 +1005,160 @@ select.log-input { font-size: 16px !important; text-align-last: center; appearan
     font-size: 12px;
     color: #e2e8f0;
 }
+
+/* ==========================================================================
+   STATUSKORT & PREMIUMKNAPPAR (FIXAD GLASSMORPHISM-EFFEKT)
+   ========================================================================== */
+
+/* Det anpassade statuskortet inuti modalen */
+.modern-status-card.day-manager-status-box {
+    display: block !important;
+    text-align: center !important;
+    padding: 28px 24px 24px 24px !important;
+    border-radius: 28px !important;
+    margin-bottom: 30px !important;
+    position: relative;
+    overflow: hidden;
+    
+    /* ÄKTA GLASSMORPHISM */
+    background: radial-gradient(circle at top, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.01) 100%) !important;
+    backdrop-filter: blur(25px) !important;
+    -webkit-backdrop-filter: blur(25px) !important;
+    
+    /* KANTLINJER: Krispig överkant för att lyfta kortet */
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.22) !important;
+    
+    /* DJUP & SKUGGA: Tvingar kortet att poppa ut i 3D */
+    box-shadow: 0 20px 45px rgba(0, 0, 0, 0.6), inset 0 1px 0px rgba(255, 255, 255, 0.15) !important;
+}
+
+/* Dynamisk bakgrundsaura baserat på status */
+.status-aura {
+    position: absolute;
+    top: -50px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 120px;
+    height: 100px;
+    filter: blur(40px);
+    pointer-events: none;
+    border-radius: 50%;
+}
+.status-aura.aura-planned { background: rgba(34, 211, 238, 0.12); }
+.status-aura.aura-rest { background: rgba(253, 224, 71, 0.06); }
+
+/* Ikon-sfären högst upp */
+.status-icon-sphere {
+    width: 56px;
+    height: 56px;
+    border-radius: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    margin: 0 auto 16px auto;
+}
+.status-icon-sphere.sphere-planned {
+    background: linear-gradient(135deg, rgba(34, 211, 238, 0.2), rgba(59, 130, 246, 0.05));
+    border: 1px solid rgba(34, 211, 238, 0.3);
+    box-shadow: 0 8px 20px rgba(34, 211, 238, 0.15);
+    animation: pulseGlow 3s infinite alternate;
+}
+.status-icon-sphere.sphere-rest {
+    background: linear-gradient(135deg, rgba(253, 224, 71, 0.15), rgba(253, 224, 71, 0.02));
+    border: 1px solid rgba(253, 224, 71, 0.2);
+    box-shadow: 0 8px 20px rgba(253, 224, 71, 0.05);
+}
+
+/* Status-badge */
+.status-badge-container {
+    display: inline-block;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    padding: 4px 12px;
+    border-radius: 100px;
+    margin-bottom: 12px;
+}
+.status-box-title {
+    font-size: 10px !important;
+    text-transform: uppercase !important;
+    color: var(--text-light) !important;
+    font-weight: 800 !important;
+    letter-spacing: 1.5px !important;
+    opacity: 0.8 !important;
+    margin: 0 !important;
+    display: inline-block !important;
+}
+
+/* Huvudtexten */
+.status-box-text {
+    margin: 0 0 24px 0 !important;
+    font-size: 21px !important;
+    font-weight: 900 !important;
+    color: #ffffff !important;
+    text-shadow: 0 2px 12px rgba(0,0,0,0.6) !important;
+    letter-spacing: -0.3px !important;
+}
+.status-highlight-text {
+    color: var(--primary) !important;
+    text-shadow: 0 0 20px rgba(34, 211, 238, 0.4) !important;
+    font-size: 23px;
+    display: inline-block;
+    margin-top: 4px;
+}
+
+/* KNAPPAR */
+.premium-action-btn {
+    width: 100% !important;
+    display: block !important;
+    margin: 0 auto !important;
+    box-sizing: border-box !important;
+    transform: none !important;
+}
+.premium-green-btn {
+    padding: 18px !important;
+    font-size: 15px !important;
+    font-weight: 900 !important;
+    border-radius: 16px !important;
+    text-transform: uppercase !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+    backdrop-filter: blur(5px) !important;
+    margin-bottom: 12px !important;
+    animation: buttonPulse 2s infinite alternate;
+    border: 1px solid rgba(34, 197, 94, 0.5) !important;
+    background: linear-gradient(135deg, rgba(34, 197, 94, 0.35) 0%, rgba(16, 185, 129, 0.15) 100%) !important;
+    color: #ffffff !important;
+}
+.premium-green-btn:hover {
+    background: linear-gradient(135deg, rgba(34, 197, 94, 0.5) 0%, rgba(16, 185, 129, 0.25) 100%) !important;
+    box-shadow: 0 0 25px rgba(34, 197, 94, 0.5) !important;
+    border-color: rgba(34, 197, 94, 0.9) !important;
+}
+.premium-free-btn {
+    padding: 14px !important;
+    font-size: 13px !important;
+    border-radius: 14px !important;
+    font-weight: 700 !important;
+    border: 1px dashed rgba(34, 211, 238, 0.3) !important;
+    color: var(--primary) !important;
+    background: rgba(34, 211, 238, 0.02) !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+    margin-top: 4px !important;
+}
+.premium-free-btn:hover {
+    background: rgba(34, 211, 238, 0.08) !important;
+    border-color: var(--primary) !important;
+}
+
+/* ANIMATIONER */
+@keyframes pulseGlow {
+    0% { box-shadow: 0 8px 20px rgba(34, 211, 238, 0.15); transform: scale(1); }
+    100% { box-shadow: 0 8px 25px rgba(34, 211, 238, 0.3); transform: scale(1.04); }
+}
+@keyframes buttonPulse {
+    0% { box-shadow: 0 4px 15px rgba(34, 197, 94, 0.2); }
+    100% { box-shadow: 0 6px 25px rgba(34, 197, 94, 0.5); }
+}
