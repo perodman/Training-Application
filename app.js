@@ -173,7 +173,6 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
         </div>`;
     } 
     else {
-        // RENA KLASSER UTAN INTERNA STYLE-ATTRIBUT SOM KAN KROCKA
         const auraClass = planned ? "status-aura aura-planned" : "status-aura aura-rest";
         const sphereClass = planned ? "status-icon-sphere sphere-planned" : "status-icon-sphere sphere-rest";
         const iconEmoji = planned ? "⚡" : "🧘";
