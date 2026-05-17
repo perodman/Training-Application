@@ -4,9 +4,9 @@
     --success: #10b981;
     --warning: #f59e0b;
     --danger: #ef4444;
-    --card: rgba(255, 255, 255, 0.08);
-    --card-light: rgba(255, 255, 255, 0.15);
-    --glass-border: rgba(255, 255, 255, 0.1);
+    --card: rgba(255, 255, 255, 0.05);
+    --card-light: rgba(255, 255, 255, 0.12);
+    --glass-border: rgba(255, 255, 255, 0.08);
     --text: #f8fafc;
     --text-light: #94a3b8;
 }
@@ -611,120 +611,145 @@ select.log-input { font-size: 16px !important; text-align-last: center; appearan
 }
 
 /* ==========================================================================
-   MODERN STYLING FÖR OPEN DAY MANAGER
+   MODERN STYLING FÖR OPEN DAY MANAGER (PREMIUM CYBER-GLASS LOOK)
    ========================================================================== */
 .day-manager-header {
     text-align: center;
-    margin-bottom: 20px;
+    margin-bottom: 25px;
 }
 .day-manager-subtitle {
     font-size: 11px;
     text-transform: uppercase;
-    letter-spacing: 2px;
-    color: var(--text-light);
-    font-weight: 600;
+    letter-spacing: 3px;
+    color: var(--primary);
+    font-weight: 700;
     display: block;
+    opacity: 0.8;
 }
 .day-title.modern-header {
-    margin: 6px 0 10px 0 !important;
-    font-size: 24px !important;
+    margin: 8px 0 10px 0 !important;
+    font-size: 26px !important;
     display: inline-block;
 }
 
+/* Snyggare kort för avklarade pass med djup glaseffekt */
 .completed-workout-card {
+    background: rgba(15, 23, 42, 0.6) !important;
+    border: 1px solid rgba(16, 185, 129, 0.2) !important;
     border-left: 4px solid var(--success) !important;
     border-radius: 20px !important;
-    padding: 16px !important;
-    margin-bottom: 15px !important;
-    background: rgba(255, 255, 255, 0.04) !important;
+    padding: 18px !important;
+    margin-bottom: 20px !important;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3), inset 0 1px 1px rgba(255,255,255,0.05);
 }
 .workout-card-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 14px;
+    margin-bottom: 16px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    padding-bottom: 10px;
 }
 .workout-card-title {
-    font-size: 17px;
-    color: var(--text);
+    font-size: 18px;
+    color: #ffffff;
     display: block;
-    font-weight: 700;
+    font-weight: 800;
+    letter-spacing: -0.3px;
 }
 .workout-card-status {
-    font-size: 12px;
-    color: var(--text-light);
-    font-weight: 500;
+    font-size: 11px;
+    color: var(--success);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    background: rgba(16, 185, 129, 0.1);
+    padding: 4px 10px;
+    border-radius: 20px;
 }
 
+/* Runda stilrena knappar för ändringar */
 .workout-card-actions {
     display: flex;
-    gap: 8px;
+    gap: 10px;
 }
 .action-circle-btn {
     border: 1px solid var(--glass-border);
     cursor: pointer;
-    font-size: 13px;
-    width: 34px;
-    height: 34px;
+    font-size: 14px;
+    width: 38px;
+    height: 38px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.2s ease;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
 }
 .action-circle-btn.edit-btn {
-    background: rgba(34, 211, 238, 0.1);
+    background: rgba(34, 211, 238, 0.08);
     color: var(--primary);
+    border-color: rgba(34, 211, 238, 0.2);
 }
 .action-circle-btn.delete-btn {
-    background: rgba(239, 68, 68, 0.1);
+    background: rgba(239, 68, 68, 0.08);
     color: var(--danger);
     border-color: rgba(239, 68, 68, 0.2);
 }
-.action-circle-btn:active {
-    transform: scale(0.9);
-    opacity: 0.8;
+.action-circle-btn:hover, .action-circle-btn:active {
+    transform: scale(1.08) translateY(-2px);
 }
+.action-circle-btn.edit-btn:active { background: var(--primary); color: #000; box-shadow: 0 0 15px rgba(34,211,238,0.4); }
+.action-circle-btn.delete-btn:active { background: var(--danger); color: #fff; box-shadow: 0 0 15px rgba(239,68,68,0.4); }
 
+/* Containers inuti korten */
 .completed-exercises-container {
-    background: rgba(0, 0, 0, 0.2);
-    padding: 14px;
+    background: rgba(0, 0, 0, 0.25);
+    padding: 16px;
     border-radius: 16px;
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 14px;
+    border: 1px solid rgba(255,255,255,0.02);
 }
 .completed-exercise-name {
     color: var(--text);
-    font-weight: 700;
-    font-size: 14px;
+    font-weight: 800;
+    font-size: 15px;
     display: block;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
 }
 .completed-sets-grid {
     display: flex;
     flex-wrap: wrap;
-    gap: 6px;
+    gap: 8px;
 }
 .completed-set-badge {
-    background: rgba(34, 211, 238, 0.06);
-    border: 1px solid rgba(34, 211, 238, 0.25);
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
     padding: 6px 12px;
-    border-radius: 10px;
+    border-radius: 12px;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
     font-size: 12px;
+    transition: all 0.2s;
+}
+.completed-set-badge:hover {
+    background: rgba(34, 211, 238, 0.05);
+    border-color: rgba(34, 211, 238, 0.3);
 }
 .completed-set-badge .set-label {
     color: var(--primary);
     font-size: 9px;
-    font-weight: 800;
+    font-weight: 900;
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
 .completed-set-badge .set-values {
     color: #ffffff;
+    font-weight: 600;
 }
 .completed-set-badge .set-values small {
     color: var(--text-light);
@@ -732,79 +757,125 @@ select.log-input { font-size: 16px !important; text-align-last: center; appearan
     font-size: 10px;
 }
 .legacy-badge {
-    background: rgba(255,255,255,0.05);
+    background: rgba(255,255,255,0.04);
     border: 1px solid var(--glass-border);
     color: var(--text);
-    border-radius: 10px;
+    border-radius: 12px;
     font-weight: 600;
 }
 
+/* Pågående pass-knapp med pulserande premiumglöd */
 .ongoing-workout-container {
     padding: 10px 0;
 }
 .ongoing-btn {
-    padding: 16px !important;
+    padding: 18px !important;
     font-size: 16px !important;
-    border-radius: 16px !important;
-    box-shadow: 0 4px 15px rgba(245, 158, 11, 0.25);
+    border-radius: 18px !important;
+    font-weight: 800 !important;
+    background: linear-gradient(135deg, var(--warning) 0%, #d97706 100%) !important;
+    color: #0f172a !important;
+    box-shadow: 0 6px 20px rgba(245, 158, 11, 0.3);
+    border: none !important;
+    position: relative;
+    overflow: hidden;
+}
+.ongoing-btn::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent);
 }
 
+/* Statuskortet (När inget är gjort) */
 .status-card {
-    padding: 20px !important;
-    border-radius: 20px !important;
+    padding: 24px !important;
+    border-radius: 24px !important;
     text-align: center;
-    margin-bottom: 20px !important;
-    background: rgba(255, 255, 255, 0.03) !important;
+    margin-bottom: 25px !important;
+    background: rgba(255, 255, 255, 0.02) !important;
+    border: 1px solid var(--glass-border) !important;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
 }
 .status-subtitle {
     font-size: 11px;
     text-transform: uppercase;
     color: var(--text-light);
-    font-weight: 600;
-    letter-spacing: 0.5px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    opacity: 0.6;
 }
 .status-label {
-    margin: 8px 0 16px 0;
-    font-size: 18px;
-    font-weight: 800;
-    color: var(--text);
-}
-.start-planned-btn {
-    padding: 16px !important;
-    font-size: 16px !important;
-    border-radius: 16px !important;
-    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.25);
-    margin-bottom: 10px;
-}
-.free-workout-btn {
-    padding: 14px !important;
-    font-size: 14px !important;
-    border-radius: 14px !important;
-    border-style: dashed !important;
+    margin: 10px 0 20px 0;
+    font-size: 20px;
+    font-weight: 900;
+    color: #ffffff;
+    letter-spacing: -0.5px;
 }
 
+/* Huvudknappar för att starta planerade pass */
+.start-planned-btn {
+    padding: 18px !important;
+    font-size: 15px !important;
+    border-radius: 18px !important;
+    font-weight: 900 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px;
+    background: linear-gradient(135deg, var(--success) 0%, #059669 100%) !important;
+    border: none !important;
+    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.3);
+    margin-bottom: 12px;
+    position: relative;
+    overflow: hidden;
+}
+.start-planned-btn::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent);
+}
+
+.free-workout-btn {
+    padding: 14px !important;
+    font-size: 13px !important;
+    border-radius: 14px !important;
+    border: 1px dashed rgba(34, 211, 238, 0.4) !important;
+    color: var(--primary) !important;
+    background: rgba(34, 211, 238, 0.03) !important;
+    font-weight: 700 !important;
+}
+.free-workout-btn:active {
+    background: rgba(34, 211, 238, 0.1) !important;
+    border-style: solid !important;
+}
+
+/* Avdelare */
 .planning-section {
-    margin-top: 20px;
+    margin-top: 25px;
 }
 .section-divider {
     display: flex;
     align-items: center;
-    gap: 12px;
-    margin-bottom: 16px;
+    gap: 14px;
+    margin-bottom: 20px;
 }
 .divider-line {
     flex-grow: 1;
     height: 1px;
-    background: rgba(255, 255, 255, 0.08);
+    background: linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,0.1), rgba(255,255,255,0));
 }
 .divider-text {
     font-size: 11px;
     text-transform: uppercase;
     color: var(--text-light);
-    font-weight: 700;
-    letter-spacing: 1px;
+    font-weight: 800;
+    letter-spacing: 2px;
     margin: 0;
+    opacity: 0.7;
 }
+
+/* Grid för Överskrivning av plan - NU MED PREMIUM-LOOK */
 .plan-override-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -818,71 +889,103 @@ select.log-input { font-size: 16px !important; text-align-last: center; appearan
 }
 .plan-override-btn {
     margin: 0 !important;
-    padding: 14px 10px !important;
-    font-size: 13px !important;
-    border-radius: 14px !important;
-    font-weight: 700 !important;
+    padding: 16px 12px !important;
+    font-size: 14px !important;
+    border-radius: 16px !important;
+    font-weight: 800 !important;
+    color: #ffffff !important;
     background: rgba(255, 255, 255, 0.03) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
     text-overflow: ellipsis;
     overflow: hidden;
     white-space: nowrap;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    position: relative;
+    overflow: hidden !important;
+    transition: all 0.2s ease;
 }
+
+/* Elegant topplinje även på småknapparna */
+.plan-override-btn::before {
+    content: "" !important;
+    position: absolute !important;
+    top: 0 !important; left: 0 !important; right: 0 !important;
+    height: 1.5px !important;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent) !important;
+    display: block !important;
+}
+
+/* Aktivt val för pass (Glödande Cyan) */
 .plan-override-btn.active-choice {
     border-color: var(--primary) !important;
-    background: rgba(34, 211, 238, 0.15) !important;
-    box-shadow: 0 0 12px rgba(34, 211, 238, 0.15);
+    background: linear-gradient(135deg, rgba(34, 211, 238, 0.15) 0%, rgba(129, 140, 248, 0.1) 100%) !important;
+    box-shadow: 0 0 15px rgba(34, 211, 238, 0.25), inset 0 0 10px rgba(34, 211, 238, 0.1);
+    color: var(--primary) !important;
 }
+
+/* Vila-knappen (Glödande Guld) */
 .override-rest-btn {
     grid-column: span 2;
     width: 100%;
-    border-color: rgba(253, 224, 71, 0.3) !important;
-    color: #fde047 !important;
-    background: rgba(253, 224, 71, 0.04) !important;
+    border-color: rgba(253, 224, 71, 0.2) !important;
+    color: rgba(253, 224, 71, 0.8) !important;
+    background: rgba(253, 224, 71, 0.02) !important;
+}
+.override-rest-btn::before {
+    background: linear-gradient(90deg, transparent, rgba(253, 224, 71, 0.4), transparent) !important;
 }
 .override-rest-btn.active-choice {
-    background: rgba(253, 224, 71, 0.15) !important;
+    background: linear-gradient(135deg, rgba(253, 224, 71, 0.15) 0%, rgba(245, 158, 11, 0.05) 100%) !important;
     border-color: #fde047 !important;
+    box-shadow: 0 0 15px rgba(253, 224, 71, 0.25), inset 0 0 10px rgba(253, 224, 71, 0.1);
+    color: #fde047 !important;
 }
 
+/* Stilrena dolda detaljer */
 .override-details summary {
     list-style: none;
     font-size: 11px;
     color: var(--text-light);
-    opacity: 0.6;
+    opacity: 0.5;
     cursor: pointer;
     padding: 6px;
-    transition: opacity 0.2s;
+    text-align: center;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: all 0.2s;
 }
 .override-details summary:hover {
     opacity: 1;
+    color: var(--primary);
 }
 .override-details summary::-webkit-details-marker {
     display: none;
 }
 .details-content {
     text-align: left;
-    padding: 10px;
-    border-radius: 12px;
-    margin-top: 4px;
-    max-height: 120px;
+    padding: 12px;
+    border-radius: 14px;
+    margin-top: 6px;
+    max-height: 130px;
     overflow-y: auto;
-    background: rgba(0, 0, 0, 0.2);
+    background: rgba(0, 0, 0, 0.3);
     border: 1px solid rgba(255, 255, 255, 0.03);
+    box-shadow: inset 0 2px 8px rgba(0,0,0,0.4);
 }
 .details-exercise-item {
-    background: rgba(255, 255, 255, 0.02);
-    padding: 6px 10px;
-    border-radius: 8px;
-    margin-bottom: 5px;
-    border-left: 2px solid var(--primary);
-    font-size: 11px;
+    background: rgba(255, 255, 255, 0.01);
+    padding: 8px 12px;
+    border-radius: 10px;
+    margin-bottom: 6px;
+    border-left: 3px solid var(--primary);
+    font-size: 12px;
     color: #e2e8f0;
     display: flex;
     align-items: center;
+    font-weight: 600;
 }
 .details-exercise-item .bullet {
-    margin-right: 6px;
+    margin-right: 8px;
     color: var(--primary);
-    opacity: 0.7;
+    font-weight: 900;
 }
