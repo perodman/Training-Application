@@ -1384,9 +1384,9 @@ function hideDefaultCloseButton(hide) {
     }
 }
 
-// 1. RADERA ÖVNING PERMANENT
+// 1. RADERA ÖVNING PERMANENT (UPPDATERAD MED BACK-TO-EDIT LOGIK)
 function deleteMasterExercise(id) {
-    hideDefaultCloseButton(true); // Dölj "Stäng"
+    hideDefaultCloseButton(true); // Dölj "Stäng" inför raderingsbekräftelsen
     const body = document.getElementById("modal-body");
     body.innerHTML = `
         <div style="text-align:center; padding:10px;">
@@ -1397,7 +1397,10 @@ function deleteMasterExercise(id) {
                 onclick="masterExercises = masterExercises.filter(e => e.id != ${id}); saveAll(); closeModal(); filterExercises(currentExerciseCategory);">
                 Ja, radera
             </button>
-            <button class="mode-btn glass-border" onclick="closeModal()">Avbryt</button>
+            
+            <button class="mode-btn glass-border" onclick="hideDefaultCloseButton(false); openEditExerciseModal(${id});">
+                Avbryt
+            </button>
         </div>
     `;
     openModal();
