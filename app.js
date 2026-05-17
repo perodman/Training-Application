@@ -1052,7 +1052,6 @@ function getExerciseHistory(exerciseName) {
 }
 
 // --- AKTIVT PASS ---
-// --- AKTIVT PASS ---
 function startWorkout(workout, data = null, date = null, isImmediateStart = false) {
     if(!activeDraft || !activeDraft.secondsElapsed) {
         secondsElapsed = 0;
@@ -1064,16 +1063,12 @@ function startWorkout(workout, data = null, date = null, isImmediateStart = fals
         data = workout.exercises.map(ex => {
             const history = getExerciseHistory(ex.name);
             if (history) {
-                // Skapa en kopia av historiken
                 const historyCopy = JSON.parse(JSON.stringify(history));
-                
-                // AUTOMATISERING: Nollställ de gamla "Klar"-bockarna så att övningen startar som ogjord
                 if (Array.isArray(historyCopy)) {
                     historyCopy.forEach(set => {
                         set.userConfirmed = false;
                     });
                 }
-                
                 return { sets_data: historyCopy, isCompleted: false };
             }
             return { sets_data: [{ weight: "", reps: "" }, { weight: "", reps: "" }, { weight: "", reps: "" }], isCompleted: false };
@@ -1096,6 +1091,23 @@ function startWorkout(workout, data = null, date = null, isImmediateStart = fals
 }
 
 function renderActiveWorkout() {
+    // --- SÄKERHETSÅTGÄRD FÖR FRITT PASS OCH NYA ÖVNINGAR ---
+    // Gå igenom alla övningar i utkastet och se till att gamla historiska bockar rensas bort automatiskt
+    if (activeDraft && activeDraft.data) {
+        activeDraft.data.forEach(exerciseData => {
+            if (!exerciseData.isCompleted && exerciseData.sets_data) {
+                // Om övningen INTE är markerad som helt klar, men enskilda set har gamla bockar...
+                const allConfirmedBeforeStart = exerciseData.sets_data.every(s => s.userConfirmed === true);
+                if (allConfirmedBeforeStart && exerciseData.sets_data.length > 0) {
+                    // ...så nollställer vi bockarna så att passet startar fräscht!
+                    exerciseData.sets_data.forEach(set => {
+                        set.userConfirmed = false;
+                    });
+                }
+            }
+        });
+    }
+
     // --- START: Din befintliga logik (RÖR EJ) ---
     document.getElementById("active-title").textContent = activeDraft.workout.name;
     const list = document.getElementById("exercise-list");
@@ -1121,7 +1133,6 @@ function renderActiveWorkout() {
     pauseBtn.className = "mode-btn save-draft-btn";
     // --- SLUT: Din befintliga logik ---
 
-    // HÄR ÄR UPPDATERINGEN: Kontrollera om ui_state och openExercises saknas helt i minnet
     if (!activeDraft.ui_state) {
         activeDraft.ui_state = {};
     }
@@ -1149,7 +1160,6 @@ function renderActiveWorkout() {
         const completedSets = exerciseData.sets_data.filter(s => s.userConfirmed).length;
         const totalSets = exerciseData.sets_data.length;
 
-        // JUSTERING: Ändrat text-align till left och lagt till padding-left: 5px på SET-rubriken
         let setsHtml = `<div style="margin-top:10px;">
             <div style="display:grid; grid-template-columns: 40px 1fr 1fr 30px; gap:8px; margin-bottom:5px; align-items:center;">
                 <small style="text-align:left; padding-left:5px; color:var(--text-light); font-size:9px; font-weight:700;">SET</small>
@@ -1183,7 +1193,6 @@ function renderActiveWorkout() {
                 <button onclick="removeSetFromExercise(${i}, ${sIdx})" style="background:none; border:none; color:var(--danger); font-size:16px; opacity: ${isLocked || showSuccess ? '0.1' : '0.8'};" ${isLocked ? 'disabled' : ''}>×</button>
             </div>`;
 
-            // JUSTERING: Om detta är det aktiva setet, skjut in en supertunn, snygg hjälprad under inputfälten
             if (isCurrent) {
                 setsHtml += `
                 <div style="grid-column: 2 / span 2; margin:-4px 0 8px 0; padding-left:2px; opacity:0.8; font-size:10px; color:var(--primary); font-weight:600; letter-spacing:0.3px;">
@@ -1227,7 +1236,6 @@ function renderActiveWorkout() {
         list.appendChild(div);
     });
 
-    // --- Slutknappar ---
     const addBtn = document.createElement("button");
     addBtn.className = "mode-btn glass-border";
     addBtn.style.marginTop = "10px";
