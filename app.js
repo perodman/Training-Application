@@ -74,9 +74,6 @@ function showView(id) {
         target.style.animation = null;
     }
     window.scrollTo(0, 0);
-
-    // AUTOMATISERING: Spara den aktuella vyn i webbläsarens minne
-    localStorage.setItem("currentActiveView", id);
 }
 
 function closeModal() {
