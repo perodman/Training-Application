@@ -80,6 +80,11 @@ function closeModal() {
     document.getElementById("workout-modal").classList.add("hidden");
     const video = document.querySelector("#modal-body video");
     if(video) video.pause();
+    
+    // SÄKERHETSÅTGÄRD: Se till att den fasta stäng-knappen ALLTID visas igen när en modal stängs
+    if (typeof hideDefaultCloseButton === 'function') {
+        hideDefaultCloseButton(false);
+    }
 }
 
 function openModal() {
@@ -89,6 +94,185 @@ function openModal() {
     setTimeout(() => {
         modal.scrollTo(0, 0);
     }, 10);
+}
+
+function openDayManager(dateStr, planned, completed, isOngoing) {
+    // SÄKERHETSÅTGÄRD: Försäkra oss om att stäng-knappen är synlig när vi öppnar kalenderdagarna
+    if (typeof hideDefaultCloseButton === 'function') {
+        hideDefaultCloseButton(false);
+    }
+
+    const body = document.getElementById("modal-body");
+    
+    let html = `
+        <div style="text-align: center; margin-bottom: 25px;">
+            <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: var(--text-light); font-weight: 600; display: block;">Valt datum</span>
+            <h2 class="section-title modern-header" style="margin: 8px 0 20px 0; display: inline-block; font-size: 26px;">
+                ${dateStr}
+            </h2>
+        </div>
+    `;
+    
+    if (completed.length > 0) {
+        completed.forEach((w, idx) => {
+            const timeStr = w.totalTime ? `⏱️ ${w.totalTime}` : "";
+            html += `
+            <div class="card glass" style="border-left: 4px solid #22c55e; text-align: left; margin-bottom: 15px; padding: 15px; border-radius: 16px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                    <div>
+                        <strong style="font-size: 16px; color: var(--text); display: block;">${w.programName}</strong>
+                        <span style="font-size: 11px; color: var(--text-light); font-weight: 500;">${timeStr || 'Slutfört pass ✅'}</span>
+                    </div>
+                    <div style="display: flex; gap: 5px;">
+                        <button onclick="editLoggedWorkout('${dateStr}', ${idx})" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: var(--primary); cursor: pointer; font-size: 14px; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">✏️</button>
+                        <button onclick="openConfirmDeleteModal('${dateStr}', ${idx})" style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2); color: var(--danger); cursor: pointer; font-size: 12px; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">✖</button>
+                    </div>
+                </div>
+                
+                <div style="background: rgba(0,0,0,0.15); padding: 12px; border-radius: 12px; display: flex; flex-direction: column; gap: 10px;">`;
+            
+            w.exercises.forEach(ex => {
+                html += `
+                <div style="font-size: 13px;">
+                    <span style="color: var(--text); font-weight: 600; display: block; margin-bottom: 8px;">${ex.name}</span>
+                    <div style="display: flex; flex-direction: column; gap: 6px;">`;
+                
+                if(ex.sets_data) {
+                    ex.sets_data.forEach((s, sIdx) => {
+                        const wVal = s.weight || 0;
+                        const rVal = s.reps || 0;
+                        html += `
+                        <div style="background: rgba(59, 130, 246, 0.08); border: 1px solid var(--primary); padding: 6px 12px; border-radius: 8px; width: fit-content; display: flex; align-items: center; gap: 8px;">
+                            <span style="color: var(--primary); font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">Set ${sIdx+1}</span> 
+                            
+                            <span style="color: #ffffff; font-size: 13px; font-weight: 600;">${wVal} <small style="color: var(--primary); font-weight:400;">kg</small></span> 
+                            
+                            <span style="color: var(--primary); opacity: 0.4;">×</span> 
+                            
+                            <span style="color: #ffffff; font-size: 13px; font-weight: 600;">${rVal} <small style="color: var(--primary); font-weight:400;">reps</small></span>
+                        </div>`;
+                    });
+                } else {
+                    const wVal = ex.weight || 0;
+                    const rVal = ex.reps || 0;
+                    html += `
+                    <div style="background: rgba(59, 130, 246, 0.08); border: 1px solid var(--primary); color: #ffffff; font-size: 12px; padding: 6px 12px; border-radius: 8px; font-weight: 600; width: fit-content;">
+                        ${ex.sets} set <span style="color: var(--primary);">×</span> ${wVal}kg <span style="color: var(--primary);">×</span> ${rVal}reps
+                    </div>`;
+                }
+                html += `</div></div>`;
+            });
+            html += `</div></div>`;
+        });
+    } 
+    else if (isOngoing) {
+        html += `
+        <div style="padding: 20px 10px; text-align: center;">
+            <button class="mode-btn orange" onclick="closeModal(); startWorkout(activeDraft.workout, activeDraft.data, activeDraft.date)" style="width: 100%; padding: 16px; font-size: 16px; font-weight: bold; border-radius: 14px; box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);">
+                Fortsätt pågående pass 🔥
+            </button>
+        </div>`;
+    } 
+    else {
+        html += `
+        <div class="card glass" style="padding: 20px; border-radius: 18px; text-align: center; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.08);">
+            <span style="font-size: 11px; text-transform: uppercase; color: var(--text-light); font-weight: 600; letter-spacing: 0.5px;">Status</span>
+            
+            <p id="current-planned-label" style="margin: 5px 0 15px 0; font-size: 18px; font-weight: 700; color: var(--text);">
+                ${planned ? `📋 Inplanerat: ${planned.name}` : '🧘 Planerad Vila'}
+            </p>
+            
+            <div id="day-manager-action-btn-container" style="margin-bottom: 10px;">`;
+            if(planned) {
+                html += `
+                <button class="mode-btn green" onclick="prepareStart('${dateStr}', '${planned.id}')" style="width: 100%; padding: 16px; font-size: 16px; font-weight: bold; border-radius: 14px; box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3); margin-bottom: 10px;">
+                    Starta ${planned.name} 🔥
+                </button>`;
+            }
+        html += `
+            </div>
+            
+            <button class="mode-btn glass-border" onclick="closeModal(); startFreeWorkoutOnDate('${dateStr}')" style="width: 100%; padding: 12px; font-size: 14px; border-radius: 12px; border-style: dashed;">
+                ➕ Starta Fritt Pass
+            </button>
+        </div>`;
+
+        html += `
+        <div style="margin-top: 25px;">
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px;">
+                <div style="flex-grow: 1; height: 1px; background: rgba(255,255,255,0.08);"></div>
+                <p style="font-size: 11px; text-transform: uppercase; color: var(--text-light); font-weight: 700; letter-spacing: 1px; margin: 0;">Ändra planering</p>
+                <div style="flex-grow: 1; height: 1px; background: rgba(255,255,255,0.08);"></div>
+            </div>
+            
+            <div class="plan-override-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">`;
+            
+            programData.routine.forEach(p => {
+                const isSelected = planned && p.id === planned.id;
+                const exList = p.exercises.map(e => `
+                    <div style="background: rgba(255,255,255,0.05); padding: 5px 8px; border-radius: 6px; margin-bottom: 4px; border-left: 2px solid var(--primary); font-size: 10px; color: #ddd; display: flex; align-items: center;">
+                        <span style="margin-right: 6px; opacity: 0.5;">•</span> ${e.name}
+                    </div>
+                `).join('');
+
+                html += `
+                <div style="display: flex; flex-direction: column; gap: 5px;">
+                    <button class="mode-btn glass-border plan-override-btn ${isSelected ? 'active-choice' : ''}" 
+                            id="btn-ovr-${p.id}" 
+                            onclick="setOverrideSilent('${dateStr}', '${p.id}')"
+                            style="margin: 0; padding: 12px; font-size: 13px; border-radius: 12px; font-weight: 600; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; width:100%;">
+                        ${p.name}
+                    </button>
+                    
+                    <details style="width: 100%; text-align: center;">
+                        <summary style="list-style: none; font-size: 10px; color: var(--text-light); opacity: 0.6; cursor: pointer; padding: 4px; border-radius: 8px;">
+                            Innehåll ▾
+                        </summary>
+                        <div style="text-align: left; padding: 8px; border-radius: 10px; margin-top: 4px; max-height: 120px; overflow-y: auto; background: rgba(0,0,0,0.1);">
+                            ${exList}
+                        </div>
+                    </details>
+                </div>`;
+            });
+            
+            const isRestSelected = !planned;
+            html += `
+                <button class="mode-btn glass-border plan-override-btn override-rest-btn ${isRestSelected ? 'active-choice' : ''}" 
+                        id="btn-ovr-none"
+                        onclick="setOverrideSilent('${dateStr}', 'none')"
+                        style="margin: 0; padding: 12px; font-size: 13px; border-radius: 12px; font-weight: bold; grid-column: span 2; border-color: rgba(253, 224, 71, 0.4); color: #fde047; background: rgba(253, 224, 71, 0.05);">
+                    🧘 Vila
+                </button>
+            `;
+            
+        html += `
+            </div>
+        </div>`;
+    }
+    
+    body.innerHTML = html;
+    openModal();
+}
+
+function removeActiveExercise(exIdx) {
+    if (typeof hideDefaultCloseButton === 'function') {
+        hideDefaultCloseButton(true); // Dölj stäng-knappen i HTML under bekräftelsen
+    }
+    const body = document.getElementById("modal-body");
+    
+    body.innerHTML = `
+        <div style="text-align:center; padding:10px;">
+            <div style="font-size:40px; margin-bottom:15px;">🗑️</div>
+            <h3 style="color:var(--danger);">Ta bort övningen?</h3>
+            <p style="color:var(--text-light); margin-bottom:25px; font-size:14px;">Är du säker på att du vill ta bort den här övningen från ditt pågående pass?</p>
+            <button class="mode-btn" style="background:linear-gradient(135deg, #ef4444 0%, #b91c1c 100%); color:white; margin-bottom:12px; font-weight:700;" 
+                onclick="activeDraft.workout.exercises.splice(${exIdx}, 1); activeDraft.data.splice(${exIdx}, 1); saveAll(); closeModal(); renderActiveWorkout();">
+                Ja, radera
+            </button>
+            <button class="mode-btn glass-border" onclick="closeModal()">Avbryt</button>
+        </div>
+    `;
+    openModal();
 }
 
 // --- TIMER LOGIK ---
