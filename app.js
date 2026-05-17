@@ -1464,71 +1464,53 @@ function confirmDiscardActiveWorkout() {
     openModal();
 }
 
-// DENNA FUNKTION KÖRS AUTOMATISKT VARJE GÅNG SIDAN LADDAS OM
+// ==========================================================================
+// AUTOMATISK ÅTERSTÄLLNING AV VY VID SIDUMLADDNING (KLICK-SIMULERING)
+// ==========================================================================
 window.addEventListener("load", () => {
-    // 1. Försök att köra din apps befintliga dataladdning om den finns definierad
-    if (typeof loadAll === 'function') {
-        loadAll();
-    } else if (typeof init === 'function') {
-        init();
+    // 1. Se till att startsidan alltid är förberedd i bakgrunden
+    if (typeof renderHome === 'function') {
+        renderHome();
     }
 
-    // 2. Förbered startsidans knappar och utkast i bakgrunden
-    renderHome();
-
-    // 3. Hämta den sparade vyn från webbläsarens minne
+    // 2. Hämta vilken vy användaren stod på innan omladdningen
     const savedView = localStorage.getItem("currentActiveView");
     
-    // Om minnet är tomt eller om användaren var mitt i ett aktivt pass, visa startsidan direkt
-    if (!savedView || savedView === "workout-view") {
-        showView("home-view");
+    // Om minnet är tomt, eller om man var mitt i ett pass, stanna på startsidan
+    if (!savedView || savedView === "home-view" || savedView === "workout-view") {
+        if (typeof showView === 'function') showView("home-view");
         return;
     }
 
-    // 4. SÄKERHETSAUTOMATISERING: Ge webbläsaren 50 millisekunder att läsa in programData/workoutHistory i minnet
+    // 3. SÄKERHETS-TRIGGER: Simulera ett klick på rätt menyknapp
+    // Detta gör att appen laddar all data i exakt rätt ordning, precis som när du trycker själv!
     setTimeout(() => {
-        try {
-            // --- LOGIK FÖR TRÄNINGSPROGRAM ---
-            if (savedView === "programs-view") {
-                // Kontrollera att programData faktiskt existerar innan vi ritar
-                if (typeof programData !== 'undefined' && programData.routine) {
-                    renderProgramView();
-                } else {
-                    // Fallback om datan ändå inte laddades ordentligt
-                    showView("programs-view");
-                }
-            }
-            
-            // --- LOGIK FÖR KALENDER / TRÄNINGSSCHEMA ---
-            else if (savedView === "calendar-view") {
-                // Kontrollera att dina kalendervariabler existerar innan vi ritar
-                if (typeof currentViewDate !== 'undefined') {
-                    renderCalendar();
-                } else {
-                    // Fallback om datan ändå inte laddades ordentligt
-                    showView("calendar-view");
-                }
-            }
-            
-            // --- LOGIK FÖR ÖVNINGAR ---
-            else if (savedView === "exercises-view") {
-                showView(savedView);
-                if (typeof currentExerciseCategory !== 'undefined' && currentExerciseCategory) {
+        if (savedView === "programs-view") {
+            const btn = document.getElementById("view-programs-btn");
+            if (btn) btn.click();
+            else if (typeof renderProgramView === 'function') renderProgramView();
+        } 
+        else if (savedView === "calendar-view") {
+            const btn = document.getElementById("calendar-mode");
+            if (btn) btn.click();
+            else if (typeof renderCalendar === 'function') renderCalendar();
+        } 
+        else if (savedView === "exercises-view") {
+            const btn = document.getElementById("view-exercises-btn");
+            if (btn) {
+                btn.click();
+                // Återställ eventuell aktiv kategori efter klicket
+                if (typeof currentExerciseCategory !== 'undefined' && currentExerciseCategory && typeof filterExercises === 'function') {
                     filterExercises(currentExerciseCategory);
                 }
+            } else if (typeof showView === 'function') {
+                showView("exercises-view");
             }
-            
-            // --- LOGIK FÖR ÖVRIGA VYER ---
-            else {
-                showView(savedView);
-                if (savedView === "stats-view" && typeof renderCharts === 'function') {
-                    renderCharts(); 
-                }
-            }
-        } catch (error) {
-            // Om något ändå skulle krascha i renderingen, logga felet och visa vyn ändå
-            console.error("Fel vid återställning av vy:", error);
-            showView(savedView);
+        } 
+        else if (savedView === "stats-view") {
+            const btn = document.getElementById("stats-mode");
+            if (btn) btn.click();
+            else if (typeof showView === 'function') showView("stats-view");
         }
-    }, 50); 
+    }, 100); // 100ms fördröjning garanterar att DOM:en och knapparna är 100% redo att klickas på
 });
