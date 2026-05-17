@@ -174,9 +174,9 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
         </div>`;
     } 
     else {
-        // RENSAT STATUSKORT (Inga hårda stilar kvar som låser designen)
+        // HÄR ANVÄNDER VI DET NAMN SOM FINNS I DIN APP: modern-status-card
         html += `
-        <div class="card status-card user-status-box">
+        <div class="modern-status-card day-manager-status-box">
             <span class="status-box-title">Status</span>
             
             <p id="current-planned-label" class="status-box-text">
@@ -186,14 +186,14 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
             <div id="day-manager-action-btn-container" class="status-btn-container">`;
             if(planned) {
                 html += `
-                <button class="mode-btn start-planned-btn premium-green-btn" onclick="prepareStart('${dateStr}', '${planned.id}')">
+                <button class="mode-btn premium-action-btn premium-green-btn" onclick="prepareStart('${dateStr}', '${planned.id}')">
                     Starta ${planned.name} 🔥
                 </button>`;
             }
         html += `
             </div>
             
-            <button class="mode-btn free-workout-btn premium-free-btn" onclick="closeModal(); startFreeWorkoutOnDate('${dateStr}')">
+            <button class="mode-btn premium-action-btn premium-free-btn" onclick="closeModal(); startFreeWorkoutOnDate('${dateStr}')">
                 ➕ Starta Fritt Pass
             </button>
         </div>`;
