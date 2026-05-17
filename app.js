@@ -6,7 +6,7 @@ let calendarOverrides = JSON.parse(localStorage.getItem("calendarOverrides") || 
 let currentViewDate = new Date();
 let currentExerciseCategory = "Ben";
 
-// Timer-variablerr
+// Timer-variablerrf
 let timerInterval = null;
 let secondsElapsed = 0;
 let isTimerRunning = false;
@@ -106,7 +106,7 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
     let html = `
         <div style="text-align: center; margin-bottom: 25px;">
             <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: var(--text-light); font-weight: 600; display: block;">Valt datum</span>
-            <h2 class="section-title modern-header" style="margin: 8px 0 20px 0; display: inline-block; font-size: 26px;">
+            <h2 class="section-title modern-header" style="margin: 8px 0 12px 0; display: inline-block; font-size: 26px;">
                 ${dateStr}
             </h2>
         </div>
@@ -184,11 +184,11 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
             <div class="${sphereClass}">${iconEmoji}</div>
             
             <div class="status-badge-container">
-                <span class="status-box-title">STATUS JUST NU</span>
+                <span class="status-box-title">STATUS</span>
             </div>
             
             <p id="current-planned-label" class="status-box-text">
-                ${planned ? `📋 Inplanerat:<br><span class="status-highlight-text">${planned.name}</span>` : '🧘 Planerad Vila'}
+                ${planned ? `📋:<br><span class="status-highlight-text">${planned.name}</span>` : '🧘 Planerad Vila'}
             </p>
             
             <div id="day-manager-action-btn-container" class="status-btn-container">`;
@@ -208,10 +208,12 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
 
         html += `
         <div style="margin-top: 25px;">
-            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px;">
-                <div style="flex-grow: 1; height: 1px; background: rgba(255,255,255,0.08);"></div>
-                <p style="font-size: 11px; text-transform: uppercase; color: var(--text-light); font-weight: 700; letter-spacing: 1px; margin: 0;">Ändra planering</p>
-                <div style="flex-grow: 1; height: 1px; background: rgba(255,255,255,0.08);"></div>
+            <div style="display: flex; align-items: center; justify-content: center; gap: 15px; margin-bottom: 20px;">
+                <div style="flex-grow: 1; height: 1px; background: linear-gradient(90deg, transparent, rgba(56, 189, 248, 0.3));"></div>
+                <div class="status-badge-container" style="margin-bottom: 0;">
+                    <span class="status-box-title">ÄNDRA PLANERING</span>
+                </div>
+                <div style="flex-grow: 1; height: 1px; background: linear-gradient(90deg, rgba(56, 189, 248, 0.3), transparent);"></div>
             </div>
             
             <div class="plan-override-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">`;
