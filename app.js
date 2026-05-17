@@ -1476,12 +1476,34 @@ window.addEventListener("load", () => {
     if (savedView && savedView !== "workout-view") {
         showView(savedView);
         
-        // Om du var inne på en specifik kategori under Övningar, ladda om listan direkt
+        // --- AUTOMATISERING: Rita ut data baserat på vilken vy vi landar på ---
+        
+        // Om vi landar på Övningar
         if (savedView === "exercises-view" && typeof currentExerciseCategory !== 'undefined' && currentExerciseCategory) {
             filterExercises(currentExerciseCategory);
         }
+        
+        // Om vi landar på Träningsprogram
+        if (savedView === "programs-view") {
+            // Kontrollera vad din funktion heter. Den heter oftast renderPrograms() eller renderPasses()
+            if (typeof renderPrograms === 'function') renderPrograms();
+            else if (typeof renderPasses === 'function') renderPasses();
+        }
+        
+        // Om vi landar på Träningsdagbok / Schema
+        if (savedView === "calendar-view") {
+            // Kontrollera vad din funktion heter. Den heter oftast renderCalendar() eller initCalendar()
+            if (typeof renderCalendar === 'function') renderCalendar();
+            else if (typeof initCalendar === 'function') initCalendar();
+        }
+        
+        // Om vi landar på Statistik
+        if (savedView === "stats-view" && typeof renderCharts === 'function') {
+            renderCharts(); 
+        }
+
     } else {
-        // 4. Om minnet är tomt eller om man var mitt i ett pass, visa startsidan (där "Fortsätt träningen" nu syns tack vare renderHome)
+        // 4. Om minnet är tomt eller om man var mitt i ett pass, visa startsidan
         showView("home-view");
     }
 });
