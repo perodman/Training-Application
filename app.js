@@ -1071,6 +1071,19 @@ function startWorkout(workout, data = null, date = null, isImmediateStart = fals
     startTimer(); 
 }
 
+function setOverrideSilent(date, val) {
+    calendarOverrides[date] = val;
+    saveAll();
+    
+    document.querySelectorAll('.plan-override-btn').forEach(b => b.classList.remove('active-choice'));
+    
+    const btnContainer = document.getElementById('day-manager-action-btn-container');
+    const statusTextElem = document.getElementById('current-planned-label');
+    
+    openDayManager(date, val === 'none' ? null : programData.routine.find(x => x.id === val), [], false);
+    renderCalendar(false); 
+}
+
 function renderActiveWorkout() {
     if (activeDraft && activeDraft.data) {
         activeDraft.data.forEach((exerciseData, i) => {
