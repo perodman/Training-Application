@@ -1007,7 +1007,7 @@ select.log-input { font-size: 16px !important; text-align-last: center; appearan
 }
 
 /* ==========================================================================
-   MAXAT STATUSKORT & PREMIUMKNAPPAR (EXTREMA KONTRASTER)
+   MAXAT STATUSKORT & PREMIUMKNAPPAR (EXTREMA KONTRASTER - FINJUSTERAD)
    ========================================================================== */
 
 /* Det anpassade statuskortet inuti modalen */
@@ -1046,8 +1046,8 @@ select.log-input { font-size: 16px !important; text-align-last: center; appearan
     border-radius: 50%;
     opacity: 0.8;
 }
-.status-aura.aura-planned { background: rgba(34, 211, 238, 0.35); } /* Stark cyan-glöd */
-.status-aura.aura-rest { background: rgba(253, 224, 71, 0.2); }    /* Stark gul-glöd */
+.status-aura.aura-planned { background: rgba(34, 211, 238, 0.35); }
+.status-aura.aura-rest { background: rgba(253, 224, 71, 0.2); }
 
 /* Ikon-sfären högst upp */
 .status-icon-sphere {
@@ -1074,7 +1074,7 @@ select.log-input { font-size: 16px !important; text-align-last: center; appearan
     box-shadow: 0 0 20px rgba(253, 224, 71, 0.4);
 }
 
-/* Status-badge */
+/* Status-badge & Ändra planering-badge (Gemensam stil för enhetlighet) */
 .status-badge-container {
     display: inline-block;
     background: rgba(255, 255, 255, 0.08);
@@ -1086,9 +1086,9 @@ select.log-input { font-size: 16px !important; text-align-last: center; appearan
     z-index: 2;
 }
 .status-box-title {
-    font-size: 11px !important;
+    font-size: 13px !important; /* Ökad från 11px till 13px för mer tydlighet */
     text-transform: uppercase !important;
-    color: #38bdf8 !important; /* Ljusblå text istället för grå */
+    color: #38bdf8 !important; /* Lysande ljusblå text */
     font-weight: 900 !important;
     letter-spacing: 2px !important;
     margin: 0 !important;
@@ -1107,7 +1107,7 @@ select.log-input { font-size: 16px !important; text-align-last: center; appearan
     z-index: 2;
 }
 .status-highlight-text {
-    color: #22d3ee !important; /* Lysande cyan */
+    color: #22d3ee !important;
     text-shadow: 0 0 25px rgba(34, 211, 238, 0.8) !important;
     font-size: 26px;
     display: inline-block;
