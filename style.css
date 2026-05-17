@@ -1007,108 +1007,115 @@ select.log-input { font-size: 16px !important; text-align-last: center; appearan
 }
 
 /* ==========================================================================
-   STATUSKORT & PREMIUMKNAPPAR (FIXAD GLASSMORPHISM-EFFEKT)
+   MAXAT STATUSKORT & PREMIUMKNAPPAR (EXTREMA KONTRASTER)
    ========================================================================== */
 
 /* Det anpassade statuskortet inuti modalen */
 .modern-status-card.day-manager-status-box {
     display: block !important;
     text-align: center !important;
-    padding: 28px 24px 24px 24px !important;
+    padding: 35px 24px 28px 24px !important;
     border-radius: 28px !important;
     margin-bottom: 30px !important;
     position: relative;
     overflow: hidden;
     
-    /* ÄKTA GLASSMORPHISM */
-    background: radial-gradient(circle at top, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.01) 100%) !important;
-    backdrop-filter: blur(25px) !important;
-    -webkit-backdrop-filter: blur(25px) !important;
+    /* EXTREM GLASSMORPHISM (Mörkare bas för att ljuset ska synas) */
+    background: linear-gradient(180deg, rgba(30, 41, 59, 0.75) 0%, rgba(15, 23, 42, 0.9) 100%) !important;
+    backdrop-filter: blur(30px) !important;
+    -webkit-backdrop-filter: blur(30px) !important;
     
-    /* KANTLINJER: Krispig överkant för att lyfta kortet */
-    border: 1px solid rgba(255, 255, 255, 0.08) !important;
-    border-top: 1px solid rgba(255, 255, 255, 0.22) !important;
+    /* KANTLINJER: Mycket starkare och vitare överkant som reflekterar ljus */
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    border-top: 2px solid rgba(255, 255, 255, 0.45) !important;
     
-    /* DJUP & SKUGGA: Tvingar kortet att poppa ut i 3D */
-    box-shadow: 0 20px 45px rgba(0, 0, 0, 0.6), inset 0 1px 0px rgba(255, 255, 255, 0.15) !important;
+    /* 3D-DJUP: Brutal nattsvart skugga under kortet */
+    box-shadow: 0 35px 65px rgba(0, 0, 0, 0.9), inset 0 1px 2px rgba(255, 255, 255, 0.2) !important;
 }
 
-/* Dynamisk bakgrundsaura baserat på status */
+/* Kraftfull bakgrundsaura (Neon-glöd) */
 .status-aura {
     position: absolute;
-    top: -50px;
+    top: -60px;
     left: 50%;
     transform: translateX(-50%);
-    width: 120px;
-    height: 100px;
-    filter: blur(40px);
+    width: 160px;
+    height: 120px;
+    filter: blur(35px);
     pointer-events: none;
     border-radius: 50%;
+    opacity: 0.8;
 }
-.status-aura.aura-planned { background: rgba(34, 211, 238, 0.12); }
-.status-aura.aura-rest { background: rgba(253, 224, 71, 0.06); }
+.status-aura.aura-planned { background: rgba(34, 211, 238, 0.35); } /* Stark cyan-glöd */
+.status-aura.aura-rest { background: rgba(253, 224, 71, 0.2); }    /* Stark gul-glöd */
 
 /* Ikon-sfären högst upp */
 .status-icon-sphere {
-    width: 56px;
-    height: 56px;
-    border-radius: 18px;
+    width: 64px;
+    height: 64px;
+    border-radius: 20px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 24px;
-    margin: 0 auto 16px auto;
+    font-size: 28px;
+    margin: 0 auto 20px auto;
+    position: relative;
+    z-index: 2;
 }
 .status-icon-sphere.sphere-planned {
-    background: linear-gradient(135deg, rgba(34, 211, 238, 0.2), rgba(59, 130, 246, 0.05));
-    border: 1px solid rgba(34, 211, 238, 0.3);
-    box-shadow: 0 8px 20px rgba(34, 211, 238, 0.15);
-    animation: pulseGlow 3s infinite alternate;
+    background: linear-gradient(135deg, #164e63 0%, #0891b2 100%);
+    border: 2px solid #22d3ee;
+    box-shadow: 0 0 25px rgba(34, 211, 238, 0.6);
+    animation: pulseGlow 2.5s infinite alternate;
 }
 .status-icon-sphere.sphere-rest {
-    background: linear-gradient(135deg, rgba(253, 224, 71, 0.15), rgba(253, 224, 71, 0.02));
-    border: 1px solid rgba(253, 224, 71, 0.2);
-    box-shadow: 0 8px 20px rgba(253, 224, 71, 0.05);
+    background: linear-gradient(135deg, #713f12 0%, #ca8a04 100%);
+    border: 2px solid #fde047;
+    box-shadow: 0 0 20px rgba(253, 224, 71, 0.4);
 }
 
 /* Status-badge */
 .status-badge-container {
     display: inline-block;
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    padding: 4px 12px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    padding: 6px 16px;
     border-radius: 100px;
-    margin-bottom: 12px;
+    margin-bottom: 16px;
+    position: relative;
+    z-index: 2;
 }
 .status-box-title {
-    font-size: 10px !important;
+    font-size: 11px !important;
     text-transform: uppercase !important;
-    color: var(--text-light) !important;
-    font-weight: 800 !important;
-    letter-spacing: 1.5px !important;
-    opacity: 0.8 !important;
+    color: #38bdf8 !important; /* Ljusblå text istället för grå */
+    font-weight: 900 !important;
+    letter-spacing: 2px !important;
     margin: 0 !important;
     display: inline-block !important;
 }
 
 /* Huvudtexten */
 .status-box-text {
-    margin: 0 0 24px 0 !important;
-    font-size: 21px !important;
+    margin: 0 0 26px 0 !important;
+    font-size: 23px !important;
     font-weight: 900 !important;
     color: #ffffff !important;
-    text-shadow: 0 2px 12px rgba(0,0,0,0.6) !important;
-    letter-spacing: -0.3px !important;
+    text-shadow: 0 3px 15px rgba(0,0,0,0.9) !important;
+    letter-spacing: -0.5px !important;
+    position: relative;
+    z-index: 2;
 }
 .status-highlight-text {
-    color: var(--primary) !important;
-    text-shadow: 0 0 20px rgba(34, 211, 238, 0.4) !important;
-    font-size: 23px;
+    color: #22d3ee !important; /* Lysande cyan */
+    text-shadow: 0 0 25px rgba(34, 211, 238, 0.8) !important;
+    font-size: 26px;
     display: inline-block;
-    margin-top: 4px;
+    margin-top: 6px;
+    font-weight: 950;
 }
 
-/* KNAPPAR */
+/* PREMIUM-KNAPPAR */
 .premium-action-btn {
     width: 100% !important;
     display: block !important;
@@ -1118,47 +1125,48 @@ select.log-input { font-size: 16px !important; text-align-last: center; appearan
 }
 .premium-green-btn {
     padding: 18px !important;
-    font-size: 15px !important;
+    font-size: 16px !important;
     font-weight: 900 !important;
     border-radius: 16px !important;
     text-transform: uppercase !important;
     cursor: pointer !important;
-    transition: all 0.3s ease !important;
-    backdrop-filter: blur(5px) !important;
-    margin-bottom: 12px !important;
+    transition: all 0.2s ease !important;
+    margin-bottom: 14px !important;
     animation: buttonPulse 2s infinite alternate;
-    border: 1px solid rgba(34, 197, 94, 0.5) !important;
-    background: linear-gradient(135deg, rgba(34, 197, 94, 0.35) 0%, rgba(16, 185, 129, 0.15) 100%) !important;
+    border: 2px solid #22c55e !important;
+    background: linear-gradient(135deg, #15803d 0%, #22c55e 100%) !important;
     color: #ffffff !important;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5) !important;
 }
 .premium-green-btn:hover {
-    background: linear-gradient(135deg, rgba(34, 197, 94, 0.5) 0%, rgba(16, 185, 129, 0.25) 100%) !important;
-    box-shadow: 0 0 25px rgba(34, 197, 94, 0.5) !important;
-    border-color: rgba(34, 197, 94, 0.9) !important;
+    background: linear-gradient(135deg, #16a34a 0%, #4ade80 100%) !important;
+    box-shadow: 0 0 30px rgba(34, 197, 94, 0.8) !important;
+    transform: scale(1.01) !important;
 }
 .premium-free-btn {
     padding: 14px !important;
     font-size: 13px !important;
     border-radius: 14px !important;
-    font-weight: 700 !important;
-    border: 1px dashed rgba(34, 211, 238, 0.3) !important;
-    color: var(--primary) !important;
-    background: rgba(34, 211, 238, 0.02) !important;
+    font-weight: 800 !important;
+    border: 2px dashed rgba(34, 211, 238, 0.5) !important;
+    color: #22d3ee !important;
+    background: rgba(34, 211, 238, 0.05) !important;
     cursor: pointer !important;
-    transition: all 0.3s ease !important;
-    margin-top: 4px !important;
+    transition: all 0.2s ease !important;
+    margin-top: 6px !important;
 }
 .premium-free-btn:hover {
-    background: rgba(34, 211, 238, 0.08) !important;
-    border-color: var(--primary) !important;
+    background: rgba(34, 211, 238, 0.15) !important;
+    border-style: solid !important;
+    color: #ffffff !important;
 }
 
 /* ANIMATIONER */
 @keyframes pulseGlow {
-    0% { box-shadow: 0 8px 20px rgba(34, 211, 238, 0.15); transform: scale(1); }
-    100% { box-shadow: 0 8px 25px rgba(34, 211, 238, 0.3); transform: scale(1.04); }
+    0% { box-shadow: 0 0 20px rgba(34, 211, 238, 0.4); transform: scale(1); }
+    100% { box-shadow: 0 0 35px rgba(34, 211, 238, 0.8); transform: scale(1.05); }
 }
 @keyframes buttonPulse {
-    0% { box-shadow: 0 4px 15px rgba(34, 197, 94, 0.2); }
-    100% { box-shadow: 0 6px 25px rgba(34, 197, 94, 0.5); }
+    0% { box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3); }
+    100% { box-shadow: 0 8px 30px rgba(34, 197, 94, 0.7); }
 }
