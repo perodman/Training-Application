@@ -1447,7 +1447,7 @@ function confirmDiscardActiveWorkout() {
     const body = document.getElementById("modal-body");
     body.innerHTML = `
         <div style="text-align:center; padding:10px;">
-            <div style="font-size:40px; margin-bottom:15px;">⚠️</div>
+            <div style="font-size:40px; margin-bottom:15px;">🗑️</div>
             <h3 style="color:var(--danger);">Radera passet?</h3>
             <p style="color:var(--text-light); margin-bottom:25px; font-size:14px;">Allt pågående arbete i detta pass kommer att raderas.</p>
             <button class="mode-btn" style="background:linear-gradient(135deg, #ef4444 0%, #b91c1c 100%); color:white; margin-bottom:12px; font-weight:700;" onclick="localStorage.removeItem('activeWorkoutDraft'); location.reload();">Ja, radera!</button>
