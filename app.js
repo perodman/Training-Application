@@ -1466,46 +1466,69 @@ function confirmDiscardActiveWorkout() {
 
 // DENNA FUNKTION KÖRS AUTOMATISKT VARJE GÅNG SIDAN LADDAS OM
 window.addEventListener("load", () => {
-    // 1. Se till att startsidans knappar och utkast alltid förbereds i bakgrunden
+    // 1. Försök att köra din apps befintliga dataladdning om den finns definierad
+    if (typeof loadAll === 'function') {
+        loadAll();
+    } else if (typeof init === 'function') {
+        init();
+    }
+
+    // 2. Förbered startsidans knappar och utkast i bakgrunden
     renderHome();
 
-    // 2. Kolla om vi har en sparad vy i webbläsarens minne
+    // 3. Hämta den sparade vyn från webbläsarens minne
     const savedView = localStorage.getItem("currentActiveView");
     
-    // 3. Om det finns en sparad vy (och det inte är workout-view) – återställ vyn korrekt
-    if (savedView && savedView !== "workout-view") {
-        
-        // --- LOGIK FÖR TRÄNINGSPROGRAM ---
-        if (savedView === "programs-view") {
-            // Kör din funktion för att rita upp programmen (den sköter showView själv)
-            renderProgramView();
-        }
-        
-        // --- LOGIK FÖR KALENDER / TRÄNINGSSCHEMA ---
-        else if (savedView === "calendar-view") {
-            // Kör din funktion för att rita upp kalendern (den sköter showView själv)
-            renderCalendar();
-        }
-        
-        // --- LOGIK FÖR ÖVNINGAR ---
-        else if (savedView === "exercises-view") {
-            showView(savedView);
-            // Om du hade en aktiv kategori vald, ladda om den listan också
-            if (typeof currentExerciseCategory !== 'undefined' && currentExerciseCategory) {
-                filterExercises(currentExerciseCategory);
-            }
-        }
-        
-        // --- LOGIK FÖR ÖVRIGA VYER (T.EX. STATISTIK) ---
-        else {
-            showView(savedView);
-            if (savedView === "stats-view" && typeof renderCharts === 'function') {
-                renderCharts(); 
-            }
-        }
-
-    } else {
-        // 4. Om minnet är tomt eller om man var mitt i ett pass, visa startsidan
+    // Om minnet är tomt eller om användaren var mitt i ett aktivt pass, visa startsidan direkt
+    if (!savedView || savedView === "workout-view") {
         showView("home-view");
+        return;
     }
+
+    // 4. SÄKERHETSAUTOMATISERING: Ge webbläsaren 50 millisekunder att läsa in programData/workoutHistory i minnet
+    setTimeout(() => {
+        try {
+            // --- LOGIK FÖR TRÄNINGSPROGRAM ---
+            if (savedView === "programs-view") {
+                // Kontrollera att programData faktiskt existerar innan vi ritar
+                if (typeof programData !== 'undefined' && programData.routine) {
+                    renderProgramView();
+                } else {
+                    // Fallback om datan ändå inte laddades ordentligt
+                    showView("programs-view");
+                }
+            }
+            
+            // --- LOGIK FÖR KALENDER / TRÄNINGSSCHEMA ---
+            else if (savedView === "calendar-view") {
+                // Kontrollera att dina kalendervariabler existerar innan vi ritar
+                if (typeof currentViewDate !== 'undefined') {
+                    renderCalendar();
+                } else {
+                    // Fallback om datan ändå inte laddades ordentligt
+                    showView("calendar-view");
+                }
+            }
+            
+            // --- LOGIK FÖR ÖVNINGAR ---
+            else if (savedView === "exercises-view") {
+                showView(savedView);
+                if (typeof currentExerciseCategory !== 'undefined' && currentExerciseCategory) {
+                    filterExercises(currentExerciseCategory);
+                }
+            }
+            
+            // --- LOGIK FÖR ÖVRIGA VYER ---
+            else {
+                showView(savedView);
+                if (savedView === "stats-view" && typeof renderCharts === 'function') {
+                    renderCharts(); 
+                }
+            }
+        } catch (error) {
+            // Om något ändå skulle krascha i renderingen, logga felet och visa vyn ändå
+            console.error("Fel vid återställning av vy:", error);
+            showView(savedView);
+        }
+    }, 50); 
 });
