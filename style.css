@@ -736,31 +736,3 @@ background: linear-gradient(90deg, transparent, rgba(34, 211, 238, 0.4), transpa
     grid-template-columns: 1fr 1fr;
     gap: 12px;
 }
-
-/* ==========================================================================
-   LYXIG TRYCKEFFEKT FÖR MOBILKNAPPAR (TACTILE FEEDBACK)
-   ========================================================================== */
-
-/* 1. Grundeffekt för alla knappar i appen */
-.mode-btn, 
-.reorder-btn, 
-#exercise-list .card > div,
-#workout-modal .modal-content > button {
-    transition: transform 0.1s ease, opacity 0.1s ease;
-}
-
-/* 2. Vad som händer EXAKT i den millisekunden du trycker ner fingret */
-.mode-btn:active, 
-.reorder-btn:active,
-#exercise-list .card > div:active {
-    transform: scale(0.96); /* Krymper knappen med 4% */
-    opacity: 0.85;          /* Gör den aningen ljusare/transparent */
-}
-
-/* Särskild justering för de små runda set-cirklarna (#1, #2, ✅) */
-[onclick*="confirmSet"] {
-    transition: transform 0.1s ease;
-}
-[onclick*="confirmSet"]:active {
-    transform: scale(0.88); /* Krymper lite extra eftersom de är mindre */
-}
