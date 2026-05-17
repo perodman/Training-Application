@@ -1223,9 +1223,10 @@ function removeActiveExercise(exIdx) {
 }
 
 // --- STANDARD-LOGIK ---
-document.getElementById("global-home").onclick = () => {
-    location.reload();
-}
+document.getElementById("global-home").addEventListener("click", () => {
+    renderHome();         // Bygger om knapparna (utkast etc.)
+    showView("home-view"); // Visar startsidan
+});
 
 document.getElementById("start-new-btn").onclick = () => renderCalendar(true);
 document.getElementById("calendar-mode").onclick = () => renderCalendar(false);
@@ -1235,10 +1236,13 @@ document.getElementById("stats-mode").onclick = renderStats;
 document.getElementById("add-custom-pass-btn").onclick = openCreateProgramModal;
 
 function renderHome() {
-    showView("home-view");
+    // JUSTERING: Vi har tagit bort den blinda showView("home-view") härifrån 
+    // så att vi kan styra vyn mer flexibelt vid sidomladdningar!
     
     // Punkt 1: Permanent avgränsande linje på startsidan
     const homeView = document.getElementById("home-view");
+    if (!homeView) return; // Säkerhetsspärr
+    
     const headerP = homeView.querySelector("header p");
     
     // Ta bort ev gamla kopior först för att undvika dubletter vid omladdning
@@ -1459,3 +1463,25 @@ function confirmDiscardActiveWorkout() {
     `;
     openModal();
 }
+
+// DENNA FUNKTION KÖRS AUTOMATISKT VARJE GÅNG SIDAN LADDAS OM
+window.addEventListener("load", () => {
+    // 1. Se till att startsidans knappar och utkast alltid förbereds i bakgrunden
+    renderHome();
+
+    // 2. Kolla om vi har en sparad vy i webbläsarens minne
+    const savedView = localStorage.getItem("currentActiveView");
+    
+    // 3. Om det finns en sparad vy (och det inte är workout-view) – hoppa direkt dit!
+    if (savedView && savedView !== "workout-view") {
+        showView(savedView);
+        
+        // Om du var inne på en specifik kategori under Övningar, ladda om listan direkt
+        if (savedView === "exercises-view" && typeof currentExerciseCategory !== 'undefined' && currentExerciseCategory) {
+            filterExercises(currentExerciseCategory);
+        }
+    } else {
+        // 4. Om minnet är tomt eller om man var mitt i ett pass, visa startsidan (där "Fortsätt träningen" nu syns tack vare renderHome)
+        showView("home-view");
+    }
+});
