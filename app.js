@@ -217,7 +217,7 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
 
                 html += `
                 <div style="display: flex; flex-direction: column; gap: 5px;">
-                    <button class="mode-btn glass-border plan-override-btn ${isSelected ? 'active-choice' : ''}" 
+                    <button class="mode-btn plan-override-btn ${isSelected ? 'active-choice' : ''}" 
                             id="btn-ovr-${p.id}" 
                             onclick="setOverrideSilent('${dateStr}', '${p.id}')"
                             style="margin: 0; padding: 12px; font-size: 13px; border-radius: 12px; font-weight: 600; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; width:100%;">
@@ -237,7 +237,7 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
             
             const isRestSelected = !planned;
             html += `
-                <button class="mode-btn glass-border plan-override-btn override-rest-btn ${isRestSelected ? 'active-choice' : ''}" 
+                <button class="mode-btn plan-override-btn override-rest-btn ${isRestSelected ? 'active-choice' : ''}" 
                         id="btn-ovr-none"
                         onclick="setOverrideSilent('${dateStr}', 'none')"
                         style="margin: 0; padding: 12px; font-size: 13px; border-radius: 12px; font-weight: bold; grid-column: span 2; border-color: rgba(253, 224, 71, 0.4); color: #fde047; background: rgba(253, 224, 71, 0.05);">
