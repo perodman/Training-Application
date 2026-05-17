@@ -174,13 +174,15 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
         </div>`;
     } 
     else {
-        // HÄR ANVÄNDER VI DET NAMN SOM FINNS I DIN APP: modern-status-card
+        // HÄR HAR VI LAGT TILL ALL STYLING DIREKT I INLINE-STYLE FÖR ATT TVINGA FRAM GLASFÄRGEN OCH KANTLINJEN
         html += `
-        <div class="modern-status-card day-manager-status-box">
-            <span class="status-box-title">Status</span>
+        <div class="modern-status-card day-manager-status-box" 
+             style="display: block !important; text-align: center !important; padding: 24px !important; border-radius: 24px !important; background: rgba(255, 255, 255, 0.03) !important; border: 1px solid var(--glass-border) !important; backdrop-filter: blur(20px) !important; -webkit-backdrop-filter: blur(20px) !important; box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.1) !important; margin-bottom: 25px !important;">
             
-            <p id="current-planned-label" class="status-box-text">
-                ${planned ? `📋 Inplanerat: <span class="status-highlight-text">${planned.name}</span>` : '🧘 Planerad Vila'}
+            <span class="status-box-title" style="font-size: 11px !important; text-transform: uppercase !important; color: var(--text-light) !important; font-weight: 800 !important; letter-spacing: 2px !important; opacity: 0.6 !important; display: block !important; margin-bottom: 6px !important;">Status</span>
+            
+            <p id="current-planned-label" class="status-box-text" style="margin: 0 0 20px 0 !important; font-size: 19px !important; font-weight: 900 !important; color: #ffffff !important; text-shadow: 0 2px 10px rgba(0,0,0,0.5) !important;">
+                ${planned ? `📋 Inplanerat: <span class="status-highlight-text" style="color: var(--primary) !important; text-shadow: 0 0 15px rgba(34, 211, 238, 0.3) !important;">${planned.name}</span>` : '🧘 Planerad Vila'}
             </p>
             
             <div id="day-manager-action-btn-container" class="status-btn-container">`;
@@ -770,31 +772,24 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
 }
 
 function setOverrideSilent(date, val) {
-    // 1. Spara i bakgrunden som vanligt
     calendarOverrides[date] = val;
     saveAll();
     
-    // 2. Ta bort markeringen från ALLA planering-knappar direkt
     document.querySelectorAll('.plan-override-btn').forEach(b => b.classList.remove('active-choice'));
     
     const btnContainer = document.getElementById('day-manager-action-btn-container');
     const statusTextElem = document.getElementById('current-planned-label');
     
-    // 3. Om man valde ett pass (inte Vila)
     if(val !== 'none') {
-        // Tänd den nya knappen
         const activeBtn = document.getElementById(`btn-ovr-${val}`);
         if(activeBtn) activeBtn.classList.add('active-choice');
         
-        // Hitta passets namn
         const p = programData.routine.find(x => x.id === val);
         
-        // Uppdatera texten i statuskortet direkt med vår nya spanklass
         if(statusTextElem) {
-            statusTextElem.innerHTML = `📋 Inplanerat: <span class="status-highlight-text">${p.name}</span>`;
+            statusTextElem.innerHTML = `📋 Inplanerat: <span class="status-highlight-text" style="color: var(--primary) !important; text-shadow: 0 0 15px rgba(34, 211, 238, 0.3) !important;">${p.name}</span>`;
         }
         
-        // UTBYTE: Här skapar vi nu den NYA premiumknappen istället för den gamla tråkiga gröna!
         if(btnContainer) {
             btnContainer.innerHTML = `
                 <button class="mode-btn premium-action-btn premium-green-btn" onclick="prepareStart('${date}', '${p.id}')">
@@ -802,20 +797,14 @@ function setOverrideSilent(date, val) {
                 </button>`;
         }
     } 
-    // 4. Om man valde Vila
     else {
-        // Tänd Vila-knappen
         const restBtn = document.getElementById('btn-ovr-none');
         if(restBtn) restBtn.classList.add('active-choice');
         
-        // Uppdatera texten i statuskortet till Vila
         if(statusTextElem) statusTextElem.textContent = "🧘 Planerad Vila";
-        
-        // Dölj startknappen eftersom det är vila
         if(btnContainer) btnContainer.innerHTML = "";
     }
     
-    // Uppdatera kalendern i bakgrunden så det stämmer när vi stänger fönstret
     renderCalendar(false); 
 }
 
@@ -1100,7 +1089,6 @@ function startWorkout(workout, data = null, date = null, isImmediateStart = fals
 }
 
 function renderActiveWorkout() {
-    // --- SÄKERHETSKONTROLL ---
     if (activeDraft && activeDraft.data) {
         activeDraft.data.forEach((exerciseData, i) => {
             if (!exerciseData.isCompleted && exerciseData.sets_data) {
@@ -1116,7 +1104,6 @@ function renderActiveWorkout() {
         });
     }
 
-    // --- START: Din befintliga logik (RÖR EJ) ---
     document.getElementById("active-title").textContent = activeDraft.workout.name;
     const list = document.getElementById("exercise-list");
     const footer = document.querySelector(".workout-footer");
@@ -1139,7 +1126,6 @@ function renderActiveWorkout() {
     const pauseBtn = document.getElementById("pause-workout-btn");
     pauseBtn.innerHTML = `Spara utkast 💾`;
     pauseBtn.className = "mode-btn save-draft-btn";
-    // --- SLUT: Din befintliga logik ---
 
     if (!activeDraft.ui_state) {
         activeDraft.ui_state = {};
