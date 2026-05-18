@@ -795,11 +795,6 @@ function saveProgramEdit(idx) {
     saveAll(); closeModal(); renderProgramView(idx); showProgramDetails(idx);
 }
 
-function saveProgramEdit(idx) {
-    programData.routine[idx].name = document.getElementById("edit-pass-name").value;
-    saveAll(); closeModal(); renderProgramView(idx); showProgramDetails(idx);
-}
-
 function openCreateProgramModal() {
     const body = document.getElementById("modal-body");
     body.innerHTML = `
