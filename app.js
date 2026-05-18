@@ -507,7 +507,7 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
         body.style.flexDirection = "column";
         body.style.justifyContent = "flex-start"; 
         body.style.alignItems = "stretch";
-        body.style.gap = "50x"; 
+        body.style.gap = "50px"; 
     }
     
     // 1. ÖVRE DATUMYTA (Nollställda marginaler för att spara vertikalt utrymme)
