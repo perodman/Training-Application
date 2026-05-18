@@ -575,7 +575,7 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
             <div class="status-aura" style="background: rgba(245, 158, 11, 0.35);"></div>
             
             <!-- REGLAGE STATUS (PÅGÅENDE): Ändra top och left (eller kör right/transform för centrering) -->
-            <span id="day-manager-status-title" class="status-box-title" style="position: absolute !important; top: 24px !important; left: 20px !important; margin: 0 !important; z-index: 5;">Status</span>
+            <span id="day-manager-status-title" class="status-box-title" style="position: absolute !important; top: 24px !important; left: 50% !important; transform: translateX(-50%) !important; margin: 0 !important; z-index: 5;">Status</span>
             
             <div style="margin: 0 0 15px 0; width: 100%;">
                 <span class="status-highlight-text" style="color: #f59e0b !important; text-shadow: 0 0 25px rgba(245, 158, 11, 0.8) !important; font-size: 20px; font-weight: 800;">🔥 Pågående Pass</span>
@@ -616,7 +616,7 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
         // ÄNDRA PLANERING - SEKTIONSAVSKILJARE
         // REGLAGE ÄNDRA PLANERING: Ändra margin-top för att skjuta hela sektionen upp eller ned!
         html += `
-        <div style="margin-top: 10px; width: 100%;">
+        <div style="margin-top: 3px; width: 100%;">
             <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px;">
                 <div style="flex-grow: 1; height: 1px; background: rgba(255,255,255,0.08);"></div>
                 
