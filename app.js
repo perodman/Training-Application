@@ -177,19 +177,16 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
         const sphereClass = planned ? "status-icon-sphere sphere-planned" : "status-icon-sphere sphere-rest";
         const iconEmoji = planned ? "⚡" : "🧘";
 
-        // FIX 1: Flyttar upp boxen
         html += `
         <div class="modern-status-card day-manager-status-box" style="margin-top: -15px;">
             <div class="${auraClass}"></div>
             
             <div class="${sphereClass}">${iconEmoji}</div>
             
-            // FIX 2: Centrerar STATUS-titeln
             <div class="status-badge-container" style="margin-top: 0px; margin-bottom: 0px; line-height: 1;">
                 <span class="status-box-title" style="display: inline-block; margin: 0; padding: 0;">STATUS</span>
             </div>
             
-            // FIX 3: Balanserar avståndet ner till passet
             <p id="current-planned-label" class="status-box-text" style="margin-top: 8px; margin-bottom: 0px;">
                 ${planned ? `📋 <span class="status-highlight-text">${planned.name}</span>` : '🧘 Planerad Vila'}
             </p>
@@ -264,7 +261,6 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
         </div>`;
     }
     
-    // TILLÄGG: Lägger till Stäng-knappen längst ned i modalen (utanför if/else-satserna)
     html += `
     <div style="margin-top: 20px;">
         <button class="mode-btn glass-border" onclick="closeModal()" style="width: 100%; padding: 14px; border-radius: 14px; font-size: 14px; font-weight: 600;">Stäng</button>
