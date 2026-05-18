@@ -103,11 +103,11 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
 
     const body = document.getElementById("modal-body");
     
-    // 1. ÖVRE DATUMYTA (Helt synkad med CSS-strukturen)
+    // 1. ÖVRE DATUMYTA (Helt synkad med CSS-strukturen - Trimmad klass för tightare avstånd)
     let html = `
         <div class="day-manager-header-area">
             <span class="day-manager-sub-date">Valt datum</span>
-            <h2 class="section-title modern-header day-manager-main-date">${dateStr}</h2>
+            <h2 class="day-manager-main-date">${dateStr}</h2>
         </div>
     `;
     
@@ -167,7 +167,7 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
         <div class="modern-status-card day-manager-status-box">
             <div class="status-aura" style="background: rgba(245, 158, 11, 0.35);"></div>
             <span class="status-box-title">Status</span>
-            <div style="margin: 10px 0 20px 0;">
+            <div style="margin: 5px 0 15px 0;">
                 <span class="status-highlight-text" style="color: #f59e0b !important; text-shadow: 0 0 25px rgba(245, 158, 11, 0.8) !important;">🔥 Pågående Pass</span>
             </div>
             <button class="premium-green-btn" onclick="closeModal(); startWorkout(activeDraft.workout, activeDraft.data, activeDraft.date)" style="border: 2px solid #f59e0b !important; background: linear-gradient(135deg, #d97706 0%, #f59e0b 100%) !important;">
@@ -184,7 +184,8 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
             <div class="status-aura" style="background: ${auraColor};"></div>
             
             <span class="status-box-title">STATUS</span>
-            <div style="margin: 10px 0 20px 0;">
+            
+            <div class="status-text-container">
                 <span class="status-highlight-text">
                     ${planned ? `📋 ${planned.name}` : '🧘 Planerad Vila'}
                 </span>
