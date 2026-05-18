@@ -96,182 +96,6 @@ function openModal() {
     }, 10);
 }
 
-function openDayManager(dateStr, planned, completed, isOngoing) {
-    if (typeof hideDefaultCloseButton === 'function') {
-        hideDefaultCloseButton(false);
-    }
-
-    const body = document.getElementById("modal-body");
-    
-    // Tvinga föräldraboxen (#modal-body) att lyda. Detta nollställer eventuell CSS som tvingar isär elementen.
-    if (body) {
-        body.style.display = "flex";
-        body.style.flexDirection = "column";
-        body.style.justifyContent = "flex-start"; // Stapla från toppen, sprid inte ut över hela skärmen
-        body.style.alignItems = "stretch";
-        body.style.gap = "15px"; // Det exakta avståndet mellan ALLA element i hela rutan
-    }
-    
-    // 1. ÖVRE DATUMYTA (Lagt till ✔ för att testa om cachen har släppt)
-    let html = `
-        <div class="day-manager-header-area" style="margin: 0 !important; padding: 0 !important; text-align: center;">
-            <span class="day-manager-sub-date" style="margin: 0 !important; padding: 0 !important; display: block; font-size: 11px; letter-spacing: 1.5px;">VALT DATUM ✔</span>
-            <h2 class="day-manager-main-date" style="margin: 5px 0 0 0 !important; padding: 0 !important; font-size: 32px; line-height: 1.1;">${dateStr}</h2>
-        </div>
-    `;
-    
-    // Fall A: Användaren har redan slutfört ett eller flera pass denna dag
-    if (completed.length > 0) {
-        completed.forEach((w, idx) => {
-            const timeStr = w.totalTime ? `⏱️ ${w.totalTime}` : "";
-            html += `
-            <div class="card glass" style="border-left: 4px solid #22c55e; text-align: left; margin: 0; padding: 15px; border-radius: 16px;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                    <div>
-                        <strong style="font-size: 16px; color: var(--text); display: block;">${w.programName}</strong>
-                        <span style="font-size: 11px; color: var(--text-light); font-weight: 500;">${timeStr || 'Slutfört pass ✅'}</span>
-                    </div>
-                    <div style="display: flex; gap: 5px;">
-                        <button onclick="editLoggedWorkout('${dateStr}', ${idx})" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: var(--primary); cursor: pointer; font-size: 14px; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">✏️</button>
-                        <button onclick="openConfirmDeleteModal('${dateStr}', ${idx})" style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2); color: var(--danger); cursor: pointer; font-size: 12px; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">✖</button>
-                    </div>
-                </div>
-                
-                <div style="background: rgba(0,0,0,0.15); padding: 12px; border-radius: 12px; display: flex; flex-direction: column; gap: 10px;">`;
-            
-            w.exercises.forEach(ex => {
-                html += `
-                <div style="font-size: 13px;">
-                    <span style="color: var(--text); font-weight: 600; display: block; margin-bottom: 8px;">${ex.name}</span>
-                    <div style="display: flex; flex-direction: column; gap: 6px;">`;
-                
-                if(ex.sets_data) {
-                    ex.sets_data.forEach((s, sIdx) => {
-                        const wVal = s.weight || 0;
-                        const rVal = s.reps || 0;
-                        html += `
-                        <div style="background: rgba(59, 130, 246, 0.08); border: 1px solid var(--primary); padding: 6px 12px; border-radius: 8px; width: fit-content; display: flex; align-items: center; gap: 8px;">
-                            <span style="color: var(--primary); font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">Set ${sIdx+1}</span> 
-                            <span style="color: #ffffff; font-size: 13px; font-weight: 600;">${wVal} <small style="color: var(--primary); font-weight:400;">kg</small></span> 
-                            <span style="color: var(--primary); opacity: 0.4;">×</span> 
-                            <span style="color: #ffffff; font-size: 13px; font-weight: 600;">${rVal} <small style="color: var(--primary); font-weight:400;">reps</small></span>
-                        </div>`;
-                    });
-                } else {
-                    const wVal = ex.weight || 0;
-                    const rVal = ex.reps || 0;
-                    html += `
-                    <div style="background: rgba(59, 130, 246, 0.08); border: 1px solid var(--primary); color: #ffffff; font-size: 12px; padding: 6px 12px; border-radius: 8px; font-weight: 600; width: fit-content;">
-                        ${ex.sets} set <span style="color: var(--primary);">×</span> ${wVal}kg <span style="color: var(--primary);">×</span> ${rVal}reps
-                    </div>`;
-                }
-                html += `</div></div>`;
-            });
-            html += `</div></div>`;
-        });
-    } 
-    // Fall B: Det finns ett aktivt utkast i bakgrunden som pågår just nu
-    else if (isOngoing) {
-        html += `
-        <div class="modern-status-card day-manager-status-box" style="margin: 0 !important;">
-            <div class="status-aura" style="background: rgba(245, 158, 11, 0.35);"></div>
-            <span class="status-box-title">Status</span>
-            <div style="margin: 5px 0 15px 0;">
-                <span class="status-highlight-text" style="color: #f59e0b !important; text-shadow: 0 0 25px rgba(245, 158, 11, 0.8) !important;">🔥 Pågående Pass</span>
-            </div>
-            <button class="premium-green-btn" onclick="closeModal(); startWorkout(activeDraft.workout, activeDraft.data, activeDraft.date)" style="border: 2px solid #f59e0b !important; background: linear-gradient(135deg, #d97706 0%, #f59e0b 100%) !important;">
-                Fortsätt träningen ⏱️
-            </button>
-        </div>`;
-    } 
-    // Fall C: Standardvy
-    else {
-        const auraColor = planned ? "rgba(34, 211, 238, 0.35)" : "rgba(129, 140, 248, 0.25)";
-        
-        html += `
-        <div class="modern-status-card day-manager-status-box" style="margin: 0 !important; padding: 20px !important;">
-            <div class="status-aura" style="background: ${auraColor};"></div>
-            
-            <span class="status-box-title" style="margin: 0 !important; display: block;">STATUS</span>
-            
-            <div style="margin: 5px 0 15px 0 !important;">
-                <span class="status-highlight-text" style="display: block; line-height: 1.2;">
-                    ${planned ? `📋 ${planned.name}` : '🧘 Planerad Vila'}
-                </span>
-            </div>
-            
-            <div id="day-manager-action-btn-container" class="status-btn-container" style="margin-bottom: 10px !important;">`;
-            if(planned) {
-                html += `
-                <button class="premium-green-btn" onclick="prepareStart('${dateStr}', '${planned.id}')">
-                    STARTA TRÄNING 🔥
-                </button>`;
-            }
-        html += `
-            </div>
-            
-            <button class="premium-free-btn" onclick="closeModal(); startFreeWorkoutOnDate('${dateStr}')">
-                ➕ Starta Fritt Pass
-            </button>
-        </div>`;
-
-        // ÄNDRA PLANERING - SEKTIONSAVSKILJARE
-        html += `
-        <div class="section-divider-container planning-section" style="margin: 5px 0 0 0 !important;">
-            <div class="divider-line"></div>
-            <p class="divider-text">Ändra planering</p>
-            <div class="divider-line"></div>
-        </div>
-        
-        <div class="plan-override-grid" style="margin: 0 !important;">`;
-            
-            programData.routine.forEach(p => {
-                const isSelected = planned && p.id === planned.id;
-                const exList = p.exercises.map(e => `
-                    <div style="background: rgba(255,255,255,0.05); padding: 5px 8px; border-radius: 6px; margin-bottom: 4px; border-left: 2px solid var(--primary); font-size: 10px; color: #ddd; display: flex; align-items: center;">
-                        <span style="margin-right: 6px; opacity: 0.5;">•</span> ${e.name}
-                    </div>
-                `).join('');
-
-                html += `
-                <div class="override-item-wrapper">
-                    <button class="mode-btn plan-override-btn ${isSelected ? 'active-choice' : ''}" 
-                            id="btn-ovr-${p.id}" 
-                            onclick="setOverrideSilent('${dateStr}', '${p.id}')">
-                        ${p.name}
-                    </button>
-                    
-                    <details class="override-details">
-                        <summary>Innehåll ▾</summary>
-                        <div style="text-align: left; padding: 8px; border-radius: 10px; margin-top: 4px; max-height: 120px; overflow-y: auto; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.05);">
-                            ${exList}
-                        </div>
-                    </details>
-                </div>`;
-            });
-            
-            const isRestSelected = !planned;
-            html += `
-                <button class="mode-btn plan-override-btn override-rest-btn ${isRestSelected ? 'active-choice' : ''}" 
-                        id="btn-ovr-none"
-                        onclick="setOverrideSilent('${dateStr}', 'none')">
-                    🧘 Vila
-                </button>
-            `;
-            
-        html += `
-        </div>`;
-    }
-    
-    html += `
-    <div style="margin-top: 10px !important;">
-        <button class="mode-btn glass-border" onclick="closeModal()" style="width: 100%; padding: 16px; border-radius: 20px; font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Stäng</button>
-    </div>`;
-    
-    body.innerHTML = html;
-    openModal();
-}
-
 function removeActiveExercise(exIdx) {
     if (typeof hideDefaultCloseButton === 'function') {
         hideDefaultCloseButton(true);
@@ -677,10 +501,20 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
 
     const body = document.getElementById("modal-body");
     
+    // Tvinga föräldraboxen (#modal-body) att stapla elementen tätt från toppen utan extra tomrum
+    if (body) {
+        body.style.display = "flex";
+        body.style.flexDirection = "column";
+        body.style.justifyContent = "flex-start"; 
+        body.style.alignItems = "stretch";
+        body.style.gap = "12px"; // Kontrollerat, snyggt avstånd mellan alla block
+    }
+    
+    // 1. ÖVRE DATUMYTA (Nollställda marginaler för att spara vertikalt utrymme)
     let html = `
-        <div style="text-align: center; margin: 0 0 10px 0 !important; padding: 0 !important;">
+        <div style="text-align: center; margin: 0 !important; padding: 0 !important;">
             <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: var(--text-light); font-weight: 600; display: block; margin: 0 !important; padding: 0 !important;">Valt datum</span>
-            <h2 class="section-title modern-header" style="margin: 5px 0 0 0 !important; padding: 0 !important; display: inline-block; font-size: 26px; line-height: 1.1 !important;">
+            <h2 class="section-title modern-header" style="margin: 3px 0 0 0 !important; padding: 0 !important; display: inline-block; font-size: 26px; line-height: 1.1 !important;">
                 ${dateStr}
             </h2>
         </div>
@@ -690,7 +524,7 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
         completed.forEach((w, idx) => {
             const timeStr = w.totalTime ? `⏱️ ${w.totalTime}` : "";
             html += `
-            <div class="card glass" style="border-left: 4px solid #22c55e; text-align: left; margin-bottom: 15px; padding: 15px; border-radius: 16px;">
+            <div class="card glass" style="border-left: 4px solid #22c55e; text-align: left; margin: 0; padding: 15px; border-radius: 16px;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
                     <div>
                         <strong style="font-size: 16px; color: var(--text); display: block;">${w.programName}</strong>
@@ -717,11 +551,8 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
                         html += `
                         <div style="background: rgba(59, 130, 246, 0.08); border: 1px solid var(--primary); padding: 6px 12px; border-radius: 8px; width: fit-content; display: flex; align-items: center; gap: 8px;">
                             <span style="color: var(--primary); font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">Set ${sIdx+1}</span> 
-                            
                             <span style="color: #ffffff; font-size: 13px; font-weight: 600;">${wVal} <small style="color: var(--primary); font-weight:400;">kg</small></span> 
-                            
                             <span style="color: var(--primary); opacity: 0.4;">×</span> 
-                            
                             <span style="color: #ffffff; font-size: 13px; font-weight: 600;">${rVal} <small style="color: var(--primary); font-weight:400;">reps</small></span>
                         </div>`;
                     });
@@ -740,16 +571,21 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
     } 
     else if (isOngoing) {
         html += `
-        <div style="padding: 20px 10px; text-align: center;">
-            <button class="mode-btn orange ongoing-btn" onclick="closeModal(); startWorkout(activeDraft.workout, activeDraft.data, activeDraft.date)" style="width: 100%; padding: 16px; font-size: 16px; font-weight: bold; border-radius: 14px; box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);">
-                Fortsätt pågående pass 🔥
+        <div class="modern-status-card day-manager-status-box" style="margin: 0 !important;">
+            <div class="status-aura" style="background: rgba(245, 158, 11, 0.35);"></div>
+            <span class="status-box-title">Status</span>
+            <div style="margin: 5px 0 15px 0;">
+                <span class="status-highlight-text" style="color: #f59e0b !important; text-shadow: 0 0 25px rgba(245, 158, 11, 0.8) !important;">🔥 Pågående Pass</span>
+            </div>
+            <button class="premium-green-btn" onclick="closeModal(); startWorkout(activeDraft.workout, activeDraft.data, activeDraft.date)" style="border: 2px solid #f59e0b !important; background: linear-gradient(135deg, #d97706 0%, #f59e0b 100%) !important;">
+                Fortsätt träningen ⏱️
             </button>
         </div>`;
     } 
     else {
-        // DET NYA PREMIUMSTATUS-KORTET
+        // DET NYA PREMIUMSTATUS-KORTET (Nu med nollställd marginal för att förhindra tomrum)
         html += `
-        <div class="modern-status-card day-manager-status-box">
+        <div class="modern-status-card day-manager-status-box" style="margin: 0 !important;">
             <span class="status-box-title">Status</span>
             
             <p id="current-planned-label" class="status-box-text">
@@ -771,9 +607,10 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
             </button>
         </div>`;
 
+        // ÄNDRA PLANERING - SEKTIONSAVSKILJARE (Reducerat avstånd från 25px till 5px)
         html += `
-        <div style="margin-top: 25px;">
-            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px;">
+        <div style="margin-top: 5px;">
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
                 <div style="flex-grow: 1; height: 1px; background: rgba(255,255,255,0.08);"></div>
                 <p style="font-size: 11px; text-transform: uppercase; color: var(--text-light); font-weight: 700; letter-spacing: 1px; margin: 0;">Ändra planering</p>
                 <div style="flex-grow: 1; height: 1px; background: rgba(255,255,255,0.08);"></div>
