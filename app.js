@@ -587,7 +587,7 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
         // ÄNDRING: Lagt till 40px marginal i toppen även här för att matcha positionen
         html += `
         <div class="modern-status-card day-manager-status-box" style="margin-top: 10px !important; margin-left: 0 !important; margin-right: 0 !important; margin-bottom: 0 !important;">
-            <span class="status-box-title">Status</span>
+            <span class="status-box-title" style="display: block; margin-top: 15px; margin-left: 5px;">Status</span>
             
             <p id="current-planned-label" class="status-box-text">
                 ${planned ? `📋 <span class="status-highlight-text">${planned.name}</span>` : '🧘 Planerad Vila'}
