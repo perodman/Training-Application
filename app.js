@@ -571,11 +571,11 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
     } 
     else if (isOngoing) {
         html += `
-        <div class="modern-status-card day-manager-status-box" style="margin-top: 12px !important; margin-left: 0 !important; margin-right: 0 !important; margin-bottom: 0 !important; padding-top: 20px !important;">
+        <div class="modern-status-card day-manager-status-box">
             <div class="status-aura" style="background: rgba(245, 158, 11, 0.35);"></div>
             
-            <!-- SPÅR 1: Klassen borttagen, helt fri positionering nu -->
-            <span style="display: block; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-light); font-weight: 700; margin-top: 10px; margin-bottom: 10px; margin-left: 5px;">Status</span>
+            <!-- HÄR FLYTTAR VI DEN: Ändra top och left i pixlar här under för att placera den exakt var du vill -->
+            <span id="day-manager-status-title" class="status-box-title" style="position: absolute !important; top: 20px !important; left: 20px !important; margin: 0 !important;">Status</span>
             
             <div style="margin: 2px 0 15px 0;">
                 <span class="status-highlight-text" style="color: #f59e0b !important; text-shadow: 0 0 25px rgba(245, 158, 11, 0.8) !important;">🔥 Pågående Pass</span>
@@ -587,10 +587,10 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
     }
     else {
         html += `
-        <div class="modern-status-card day-manager-status-box" style="margin-top: 10px !important; margin-left: 0 !important; margin-right: 0 !important; margin-bottom: 0 !important; padding-top: 20px !important;">
+        <div class="modern-status-card day-manager-status-box">
             
-            <!-- SPÅR 2: Klassen borttagen, helt fri positionering nu -->
-            <span style="display: block; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-light); font-weight: 700; margin-top: 10px; margin-bottom: 10px; margin-left: 5px;">Status</span>
+            <!-- HÄR FLYTTAR VI DEN OCKSÅ: Ändra top och left i pixlar här under så det matchar spåret ovan -->
+            <span id="day-manager-status-title" class="status-box-title" style="position: absolute !important; top: 20px !important; left: 20px !important; margin: 0 !important;">Status</span>
             
             <p id="current-planned-label" class="status-box-text">
                 ${planned ? `📋 <span class="status-highlight-text">${planned.name}</span>` : '🧘 Planerad Vila'}
