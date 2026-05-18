@@ -505,16 +505,24 @@ select.log-input { font-size: 16px !important; text-align-last: center; appearan
 .day-manager-sub-date { font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: var(--text-light); font-weight: 600; display: block; }
 .day-manager-main-date { margin: 4px 0 0 0 !important; display: inline-block; font-size: 26px; }
 
-/* FIX: Nu appliceras denna lyxiga iOS-effekt direkt på boxen i modalen */
+/* 
+   KONTROLLPANEL FÖR DIN MODAL-ADMINISTRERING
+   Här styr du hela flödet i boxarna. Flexbox staplar allt naturligt uppifrån och ned.
+*/
 .modern-status-card.day-manager-status-box,
 .day-manager-status-box {
-    display: block !important;
-    text-align: center !important;
-    padding: 24px 20px !important;
-    border-radius: 28px !important;
-    margin-bottom: 30px !important;
+    display: flex !important;
+    flex-direction: column !important;        /* Staplar elementen vertikalt */
+    align-items: flex-start !important;        /* Justerar allt till vänster. Ändra till 'center' om du vill centrera text/knappar */
+    justify-content: flex-start !important;
+    text-align: left !important;               /* Ger dig naturlig vänsterjusterad text */
+    
+    padding: 24px 20px !important;             /* Det inre tomrummet i boxen */
+    margin-bottom: 25px !important;            /* Avstånd till nästa box */
+    
     position: relative !important;
     overflow: hidden !important;
+    border-radius: 28px !important;
     background: linear-gradient(180deg, rgba(30, 41, 59, 0.75) 0%, rgba(15, 23, 42, 0.9) 100%) !important;
     backdrop-filter: blur(30px) !important;
     -webkit-backdrop-filter: blur(30px) !important;
@@ -533,22 +541,52 @@ select.log-input { font-size: 16px !important; text-align-last: center; appearan
 .status-icon-sphere.sphere-planned { background: linear-gradient(135deg, #164e63 0%, #0891b2 100%); border: 2px solid #22d3ee; box-shadow: 0 0 25px rgba(34, 211, 238, 0.6); animation: pulseGlow 2.5s infinite alternate; }
 .status-icon-sphere.sphere-rest { background: linear-gradient(135deg, #713f12 0%, #ca8a04 100%); border: 2px solid #fde047; box-shadow: 0 0 20px rgba(253, 224, 71, 0.4); }
 
-/* Kapsel-Badge för textrubrikerna */
+/* 
+   ADMINISTRERA DE SMÅ RUBRIKERNA ("STATUS" / "ÄNDRA PLANERING")
+   Använd marginalerna under för att flytta runt dem precis hur du vill.
+*/
 .status-badge-container {
-    display: inline-block; background: rgba(255, 255, 255, 0.08) !important; border: 1px solid rgba(255, 255, 255, 0.15) !important;
-    padding: 6px 18px !important; border-radius: 100px !important; margin-bottom: 14px !important; position: relative; z-index: 2;
+    display: block !important; 
+    background: transparent !important;        /* Tog bort kapsel-bakgrunden så rubriken är fri att flyttas */
+    border: none !important;
+    padding: 0 !important; 
+    
+    margin-top: 0px !important;                /* Avstånd från boxens överkant */
+    margin-bottom: 15px !important;            /* Avstånd ner till texten under rubriken */
+    margin-left: 0px !important;               /* Avstånd från vänsterkanten */
+    position: relative; 
+    z-index: 2;
 }
 .status-box-title {
-    font-size: 14px !important; text-transform: uppercase !important; color: #38bdf8 !important; 
-    font-weight: 900 !important; letter-spacing: 2px !important; margin: 0 !important; display: inline-block !important;
+    font-size: 11px !important;                /* Matchar din snygga, lilla undertitel-look */
+    text-transform: uppercase !important; 
+    color: var(--text-light) !important;       /* Clean dämpad färg, inte skrikig neonblå */
+    font-weight: 700 !important; 
+    letter-spacing: 1px !important; 
+    margin: 0 !important; 
+    display: block !important;
 }
 
-/* Centrala status-beskrivningar */
-.status-box-text { margin: 0 0 20px 0 !important; font-size: 23px !important; font-weight: 900 !important; color: #ffffff !important; text-shadow: 0 3px 15px rgba(0,0,0,0.9) !important; letter-spacing: -0.5px !important; position: relative; z-index: 2; }
-.status-highlight-text { color: #22d3ee !important; text-shadow: 0 0 25px rgba(34, 211, 238, 0.8) !important; font-size: 26px; display: inline-block; font-weight: 950; }
+/* Centrala status-beskrivningar (t.ex. "Planerad Vila" eller träningsnamnet) */
+.status-box-text { 
+    margin: 0 0 15px 0 !important;             /* Kontrollerat avstånd ner till knapparna */
+    font-size: 20px !important;                /* Balanserad textstorlek */
+    font-weight: 800 !important; 
+    color: #ffffff !important; 
+    text-shadow: 0 3px 15px rgba(0,0,0,0.4) !important; 
+    letter-spacing: -0.5px !important; 
+    position: relative; 
+    z-index: 2; 
+    text-align: left !important;
+    width: 100% !important;
+}
+.status-highlight-text { color: #22d3ee !important; text-shadow: 0 0 25px rgba(34, 211, 238, 0.8) !important; font-size: 22px; display: inline-block; font-weight: 950; }
 .status-highlight-text.rest-color { color: #fde047 !important; text-shadow: 0 0 25px rgba(253, 224, 71, 0.6) !important; }
 
-/* Handlingsknappar inuti modalen */
+/* Handlingsknappar och behållare inuti modalen */
+.status-btn-container {
+    width: 100% !important;
+}
 .premium-action-btn { width: 100% !important; display: block !important; margin: 0 auto !important; box-sizing: border-box !important; }
 .premium-green-btn {
     padding: 18px !important; font-size: 16px !important; font-weight: 900 !important; border-radius: 16px !important;
