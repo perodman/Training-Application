@@ -507,7 +507,7 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
         body.style.flexDirection = "column";
         body.style.justifyContent = "flex-start"; 
         body.style.alignItems = "stretch";
-        body.style.gap = "14x"; // Kontrollerat, snyggt avstånd mellan alla block
+        body.style.gap = "50x"; // Kontrollerat, snyggt avstånd mellan alla block
     }
     
     // 1. ÖVRE DATUMYTA (Nollställda marginaler för att spara vertikalt utrymme)
