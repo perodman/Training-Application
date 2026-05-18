@@ -507,7 +507,7 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
         body.style.flexDirection = "column";
         body.style.justifyContent = "flex-start"; 
         body.style.alignItems = "stretch";
-        body.style.gap = "50px"; 
+        body.style.gap = "20px"; // Korrigerat stavfel från 50x och satt till ett bra grundavstånd
     }
     
     // 1. ÖVRE DATUMYTA (Nollställda marginaler för att spara vertikalt utrymme)
@@ -571,56 +571,62 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
     } 
     else if (isOngoing) {
         html += `
-        <div class="modern-status-card day-manager-status-box">
+        <div class="modern-status-card day-manager-status-box" style="padding-top: 55px !important;">
             <div class="status-aura" style="background: rgba(245, 158, 11, 0.35);"></div>
             
-            <!-- HÄR FLYTTAR VI DEN: Ändra top och left i pixlar här under för att placera den exakt var du vill -->
-            <span id="day-manager-status-title" class="status-box-title" style="position: absolute !important; top: 20px !important; left: 20px !important; margin: 0 !important;">Status</span>
+            <!-- REGLAGE STATUS (PÅGÅENDE): Ändra top och left (eller kör right/transform för centrering) -->
+            <span id="day-manager-status-title" class="status-box-title" style="position: absolute !important; top: 24px !important; left: 20px !important; margin: 0 !important; z-index: 5;">Status</span>
             
-            <div style="margin: 2px 0 15px 0;">
-                <span class="status-highlight-text" style="color: #f59e0b !important; text-shadow: 0 0 25px rgba(245, 158, 11, 0.8) !important;">🔥 Pågående Pass</span>
+            <div style="margin: 0 0 15px 0; width: 100%;">
+                <span class="status-highlight-text" style="color: #f59e0b !important; text-shadow: 0 0 25px rgba(245, 158, 11, 0.8) !important; font-size: 20px; font-weight: 800;">🔥 Pågående Pass</span>
             </div>
-            <button class="premium-green-btn" onclick="closeModal(); startWorkout(activeDraft.workout, activeDraft.data, activeDraft.date)" style="border: 2px solid #f59e0b !important; background: linear-gradient(135deg, #d97706 0%, #f59e0b 100%) !important;">
+            <button class="premium-green-btn" onclick="closeModal(); startWorkout(activeDraft.workout, activeDraft.data, activeDraft.date)" style="border: 2px solid #f59e0b !important; background: linear-gradient(135deg, #d97706 0%, #f59e0b 100%) !important; width: 100% !important;">
                 Fortsätt träningen ⏱️
             </button>
         </div>`;
     }
     else {
         html += `
-        <div class="modern-status-card day-manager-status-box">
+        <div class="modern-status-card day-manager-status-box" style="padding-top: 55px !important;">
             
-            <!-- HÄR FLYTTAR VI DEN OCKSÅ: Ändra top och left i pixlar här under så det matchar spåret ovan -->
-            <span id="day-manager-status-title" class="status-box-title" style="position: absolute !important; top: 20px !important; left: 20px !important; margin: 0 !important;">Status</span>
+            <!-- REGLAGE STATUS (PLANERAD/VILA): Här styr du exakt var rubriken landar -->
+            <!-- TIPS FÖR CENTRERING: Ändra till -> left: 50% !important; transform: translateX(-50%) !important; -->
+            <span id="day-manager-status-title" class="status-box-title" style="position: absolute !important; top: 24px !important; left: 20px !important; margin: 0 !important; z-index: 5;">Status</span>
             
-            <p id="current-planned-label" class="status-box-text">
+            <!-- REGLAGE PASS-NAMN (t.ex Pass A / Planerad vila): Ändra marginaler eller text-align här -->
+            <p id="current-planned-label" class="status-box-text" style="margin: 0 0 15px 0 !important; text-align: left !important;">
                 ${planned ? `📋 <span class="status-highlight-text">${planned.name}</span>` : '🧘 Planerad Vila'}
             </p>
             
-            <div id="day-manager-action-btn-container" class="status-btn-container">`;
+            <div id="day-manager-action-btn-container" class="status-btn-container" style="width: 100% !important; display: flex; flex-direction: column; gap: 10px;">`;
             if(planned) {
                 html += `
-                <button class="mode-btn premium-action-btn premium-green-btn" onclick="prepareStart('${dateStr}', '${planned.id}')">
+                <button class="mode-btn premium-action-btn premium-green-btn" onclick="prepareStart('${dateStr}', '${planned.id}')" style="width: 100% !important; margin: 0 !important;">
                     Starta Träning 🔥
                 </button>`;
             }
         html += `
             </div>
             
-            <button class="mode-btn premium-action-btn premium-free-btn" onclick="closeModal(); startFreeWorkoutOnDate('${dateStr}')">
+            <button class="mode-btn premium-action-btn premium-free-btn" onclick="closeModal(); startFreeWorkoutOnDate('${dateStr}')" style="width: 100% !important; margin: 10px 0 0 0 !important;">
                 ➕ Starta Fritt Pass
             </button>
         </div>`;
 
         // ÄNDRA PLANERING - SEKTIONSAVSKILJARE
+        // REGLAGE ÄNDRA PLANERING: Ändra margin-top för att skjuta hela sektionen upp eller ned!
         html += `
-        <div style="margin-top: 15px;">
-            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+        <div style="margin-top: 10px; width: 100%;">
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px;">
                 <div style="flex-grow: 1; height: 1px; background: rgba(255,255,255,0.08);"></div>
-                <p style="font-size: 11px; text-transform: uppercase; color: var(--text-light); font-weight: 700; letter-spacing: 1px; margin: 0;">Ändra planering</p>
+                
+                <!-- Här styr du stilen på själva textraden "Ändra planering" -->
+                <p style="font-size: 11px; text-transform: uppercase; color: var(--text-light); font-weight: 700; letter-spacing: 1px; margin: 0 !important; white-space: nowrap;">Ändra planering</p>
+                
                 <div style="flex-grow: 1; height: 1px; background: rgba(255,255,255,0.08);"></div>
             </div>
             
-            <div class="plan-override-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">`;
+            <div class="plan-override-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; width: 100%;">`;
             
             programData.routine.forEach(p => {
                 const isSelected = planned && p.id === planned.id;
