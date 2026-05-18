@@ -704,7 +704,7 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
             <span class="status-box-title">Status</span>
             
             <p id="current-planned-label" class="status-box-text">
-                ${planned ? `📋 Inplanerat: <span class="status-highlight-text">${planned.name}</span>` : '🧘 Planerad Vila'}
+                ${planned ? `📋<span class="status-highlight-text">${planned.name}</span>` : '🧘 Planerad Vila'}
             </p>
             
             <div id="day-manager-action-btn-container" class="status-btn-container">`;
