@@ -1,3 +1,6 @@
+/* ==========================================================================
+   1. GLOBALA VARIABLER & BASSTYLING
+   ========================================================================== */
 :root {
     --primary: #22d3ee;
     --secondary: #818cf8;
@@ -39,7 +42,9 @@ body {
 
 .hidden { display: none !important; }
 
-/* --- HEADER & HERO --- */
+/* ==========================================================================
+   2. HEADER, HERO & ALLMÄNNA LAYOUTKOMPONENTER
+   ========================================================================== */
 .hero-section {
     text-align: center;
     padding: 40px 0 20px;
@@ -82,12 +87,57 @@ body {
     animation: fadeIn 0.4s ease-out;
 }
 
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
+.card { padding: 20px; margin-bottom: 15px; }
+
+.glass { background: var(--card); backdrop-filter: blur(12px); border: 1px solid var(--glass-border); border-radius: 24px; }
+.glass-light { background: var(--card-light); backdrop-filter: blur(15px); border: 1px solid rgba(255,255,245,0.2); border-radius: 24px; }
+.glass-modern { background: rgba(30, 41, 59, 0.7); border: 1px solid var(--glass-border); border-radius: 24px; box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1); backdrop-filter: blur(5px); }
+
+.circle-ctrl { background: var(--card); border: 1px solid var(--glass-border); backdrop-filter: blur(10px); width: 45px; height: 45px; border-radius: 15px; display: flex; align-items: center; justify-content: center; position: fixed; top: 20px; right: 20px; z-index: 1000; cursor: pointer; color: white; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+
+/* Sektionsavskiljare */
+.planning-section { margin-top: 25px; }
+.section-title { text-align: center; font-weight: 800; margin-bottom: 25px; font-size: 1.4rem; width: 100%; }
+.modern-header { 
+    font-family: 'Montserrat', sans-serif; 
+    font-weight: 900; 
+    text-transform: uppercase; 
+    letter-spacing: 0.5px; 
+    background: linear-gradient(to right, #fff, var(--primary)); 
+    -webkit-background-clip: text; 
+    -webkit-text-fill-color: transparent; 
+    font-size: 1.5rem; 
+    white-space: nowrap; 
+    box-sizing: border-box; 
+    margin-top: 55px;        
+    padding: 0 15px;               
 }
 
-/* --- ALLMÄNNA KNAPPAR & GRID --- */
+.section-divider { display: flex; align-items: center; gap: 14px; margin-bottom: 20px; }
+.section-divider-container {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 15px !important;
+    margin-top: 10px !important;
+    margin-bottom: 20px !important;
+    width: 100% !important;
+}
+.divider-line { 
+    flex-grow: 1; 
+    height: 1px; 
+    background: linear-gradient(90deg, transparent, rgba(56, 189, 248, 0.3), transparent); 
+}
+.divider-text { font-size: 11px; text-transform: uppercase; color: var(--text-light); font-weight: 800; letter-spacing: 2px; margin: 0; opacity: 0.7; }
+.alternative-badge { margin-bottom: 0 !important; }
+
+/* Diagramkomponenter */
+.chart-wrapper { display: flex; align-items: flex-end; gap: 10px; height: 150px; padding-top: 20px; }
+.chart-bar { flex: 1; background: var(--primary); border-radius: 6px 6px 0 0; position: relative; }
+
+/* ==========================================================================
+   3. KNAPPAR & GRIDS (BAS, PREMIUM & RÖK-EFFEKTER)
+   ========================================================================== */
 .menu-grid {
     display: grid;
     grid-template-columns: 1fr 1fr; 
@@ -97,6 +147,7 @@ body {
     margin-top: 10px;
 }
 
+/* Standard funktionsknapp */
 .mode-btn { 
     width: 100%; 
     box-sizing: border-box;
@@ -113,7 +164,6 @@ body {
     justify-content: center; 
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); 
 }
-
 .mode-btn:active {
     transform: scale(0.94);
     background: rgba(255, 255, 255, 0.12);
@@ -128,443 +178,18 @@ body {
     align-items: center;
     justify-content: center;
 }
+.btn-main-text { font-size: 14px; font-weight: 700; color: var(--text); letter-spacing: 0.2px; }
+.btn-sub-text { font-size: 8px; color: var(--primary); text-transform: uppercase; letter-spacing: 1px; font-weight: 600; margin-top: 4px; opacity: 0.8; }
+.btn-text-container { display: flex; flex-direction: column; align-items: flex-start; text-align: left; }
 
-.btn-main-text {
-    font-size: 14px;
-    font-weight: 700;
-    color: var(--text);
-    letter-spacing: 0.2px;
-}
-
-.btn-sub-text {
-    font-size: 8px;
-    color: var(--primary);
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    font-weight: 600;
-    margin-top: 4px;
-    opacity: 0.8;
-}
-
-.btn-text-container {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    text-align: left;
-}
-
+/* Färgteman knappar */
 .blue { background: linear-gradient(135deg, #22d3ee 0%, #0ea5e9 100%); color: #0f172a; }
 .green { background: linear-gradient(135deg, #10b981 0%, #059669 100%); }
 .orange { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); }
-
 .glass-border { background: transparent; border: 2px solid var(--glass-border); color: white; }
 .btn-disabled { opacity: 0.8; cursor: not-allowed; pointer-events: none; background: rgba(255,255,255,0.05) !important; color: rgba(255,255,255,0.3) !important; }
 
-/* --- KALENDER & DISPLAY --- */
-.timer-display {
-    font-family: 'Montserrat', sans-serif;
-    font-size: 2rem;
-    font-weight: 900;
-    text-align: center;
-    margin: 10px 0;
-    color: var(--primary);
-    text-shadow: 0 0 15px rgba(34, 211, 238, 0.3);
-}
-
-#month-label {
-    font-size: 1.1rem;
-    font-weight: 700;
-    letter-spacing: 0.5px;
-    color: var(--text);
-    background: rgba(255,255,255,0.05);
-    padding: 8px 16px;
-    border-radius: 12px;
-    border: 1px solid var(--glass-border);
-}
-
-.calendar-nav { 
-    display: flex; 
-    justify-content: space-between; 
-    align-items: center; 
-    margin-bottom: 15px; 
-}
-
-.nav-arrow { 
-    background: var(--card); 
-    border: 1px solid var(--glass-border); 
-    color: white; 
-    padding: 10px 15px; 
-    border-radius: 12px; 
-    cursor: pointer; 
-}
-
-.calendar-weekdays { 
-    display: grid; 
-    grid-template-columns: repeat(7, 1fr); 
-    text-align: center; 
-    font-size: 11px; 
-    margin-bottom: 10px; 
-    color: var(--text-light); 
-}
-
-.calendar-grid { 
-    display: grid; 
-    grid-template-columns: repeat(7, 1fr); 
-    gap: 6px !important; 
-    width: 100% !important; 
-    box-sizing: border-box !important;
-}
-
-.calendar-cell { 
-    width: 100% !important;
-    aspect-ratio: 1 / 1 !important; 
-    box-sizing: border-box !important;
-    border-radius: 12px; 
-    background: rgba(255, 255, 255, 0.07); 
-    display: flex; 
-    flex-direction: column; 
-    align-items: center; 
-    justify-content: center; 
-    font-size: 14px !important; 
-    font-weight: 700;
-    cursor: pointer;
-    border: 1px solid rgba(255, 255, 255, 0.05) !important; 
-    position: relative;
-    overflow: hidden; 
-    animation: calendarCellAppear 0.35s ease-out forwards !important;
-}
-
-#calendar-grid > div:not([class]) {
-    width: 100% !important;
-    aspect-ratio: 1 / 1 !important;
-    box-sizing: border-box !important;
-}
-
-.cell-info { 
-    font-size: 8px !important; 
-    font-weight: 800; 
-    text-transform: uppercase; 
-    margin-top: 2px !important; 
-    display: block !important; 
-    line-height: 1 !important;
-    max-width: 100% !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-    white-space: nowrap !important;
-    padding: 0 2px !important;
-    box-sizing: border-box !important;
-}
-
-.calendar-cell.today,
-.calendar-cell.is-today,
-.calendar-cell.current-day,
-.calendar-cell.active-day,
-.calendar-cell.current {
-    box-shadow: 
-        inset 0 0 0 2px rgba(239, 68, 68, 0.9), 
-        0 0 10px rgba(239, 68, 68, 0.25) !important;
-    color: #ffffff !important; 
-}
-
-@keyframes calendarCellAppear {
-    0% { opacity: 0; transform: translateY(2px); }
-    100% { opacity: 1; transform: translateY(0); }
-}
-
-.cell-completed { background: var(--success) !important; color: white !important; }
-.cell-ongoing { background: transparent !important; border: 2px solid var(--warning) !important; color: var(--warning) !important; }
-.cell-planned { background: transparent !important; border: 1px solid var(--primary) !important; color: var(--primary) !important; }
-
-.legend { display: flex; gap: 15px; justify-content: center; margin-top: 20px; font-size: 12px; }
-.legend-item { display: flex; align-items: center; gap: 5px; }
-.legend-color { width: 12px; height: 12px; border-radius: 3px; }
-.legend-color.planned { border: 1px solid var(--primary); }
-.legend-color.ongoing { border: 2px solid var(--warning); }
-.legend-color.completed { background: var(--success); }
-
-/* --- PROGRAM & KATEGORIER --- */
-.section-title { text-align: center; font-weight: 800; margin-bottom: 25px; font-size: 1.4rem; width: 100%; }
-.modern-header { 
-    font-family: 'Montserrat', sans-serif; 
-    font-weight: 900; 
-    text-transform: uppercase; 
-    letter-spacing: 0.5px; 
-    background: linear-gradient(to right, #fff, var(--primary)); 
-    -webkit-background-clip: text; 
-    -webkit-text-fill-color: transparent; 
-    font-size: 1.5rem; 
-    white-space: nowrap; 
-    box-sizing: border-box; 
-    margin-top: 55px;       
-    padding: 0 15px;        
-}
-.glass-light { background: var(--card-light); backdrop-filter: blur(15px); border: 1px solid rgba(255,255,245,0.2); border-radius: 24px; }
-.card { padding: 20px; margin-bottom: 15px; }
-
-.program-modern-grid { 
-    display: grid; 
-    grid-template-columns: repeat(3, 1fr); 
-    gap: 10px; 
-}
-
-.prog-card { 
-    background: linear-gradient(135deg, rgba(34, 211, 238, 0.1) 0%, rgba(129, 140, 248, 0.1) 100%); 
-    border: 1px solid var(--glass-border); 
-    border-radius: 16px; 
-    padding: 12px 6px; 
-    text-align: center; 
-    cursor: pointer; 
-    position: relative; 
-    overflow: hidden; 
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
-}
-
-.prog-card h4 { 
-    margin: 5px 0 0; 
-    font-size: 0.95rem; 
-    font-weight: 800; 
-}
-
-.prog-card .btn-icon {
-    font-size: 18px; 
-    margin-bottom: 4px;
-}
-
-.prog-card.active { 
-    border-color: var(--primary); 
-    background: linear-gradient(135deg, rgba(34, 211, 238, 0.25) 0%, rgba(129, 140, 248, 0.25) 100%); 
-    box-shadow: 0 8px 20px rgba(34, 211, 238, 0.2); 
-}
-.glass-modern { background: rgba(30, 41, 59, 0.7); border: 1px solid var(--glass-border); border-radius: 24px; box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1); backdrop-filter: blur(5px); }
-.glass { background: var(--card); backdrop-filter: blur(12px); border: 1px solid var(--glass-border); border-radius: 24px; }
-.category-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
-.cat-btn { display: flex; flex-direction: column; align-items: center; padding: 15px 5px; border-radius: 20px; font-size: 14px; font-weight: 700; color: var(--text-light); cursor: pointer; border: 1px solid var(--glass-border); background: var(--card); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-.cat-btn .cat-icon { font-size: 24px; margin-bottom: 5px; }
-.cat-btn.active { background: rgba(34, 211, 238, 0.15); border-color: var(--primary); color: var(--primary); box-shadow: 0 4px 15px rgba(34, 211, 238, 0.1); }
-
-.circle-ctrl { background: var(--card); border: 1px solid var(--glass-border); backdrop-filter: blur(10px); width: 45px; height: 45px; border-radius: 15px; display: flex; align-items: center; justify-content: center; position: fixed; top: 20px; right: 20px; z-index: 1000; cursor: pointer; color: white; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
-
-/* --- MODAL --- */
-.modal { position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px); display: flex; align-items: center; justify-content: center; z-index: 9999; padding: 20px; }
-.modal-content { padding: 25px; border-radius: 28px; width: 100%; max-width: 420px; background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%); border: 1px solid var(--glass-border); overflow-y: auto; max-height: 85vh; box-shadow: 0 20px 50px rgba(0,0,0,0.6); }
-.modal-content h3 { text-align: center; margin-bottom: 25px; font-weight: 800; font-size: 1.4rem; color: var(--primary); }
-.log-input { width: 100%; padding: 12px; border-radius: 12px; border: 1px solid var(--glass-border); background: rgba(0,0,0,0.2); color: white; text-align: center; font-weight: 700; margin: 5px 0 15px; font-size: 16px !important; }
-select.log-input { font-size: 16px !important; text-align-last: center; appearance: none; }
-
-/* --- ÖVRIGT & SPECIALREGLER --- */
-.edit-item-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; background: linear-gradient(90deg, rgba(255,255,255,0.03), rgba(255,255,255,0.07)); border: 1px solid var(--glass-border); padding: 12px; border-radius: 16px; }
-.add-inline-btn { position: absolute; right: 0; background: var(--primary); border: none; color: #333; width: 32px; height: 32px; border-radius: 10px; font-weight: 900; cursor: pointer; font-size: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
-.reorder-btn { background: rgba(34, 211, 238, 0.1); border: 1px solid rgba(34, 211, 238, 0.2); color: var(--primary); border-radius: 8px; width: 32px; height: 32px; cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center; }
-.reorder-btn:active { background: var(--primary); color: #000; }
-
-.chart-wrapper { display: flex; align-items: flex-end; gap: 10px; height: 150px; padding-top: 20px; }
-.chart-bar { flex: 1; background: var(--primary); border-radius: 6px 6px 0 0; position: relative; }
-
-.save-draft-btn {
-    background: linear-gradient(135deg, #64748b 0%, #475569 100%) !important;
-    border: 1px solid rgba(255,255,255,0.1);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-}
-
-.exercise-done {
-    border-color: var(--success) !important;
-    background: rgba(16, 185, 129, 0.1) !important;
-    opacity: 0.8;
-}
-
-.exercise-done strong {
-    text-decoration: line-through;
-    color: var(--success);
-}
-
-.exercise-done input {
-    pointer-events: none;
-    opacity: 0.5;
-}
-
-.exercise-done .mode-btn.glass-border, 
-.exercise-done .reorder-btn,
-.exercise-done button[onclick*="removeSet"] {
-    opacity: 0.3 !important;
-    pointer-events: none !important;
-}
-
-/* --- ISOLERADE MOBIL-FIXAR --- */
-#calendar-view .calendar-grid {
-    grid-template-columns: repeat(7, 1fr) !important;
-    width: 100% !important;
-}
-
-#history-detail-view {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: #0f172a;
-    z-index: 9999;
-    overflow-y: auto !important;
-    padding: 20px;
-}
-
-.set-locked {
-    opacity: 0.25;
-    pointer-events: none;
-    filter: grayscale(1);
-}
-
-/* ==========================================================================
-   STATUSKORT & PREMIUMKNAPPAR (FIXAD MATCHNING)
-   ========================================================================== */
-
-/* Det vanliga kortet som ligger på din startsida */
-.modern-status-card {
-    background: var(--card);
-    border: 1px solid var(--glass-border);
-    border-radius: 24px;
-    padding: 16px;
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    margin-bottom: 25px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-}
-
-.status-icon-circle { 
-    width: 44px; 
-    height: 44px; 
-    border-radius: 12px; 
-    background: rgba(34, 211, 238, 0.1); 
-    display: flex; 
-    align-items: center; 
-    justify-content: center; 
-    font-size: 20px; 
-    border: 1px solid rgba(34, 211, 238, 0.2); 
-}
-
-/* ==========================================================================
-   STATUSKORT & PREMIUMKNAPPAR (UPPDATERAD MED GLASSMORPHISM-EFFEKT)
-   ========================================================================== */
-
-/* Det vanliga kortet som ligger på din startsida */
-.modern-status-card {
-    background: var(--card);
-    border: 1px solid var(--glass-border);
-    border-radius: 24px;
-    padding: 16px;
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    margin-bottom: 25px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-}
-
-.status-icon-circle { 
-    width: 44px; 
-    height: 44px; 
-    border-radius: 12px; 
-    background: rgba(34, 211, 238, 0.1); 
-    display: flex; 
-    align-items: center; 
-    justify-content: center; 
-    font-size: 20px; 
-    border: 1px solid rgba(34, 211, 238, 0.2); 
-}
-
-/* DET ANPASSADE STATUSKORTET INUTI MODALEN (Nu med lyxig glaseffekt!) */
-.modern-status-card.day-manager-status-box {
-    display: block !important;
-    text-align: center !important;
-    padding: 24px !important;
-    border-radius: 24px !important;
-    
-    /* EFFEKT: Samma snygga mörka, halvtransparenta bas som dina andra boxar */
-    background: rgba(255, 255, 255, 0.03) !important; 
-    
-    /* KANTLINJE: Använder din apps egna glas-kant för en fin, skarp övre/runtom-linje */
-    border: 1px solid var(--glass-border) !important; 
-    
-    /* BLUR: Suddar ut bakgrunden bakom kortet för äkta iOS-glassmorphism */
-    backdrop-filter: blur(20px) !important;
-    -webkit-backdrop-filter: blur(20px) !important;
-    
-    /* SKUGGA: Djupare skugga med lite mer mörker för att poppa ut från bakgrunden */
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.1) !important;
-    margin-bottom: 25px !important;
-}
-
-.status-box-title {
-    font-size: 11px !important;
-    text-transform: uppercase !important;
-    color: var(--text-light) !important;
-    font-weight: 800 !important;
-    letter-spacing: 2px !important;
-    opacity: 0.6 !important;
-    display: block !important;
-    margin-bottom: 6px !important;
-}
-
-.status-box-text {
-    margin: 0 0 20px 0 !important;
-    font-size: 19px !important;
-    font-weight: 900 !important;
-    color: #ffffff !important;
-    text-shadow: 0 2px 10px rgba(0,0,0,0.5) !important;
-}
-
-/* PREMIUM-KNAPPAR INUTI BOXEN */
-.premium-action-btn {
-    width: 100% !important;
-    display: block !important;
-    margin: 0 auto !important;
-    box-sizing: border-box !important;
-    transform: none !important;
-}
-
-/* Den glödande, rökiga gröna knappen */
-.premium-green-btn {
-    padding: 18px !important;
-    font-size: 15px !important;
-    font-weight: 900 !important;
-    border-radius: 16px !important;
-    text-transform: uppercase !important;
-    border: 1px solid rgba(34, 197, 94, 0.4) !important;
-    background: linear-gradient(135deg, rgba(34, 197, 94, 0.2) 0%, rgba(16, 185, 129, 0.1) 100%) !important;
-    color: #ffffff !important;
-    box-shadow: 0 4px 15px rgba(34, 197, 94, 0.15), inset 0 1px 0 rgba(255,255,255,0.1) !important;
-    cursor: pointer !important;
-    transition: all 0.3s ease !important;
-    backdrop-filter: blur(5px) !important;
-    margin-bottom: 12px !important;
-}
-
-.premium-green-btn:hover {
-    background: linear-gradient(135deg, rgba(34, 197, 94, 0.3) 0%, rgba(16, 185, 129, 0.2) 100%) !important;
-    box-shadow: 0 0 25px rgba(34, 197, 94, 0.4) !important;
-    border-color: rgba(34, 197, 94, 0.8) !important;
-    transform: translateY(-1px) !important;
-}
-
-/* Den streckade cyanblå knappen */
-.premium-free-btn {
-    padding: 14px !important;
-    font-size: 13px !important;
-    border-radius: 14px !important;
-    font-weight: 700 !important;
-    border: 1px dashed rgba(34, 211, 238, 0.3) !important;
-    color: var(--primary) !important;
-    background: rgba(34, 211, 238, 0.02) !important;
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.02) !important;
-    cursor: pointer !important;
-    transition: all 0.3s ease !important;
-}
-
-.premium-free-btn:hover {
-    background: rgba(34, 211, 238, 0.08) !important;
-    border-color: var(--primary) !important;
-    box-shadow: 0 0 15px rgba(34, 211, 238, 0.2) !important;
-}
-/* --- SAMLAD KOD FÖR HUVUDKNAPPEN (MED PREMIUM-EFFEKTER) --- */
+/* HUVUDKNAPPEN (MED PREMIUM EFFEKTER) */
 .main-action {
     grid-column: span 2;
     margin: 0 0 15px 0 !important; 
@@ -580,64 +205,29 @@ select.log-input { font-size: 16px !important; text-align-last: center; appearan
     position: relative !important;
     overflow: hidden !important;
 }
-
 .main-action::before {
     content: "" !important;
     position: absolute !important;
-    top: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
-    height: 2px !important;
+    top: 0 !important; left: 0 !important; right: 0 !important; height: 2px !important;
     background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.7), transparent) !important;
     display: block !important;
     z-index: 5 !important;
 }
-
 .main-action::after {
     content: "";
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    top: 0; left: 0; width: 100%; height: 100%;
     background: linear-gradient(135deg, transparent 20%, rgba(255, 255, 255, 0.25) 50%, transparent 80%);
     filter: blur(8px); 
     z-index: 1;
     pointer-events: none;
     animation: mainSmokyMove 5s ease-in-out infinite;
 }
+.main-action .btn-icon { margin-bottom: 0 !important; font-size: 24px; position: relative; z-index: 2; }
+.main-action .btn-main-text { font-size: 16px !important; color: #0f172a; font-weight: 900; text-transform: uppercase; line-height: 1.2 !important; position: relative; z-index: 2; }
+.main-action .btn-sub-text { color: rgba(15, 23, 42, 0.6); font-weight: 800; font-size: 9px; margin-top: 2px; }
 
-.main-action .btn-icon {
-    margin-bottom: 0 !important;
-    font-size: 24px;
-    position: relative;
-    z-index: 2; 
-}
-
-.main-action .btn-main-text {
-    font-size: 16px !important;
-    color: #0f172a;
-    font-weight: 900;
-    text-transform: uppercase;
-    line-height: 1.2 !important;
-    position: relative;
-    z-index: 2; 
-}
-
-.main-action .btn-sub-text {
-    color: rgba(15, 23, 42, 0.6);
-    font-weight: 800;
-    font-size: 9px;
-    margin-top: 2px;
-}
-
-@keyframes mainSmokyMove {
-    0% { transform: scale(1) translateX(-30%); opacity: 0.3; }
-    50% { transform: scale(1.1) translateX(30%); opacity: 0.9; }
-    100% { transform: scale(1) translateX(-30%); opacity: 0.3; }
-}
-
-/* --- BASEN FÖR KNAPPARNA (HUVUDINSTÄLLNING FRÅN STARTSIDAN) --- */
+/* BASINSTÄLLNING FÖR HOME-CARDS OCH OVERRIDE-KNAPPAR (Rök + Premiumlinje) */
 #home-view .mode-btn.home-card,
 .plan-override-btn {
     background: rgba(255, 255, 255, 0.15) !important;
@@ -648,30 +238,20 @@ select.log-input { font-size: 16px !important; text-align-last: center; appearan
     overflow: hidden !important;
     box-shadow: 0 8px 20px rgba(0,0,0,0.4) !important;
 }
-
-/* --- DEN VITA PREMIUM-LINJEN I TOPPEN --- */
 #home-view .mode-btn.home-card::before,
 .plan-override-btn::before {
     content: "" !important;
     position: absolute !important;
-    top: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
-    height: 2px !important;
+    top: 0 !important; left: 0 !important; right: 0 !important; height: 2px !important;
     background: linear-gradient(90deg, transparent, rgba(255,255,255,0.7), transparent) !important;
     display: block !important;
     z-index: 5 !important;
 }
-
-/* --- DET RÖKIGA RÖRELSE-LAGRET --- */
 #home-view .mode-btn.home-card::after,
 .plan-override-btn::after {
     content: "" !important;
     position: absolute !important;
-    top: 0 !important;
-    left: 0 !important;
-    width: 100% !important;
-    height: 100% !important;
+    top: 0 !important; left: 0 !important; width: 100% !important; height: 100% !important;
     background: linear-gradient(135deg, transparent 20%, rgba(255, 255, 255, 0.18) 50%, transparent 80%) !important;
     filter: blur(10px) !important; 
     z-index: 1 !important;
@@ -679,206 +259,7 @@ select.log-input { font-size: 16px !important; text-align-last: center; appearan
     animation: smokyMove 10s ease-in-out infinite !important;
 }
 
-@keyframes smokyMove {
-    0% { transform: scale(1) translateX(-5%); opacity: 0.4; }
-    50% { transform: scale(1.1) translateX(5%); opacity: 0.8; }
-    100% { transform: scale(1) translateX(-5%); opacity: 0.4; }
-}
-
-/* --- ÖVNINGSVY: ENBART TOPPLINJE --- */
-#category-menu .cat-btn.glass::before {
-    display: none !important;
-    content: none !important;
-}
-
-#exercise-results .exercise-item,
-#exercise-results .workout-card,
-#exercise-results [class*="card"] {
-    position: relative !important;
-    overflow: hidden !important;
-}
-
-#exercise-results .exercise-item::before,
-#exercise-results .workout-card::before,
-#exercise-results [class*="card"]::before {
-    content: "" !important;
-    position: absolute !important;
-    top: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
-    height: 2px !important;
-    background: linear-gradient(90deg, transparent, rgba(34, 211, 238, 0.4), transparent) !important;
-    display: block !important;
-    z-index: 5 !important;
-}
-
-/* --- MJUKA ÖVERGÅNGAR (FADE & SLIDE) --- */
-#exercise-results > *,
-#calendar-grid > *,
-#pass-selector-list > *,
-#program-exercise-list > * {
-    animation: softAppear 0.35s ease-out forwards !important;
-}
-
-#workout-modal:not(.hidden) .modal-content {
-    animation: softAppear 0.35s ease-out forwards !important;
-}
-
-@keyframes softAppear {
-    0% { opacity: 0; transform: translateY(6px); }
-    100% { opacity: 1; transform: translateY(0); }
-}
-
-/* --- DESIGNAD RADERINGSMODAL --- */
-.modal-content.danger-modal {
-    border-color: rgba(239, 68, 68, 0.3) !important; 
-    text-align: center;
-}
-
-.modal-content.danger-modal h3 {
-    color: var(--danger) !important; 
-    margin-bottom: 15px;
-}
-
-.modal-content.danger-modal p {
-    color: var(--text-light);
-    font-size: 14px;
-    margin-bottom: 25px;
-    line-height: 1.5;
-}
-
-.modal-btn-group {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-}
-
-/* ==========================================================================
-   MODERN STYLING FÖR OPEN DAY MANAGER (PREMIUM GRÄNSSNITT)
-   ========================================================================== */
-.day-manager-header {
-    text-align: center;
-    margin-bottom: 25px;
-}
-.day-manager-subtitle {
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 3px;
-    color: var(--primary);
-    font-weight: 700;
-    display: block;
-    opacity: 0.8;
-}
-.day-title.modern-header {
-    margin: 8px 0 10px 0 !important;
-    font-size: 26px !important;
-    display: inline-block;
-}
-
-.completed-workout-card {
-    background: rgba(15, 23, 42, 0.6) !important;
-    border: 1px solid rgba(16, 185, 129, 0.2) !important;
-    border-left: 4px solid var(--success) !important;
-    border-radius: 20px !important;
-    padding: 18px !important;
-    margin-bottom: 20px !important;
-    backdrop-filter: blur(10px);
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
-}
-.workout-card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 16px;
-    border-bottom: 1px solid rgba(255,255,255,0.05);
-    padding-bottom: 10px;
-}
-.workout-card-title {
-    font-size: 18px;
-    color: #ffffff;
-    display: block;
-    font-weight: 800;
-}
-.workout-card-status {
-    font-size: 11px;
-    color: var(--success);
-    font-weight: 700;
-    text-transform: uppercase;
-    background: rgba(16, 185, 129, 0.1);
-    padding: 4px 10px;
-    border-radius: 20px;
-}
-
-.workout-card-actions {
-    display: flex;
-    gap: 10px;
-}
-.action-circle-btn {
-    border: 1px solid var(--glass-border);
-    cursor: pointer;
-    font-size: 14px;
-    width: 38px;
-    height: 38px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s ease;
-}
-.action-circle-btn.edit-btn { background: rgba(34, 211, 238, 0.08); color: var(--primary); }
-.action-circle-btn.delete-btn { background: rgba(239, 68, 68, 0.08); color: var(--danger); }
-
-.completed-exercises-container {
-    background: rgba(0, 0, 0, 0.25);
-    padding: 16px;
-    border-radius: 16px;
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-}
-.completed-exercise-name {
-    color: var(--text);
-    font-weight: 800;
-    font-size: 15px;
-}
-.completed-sets-grid {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-}
-.completed-set-badge {
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    padding: 6px 12px;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-}
-.completed-set-badge .set-label {
-    color: var(--primary);
-    font-size: 9px;
-    font-weight: 900;
-    text-transform: uppercase;
-}
-
-.status-card {
-    padding: 24px !important;
-    border-radius: 24px !important;
-    text-align: center;
-    margin-bottom: 25px !important;
-    background: rgba(255, 255, 255, 0.02) !important;
-    border: 1px solid var(--glass-border) !important;
-    backdrop-filter: blur(10px);
-}
-.status-label {
-    margin: 10px 0 20px 0;
-    font-size: 20px;
-    font-weight: 900;
-    color: #ffffff;
-}
-
-/* Anpassade knappar för flödet */
+/* Flödes- & Specialknappar (Utanför fönster) */
 .ongoing-btn, .start-planned-btn {
     padding: 18px !important;
     font-size: 15px !important;
@@ -904,7 +285,6 @@ select.log-input { font-size: 16px !important; text-align-last: center; appearan
     top: 0; left: 0; right: 0; height: 2px;
     background: linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent) !important;
 }
-
 .free-workout-btn {
     padding: 14px !important;
     font-size: 13px !important;
@@ -914,121 +294,221 @@ select.log-input { font-size: 16px !important; text-align-last: center; appearan
     background: rgba(34, 211, 238, 0.03) !important;
     font-weight: 700 !important;
 }
-
-.planning-section { margin-top: 25px; }
-.section-divider { display: flex; align-items: center; gap: 14px; margin-bottom: 20px; }
-.divider-line { flex-grow: 1; height: 1px; background: linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,0.1), rgba(255,255,255,0)); }
-.divider-text { font-size: 11px; text-transform: uppercase; color: var(--text-light); font-weight: 800; letter-spacing: 2px; margin: 0; opacity: 0.7; }
-
-/* Grid för Överskrivning av plan */
-.plan-override-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
-    margin-top: 10px;
+.save-draft-btn {
+    background: linear-gradient(135deg, #64748b 0%, #475569 100%) !important;
+    border: 1px solid rgba(255,255,255,0.1);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
 }
-.override-item-wrapper {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
+.add-inline-btn { position: absolute; right: 0; background: var(--primary); border: none; color: #333; width: 32px; height: 32px; border-radius: 10px; font-weight: 900; cursor: pointer; font-size: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+.reorder-btn { background: rgba(34, 211, 238, 0.1); border: 1px solid rgba(34, 211, 238, 0.2); color: var(--primary); border-radius: 8px; width: 32px; height: 32px; cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center; }
+.reorder-btn:active { background: var(--primary); color: #000; }
+
+/* ==========================================================================
+   4. KALENDERKOMPONENTER
+   ========================================================================== */
+.timer-display {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 2rem;
+    font-weight: 900;
+    text-align: center;
+    margin: 10px 0;
+    color: var(--primary);
+    text-shadow: 0 0 15px rgba(34, 211, 238, 0.3);
 }
 
-/* Knapparna ärvs nu direkt från hem-korten i toppen (Rök + Glas + Topplinje) */
+#month-label {
+    font-size: 1.1rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    color: var(--text);
+    background: rgba(255,255,255,0.05);
+    padding: 8px 16px;
+    border-radius: 12px;
+    border: 1px solid var(--glass-border);
+}
+
+.calendar-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+.nav-arrow { background: var(--card); border: 1px solid var(--glass-border); color: white; padding: 10px 15px; border-radius: 12px; cursor: pointer; }
+.calendar-weekdays { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; font-size: 11px; margin-bottom: 10px; color: var(--text-light); }
+
+.calendar-grid { 
+    display: grid; 
+    grid-template-columns: repeat(7, 1fr) !important; 
+    gap: 6px !important; 
+    width: 100% !important; 
+    box-sizing: border-box !important;
+}
+
+.calendar-cell, 
+#calendar-grid > div:not([class]) { 
+    width: 100% !important;
+    aspect-ratio: 1 / 1 !important; 
+    box-sizing: border-box !important;
+    border-radius: 12px; 
+    background: rgba(255, 255, 255, 0.07); 
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    justify-content: center; 
+    font-size: 14px !important; 
+    font-weight: 700;
+    cursor: pointer;
+    border: 1px solid rgba(255, 255, 255, 0.05) !important; 
+    position: relative;
+    overflow: hidden; 
+    animation: calendarCellAppear 0.35s ease-out forwards !important;
+}
+
+.cell-info { 
+    font-size: 8px !important; 
+    font-weight: 800; 
+    text-transform: uppercase; 
+    margin-top: 2px !important; 
+    display: block !important; 
+    line-height: 1 !important;
+    max-width: 100% !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+    padding: 0 2px !important;
+    box-sizing: border-box !important;
+}
+
+.calendar-cell.today,
+.calendar-cell.is-today,
+.calendar-cell.current-day,
+.calendar-cell.active-day,
+.calendar-cell.current {
+    box-shadow: inset 0 0 0 2px rgba(239, 68, 68, 0.9), 0 0 10px rgba(239, 68, 68, 0.25) !important;
+    color: #ffffff !important; 
+}
+
+.cell-completed { background: var(--success) !important; color: white !important; }
+.cell-ongoing { background: transparent !important; border: 2px solid var(--warning) !important; color: var(--warning) !important; }
+.cell-planned { background: transparent !important; border: 1px solid var(--primary) !important; color: var(--primary) !important; }
+
+/* Kalenderförklaring */
+.legend { display: flex; gap: 15px; justify-content: center; margin-top: 20px; font-size: 12px; }
+.legend-item { display: flex; align-items: center; gap: 5px; }
+.legend-color { width: 12px; height: 12px; border-radius: 3px; }
+.legend-color.planned { border: 1px solid var(--primary); }
+.legend-color.ongoing { border: 2px solid var(--warning); }
+.legend-color.completed { background: var(--success); }
+
+/* ==========================================================================
+   5. PROGRAM, KATEGORIER & RUTINER
+   ========================================================================== */
+.program-modern-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.prog-card { 
+    background: linear-gradient(135deg, rgba(34, 211, 238, 0.1) 0%, rgba(129, 140, 248, 0.1) 100%); 
+    border: 1px solid var(--glass-border); 
+    border-radius: 16px; 
+    padding: 12px 6px; 
+    text-align: center; 
+    cursor: pointer; 
+    position: relative; 
+    overflow: hidden; 
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
+}
+.prog-card h4 { margin: 5px 0 0; font-size: 0.95rem; font-weight: 800; }
+.prog-card .btn-icon { font-size: 18px; margin-bottom: 4px; }
+.prog-card.active { 
+    border-color: var(--primary); 
+    background: linear-gradient(135deg, rgba(34, 211, 238, 0.25) 0%, rgba(129, 140, 248, 0.25) 100%); 
+    box-shadow: 0 8px 20px rgba(34, 211, 238, 0.2); 
+}
+
+.category-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+.cat-btn { display: flex; flex-direction: column; align-items: center; padding: 15px 5px; border-radius: 20px; font-size: 14px; font-weight: 700; color: var(--text-light); cursor: pointer; border: 1px solid var(--glass-border); background: var(--card); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+.cat-btn .cat-icon { font-size: 24px; margin-bottom: 5px; }
+.cat-btn.active { background: rgba(34, 211, 238, 0.15); border-color: var(--primary); color: var(--primary); box-shadow: 0 4px 15px rgba(34, 211, 238, 0.1); }
+
+#category-menu .cat-btn.glass::before { display: none !important; content: none !important; }
+
+/* Träningsöverskrivning (Plan Override) Grid */
+.plan-override-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 10px; }
+.override-item-wrapper { display: flex; flex-direction: column; gap: 6px; }
+
 .plan-override-btn {
-    margin: 0 !important;
-    padding: 16px 12px !important;
-    font-size: 14px !important;
-    border-radius: 16px !important;
-    font-weight: 800 !important;
-    color: #ffffff !important;
-    text-overflow: ellipsis;
-    overflow: hidden;
-    white-space: nowrap;
+    margin: 0 !important; padding: 16px 12px !important; font-size: 14px !important;
+    border-radius: 16px !important; font-weight: 800 !important; color: #ffffff !important;
+    text-overflow: ellipsis; overflow: hidden; white-space: nowrap;
 }
-
-/* Aktivt val för pass (Glödande Cyan) */
 .plan-override-btn.active-choice {
     border-color: var(--primary) !important;
     background: linear-gradient(135deg, rgba(34, 211, 238, 0.25) 0%, rgba(129, 140, 248, 0.15) 100%) !important;
     box-shadow: 0 0 18px rgba(34, 211, 238, 0.4) !important;
     color: var(--primary) !important;
 }
-
-/* Vila-knappen (Glödande Guld) */
 .override-rest-btn {
-    grid-column: span 2;
-    width: 100%;
+    grid-column: span 2; width: 100%;
     border-color: rgba(253, 224, 71, 0.3) !important;
-    color: rgba(253, 224, 71, 0.9) !important;
-    background: rgba(253, 224, 71, 0.03) !important;
+    color: rgba(253, 224, 71, 0.9) !important; background: rgba(253, 224, 71, 0.03) !important;
 }
-.override-rest-btn::before {
-    background: linear-gradient(90deg, transparent, rgba(253, 224, 71, 0.5), transparent) !important;
-}
+.override-rest-btn::before { background: linear-gradient(90deg, transparent, rgba(253, 224, 71, 0.5), transparent) !important; }
 .override-rest-btn.active-choice {
     background: linear-gradient(135deg, rgba(253, 224, 71, 0.25) 0%, rgba(245, 158, 11, 0.1) 100%) !important;
-    border-color: #fde047 !important;
-    box-shadow: 0 0 18px rgba(253, 224, 71, 0.4) !important;
-    color: #fde047 !important;
+    border-color: #fde047 !important; box-shadow: 0 0 18px rgba(253, 224, 71, 0.4) !important; color: #fde047 !important;
 }
 
-.override-details summary {
-    list-style: none;
-    font-size: 11px;
-    color: var(--text-light);
-    opacity: 0.5;
-    cursor: pointer;
-    padding: 6px;
-    text-align: center;
-    font-weight: 600;
-    text-transform: uppercase;
-}
-.details-content {
-    text-align: left;
-    padding: 12px;
-    border-radius: 14px;
-    margin-top: 6px;
-    background: rgba(0, 0, 0, 0.3);
-    border: 1px solid rgba(255, 255, 255, 0.03);
-}
-.details-exercise-item {
-    background: rgba(255, 255, 255, 0.01);
-    padding: 8px 12px;
-    border-radius: 10px;
-    margin-bottom: 6px;
-    border-left: 3px solid var(--primary);
-    font-size: 12px;
-    color: #e2e8f0;
+.override-details summary { list-style: none; font-size: 11px; color: var(--text-light); opacity: 0.5; cursor: pointer; padding: 6px; text-align: center; font-weight: 600; text-transform: uppercase; }
+.details-content { text-align: left; padding: 12px; border-radius: 14px; margin-top: 6px; background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 255, 255, 0.03); }
+.details-exercise-item { background: rgba(255, 255, 255, 0.01); padding: 8px 12px; border-radius: 10px; margin-bottom: 6px; border-left: 3px solid var(--primary); font-size: 12px; color: #e2e8f0; }
+
+/* Övningseffekter (Slutförda rader under pågående pass) */
+.exercise-done { border-color: var(--success) !important; background: rgba(16, 185, 129, 0.1) !important; opacity: 0.8; }
+.exercise-done strong { text-decoration: line-through; color: var(--success); }
+.exercise-done input { pointer-events: none; opacity: 0.5; }
+.exercise-done .mode-btn.glass-border, 
+.exercise-done .reorder-btn,
+.exercise-done button[onclick*="removeSet"] { opacity: 0.3 !important; pointer-events: none !important; }
+
+#exercise-results .exercise-item, #exercise-results .workout-card, #exercise-results [class*="card"] { position: relative !important; overflow: hidden !important; }
+#exercise-results .exercise-item::before, #exercise-results .workout-card::before, #exercise-results [class*="card"]::before {
+    content: "" !important; position: absolute !important; top: 0 !important; left: 0 !important; right: 0 !important; height: 2px !important;
+    background: linear-gradient(90deg, transparent, rgba(34, 211, 238, 0.4), transparent) !important; z-index: 5 !important;
 }
 
 /* ==========================================================================
-   STATUSKORT & FINJUSTERAD MODAL-DESIGN (SYMMETRISKA AVSTÅND)
+   6. VINDUR (MODALER) & APPARATENS STATUSKORT
    ========================================================================== */
+.modal { position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px); display: flex; align-items: center; justify-content: center; z-index: 9999; padding: 20px; }
+.modal-content { padding: 25px; border-radius: 28px; width: 100%; max-width: 420px; background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%); border: 1px solid var(--glass-border); overflow-y: auto; max-height: 85vh; box-shadow: 0 20px 50px rgba(0,0,0,0.6); }
+.modal-content h3 { text-align: center; margin-bottom: 25px; font-weight: 800; font-size: 1.4rem; color: var(--primary); }
+.log-input { width: 100%; padding: 12px; border-radius: 12px; border: 1px solid var(--glass-border); background: rgba(0,0,0,0.2); color: white; text-align: center; font-weight: 700; margin: 5px 0 15px; font-size: 16px !important; }
+select.log-input { font-size: 16px !important; text-align-last: center; appearance: none; }
 
-/* Datumområdet högst upp */
-.day-manager-header-area {
-    text-align: center;
-    margin-bottom: 20px !important; /* Minskat avstånd ner till statusboxen */
+.edit-item-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; background: linear-gradient(90deg, rgba(255,255,255,0.03), rgba(255,255,255,0.07)); border: 1px solid var(--glass-border); padding: 12px; border-radius: 16px; }
+.set-locked { opacity: 0.25; pointer-events: none; filter: grayscale(1); }
+
+/* Raderings/Danger-modal */
+.modal-content.danger-modal { border-color: rgba(239, 68, 68, 0.3) !important; text-align: center; }
+.modal-content.danger-modal h3 { color: var(--danger) !important; margin-bottom: 15px; }
+.modal-content.danger-modal p { color: var(--text-light); font-size: 14px; margin-bottom: 25px; line-height: 1.5; }
+.modal-btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+/* Allmän statusbox på startsidan */
+.modern-status-card {
+    background: var(--card); border: 1px solid var(--glass-border); border-radius: 24px;
+    padding: 16px; display: flex; align-items: center; gap: 15px; margin-bottom: 25px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
 }
-.day-manager-sub-date {
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    color: var(--text-light);
-    font-weight: 600;
-    display: block;
-}
-.day-manager-main-date {
-    margin: 4px 0 0 0 !important;
-    display: inline-block;
-    font-size: 26px;
+.status-icon-circle { 
+    width: 44px; height: 44px; border-radius: 12px; background: rgba(34, 211, 238, 0.1); 
+    display: flex; align-items: center; justify-content: center; font-size: 20px; border: 1px solid rgba(34, 211, 238, 0.2); 
 }
 
-/* Det anpassade statuskortet inuti modalen */
+/* ==========================================================================
+   7. DET EXKLUSIVA STATUSKORTET INUTI MODALEN (OPEN DAY MANAGER)
+   ========================================================================== */
+.day-manager-header-area { text-align: center; margin-bottom: 20px !important; }
+.day-manager-sub-date { font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: var(--text-light); font-weight: 600; display: block; }
+.day-manager-main-date { margin: 4px 0 0 0 !important; display: inline-block; font-size: 26px; }
+
 .modern-status-card.day-manager-status-box {
     display: block !important;
     text-align: center !important;
-    padding: 24px 24px 24px 24px !important; /* Helt jämn och symmetrisk padding runt om */
+    padding: 24px !important;
     border-radius: 28px !important;
     margin-bottom: 30px !important;
     position: relative;
@@ -1041,162 +521,95 @@ select.log-input { font-size: 16px !important; text-align-last: center; appearan
     box-shadow: 0 35px 65px rgba(0, 0, 0, 0.9), inset 0 1px 2px rgba(255, 255, 255, 0.2) !important;
 }
 
-/* Kraftfull bakgrundsaura (Neon-glöd) */
-.status-aura {
-    position: absolute;
-    top: -60px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 160px;
-    height: 120px;
-    filter: blur(35px);
-    pointer-events: none;
-    border-radius: 50%;
-    opacity: 0.8;
-}
+/* Neon-glöd bakom */
+.status-aura { position: absolute; top: -60px; left: 50%; transform: translateX(-50%); width: 160px; height: 120px; filter: blur(35px); pointer-events: none; border-radius: 50%; opacity: 0.8; }
 .status-aura.aura-planned { background: rgba(34, 211, 238, 0.35); }
 .status-aura.aura-rest { background: rgba(253, 224, 71, 0.2); }
 
-/* Ikon-sfären högst upp */
-.status-icon-sphere {
-    width: 64px;
-    height: 64px;
-    border-radius: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 28px;
-    margin: 0 auto 16px auto; /* Symmetriskt avstånd */
-    position: relative;
-    z-index: 2;
-}
-.status-icon-sphere.sphere-planned {
-    background: linear-gradient(135deg, #164e63 0%, #0891b2 100%);
-    border: 2px solid #22d3ee;
-    box-shadow: 0 0 25px rgba(34, 211, 238, 0.6);
-    animation: pulseGlow 2.5s infinite alternate;
-}
-.status-icon-sphere.sphere-rest {
-    background: linear-gradient(135deg, #713f12 0%, #ca8a04 100%);
-    border: 2px solid #fde047;
-    box-shadow: 0 0 20px rgba(253, 224, 71, 0.4);
-}
+/* Glob/Ikon-svär */
+.status-icon-sphere { width: 64px; height: 64px; border-radius: 20px; display: flex; align-items: center; justify-content: center; font-size: 28px; margin: 0 auto 16px auto; position: relative; z-index: 2; }
+.status-icon-sphere.sphere-planned { background: linear-gradient(135deg, #164e63 0%, #0891b2 100%); border: 2px solid #22d3ee; box-shadow: 0 0 25px rgba(34, 211, 238, 0.6); animation: pulseGlow 2.5s infinite alternate; }
+.status-icon-sphere.sphere-rest { background: linear-gradient(135deg, #713f12 0%, #ca8a04 100%); border: 2px solid #fde047; box-shadow: 0 0 20px rgba(253, 224, 71, 0.4); }
 
-/* Status-badge & Ändra planering-badge (Delar nu EXAKT samma utseende) */
+/* Kapsel-Badge för textrubrikerna */
 .status-badge-container {
-    display: inline-block;
-    background: rgba(255, 255, 255, 0.08) !important;
-    border: 1px solid rgba(255, 255, 255, 0.15) !important;
-    padding: 6px 18px !important;
-    border-radius: 100px !important;
-    margin-bottom: 14px !important; /* Flyttar ner texten under något, skapar luft */
-    position: relative;
-    z-index: 2;
+    display: inline-block; background: rgba(255, 255, 255, 0.08) !important; border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    padding: 6px 18px !important; border-radius: 100px !important; margin-bottom: 14px !important; position: relative; z-index: 2;
 }
 .status-box-title {
-    font-size: 13px !important; /* Större text som begärt */
-    text-transform: uppercase !important;
-    color: #38bdf8 !important; /* Lysande ljusblå färg */
-    font-weight: 900 !important;
-    letter-spacing: 2px !important;
-    margin: 0 !important;
-    display: inline-block !important;
+    font-size: 13px !important; text-transform: uppercase !important; color: #38bdf8 !important; 
+    font-weight: 900 !important; letter-spacing: 2px !important; margin: 0 !important; display: inline-block !important;
 }
 
-/* Den nya sektionsavskiljaren för ÄNDRA PLANERING */
-.section-divider-container {
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    gap: 15px !important;
-    margin-top: 10px !important;
-    margin-bottom: 20px !important;
-    width: 100% !important;
-}
-.alternative-badge {
-    margin-bottom: 0 !important; /* Nollställ marginal inuti avskiljaren för perfekt centrering */
-}
-.divider-line {
-    flex-grow: 1;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(56, 189, 248, 0.3), transparent);
-}
+/* Centrala status-beskrivningar */
+.status-box-text { margin: 0 0 20px 0 !important; font-size: 23px !important; font-weight: 900 !important; color: #ffffff !important; text-shadow: 0 3px 15px rgba(0,0,0,0.9) !important; letter-spacing: -0.5px !important; position: relative; z-index: 2; }
+.status-highlight-text { color: #22d3ee !important; text-shadow: 0 0 25px rgba(34, 211, 238, 0.8) !important; font-size: 26px; display: inline-block; font-weight: 950; }
+.status-highlight-text.rest-color { color: #fde047 !important; text-shadow: 0 0 25px rgba(253, 224, 71, 0.6) !important; }
 
-/* Huvudtexten (Själva träningspassets namn) */
-.status-box-text {
-    margin: 0 0 20px 0 !important;
-    font-size: 23px !important;
-    font-weight: 900 !important;
-    color: #ffffff !important;
-    text-shadow: 0 3px 15px rgba(0,0,0,0.9) !important;
-    letter-spacing: -0.5px !important;
-    position: relative;
-    z-index: 2;
-}
-
-.status-highlight-text {
-    color: #22d3ee !important;
-    text-shadow: 0 0 25px rgba(34, 211, 238, 0.8) !important;
-    font-size: 26px;
-    display: inline-block;
-    font-weight: 950;
-}
-
-.status-highlight-text.rest-color {
-    color: #fde047 !important;
-    text-shadow: 0 0 25px rgba(253, 224, 71, 0.6) !important;
-}
-
-/* PREMIUM-KNAPPAR */
-.premium-action-btn {
-    width: 100% !important;
-    display: block !important;
-    margin: 0 auto !important;
-    box-sizing: border-box !important;
-}
+/* Handlingsknappar inuti modalen */
+.premium-action-btn { width: 100% !important; display: block !important; margin: 0 auto !important; box-sizing: border-box !important; }
 .premium-green-btn {
-    padding: 18px !important;
-    font-size: 16px !important;
-    font-weight: 900 !important;
-    border-radius: 16px !important;
-    text-transform: uppercase !important;
-    cursor: pointer !important;
-    transition: all 0.2s ease !important;
-    margin-bottom: 12px !important;
-    animation: buttonPulse 2s infinite alternate;
-    border: 2px solid #22c55e !important;
-    background: linear-gradient(135deg, #15803d 0%, #22c55e 100%) !important;
-    color: #ffffff !important;
-    text-shadow: 0 2px 4px rgba(0,0,0,0.5) !important;
+    padding: 18px !important; font-size: 16px !important; font-weight: 900 !important; border-radius: 16px !important;
+    text-transform: uppercase !important; cursor: pointer !important; transition: all 0.2s ease !important; margin-bottom: 12px !important;
+    animation: buttonPulse 2s infinite alternate; border: 2px solid #22c55e !important; background: linear-gradient(135deg, #15803d 0%, #22c55e 100%) !important;
+    color: #ffffff !important; text-shadow: 0 2px 4px rgba(0,0,0,0.5) !important;
 }
-.premium-green-btn:hover {
-    background: linear-gradient(135deg, #16a34a 0%, #4ade80 100%) !important;
-    box-shadow: 0 0 30px rgba(34, 197, 94, 0.8) !important;
-}
+.premium-green-btn:hover { background: linear-gradient(135deg, #16a34a 0%, #4ade80 100%) !important; box-shadow: 0 0 30px rgba(34, 197, 94, 0.8) !important; }
+
 .premium-free-btn {
-    padding: 14px !important;
-    font-size: 13px !important;
-    border-radius: 14px !important;
-    font-weight: 800 !important;
-    border: 2px dashed rgba(34, 211, 238, 0.5) !important;
-    color: #22d3ee !important;
-    background: rgba(34, 211, 238, 0.05) !important;
-    cursor: pointer !important;
-    transition: all 0.2s ease !important;
-    margin-top: 4px !important;
+    padding: 14px !important; font-size: 13px !important; border-radius: 14px !important; font-weight: 800 !important;
+    border: 2px dashed rgba(34, 211, 238, 0.5) !important; color: #22d3ee !important; background: rgba(34, 211, 238, 0.05) !important;
+    cursor: pointer !important; transition: all 0.2s ease !important; margin-top: 4px !important;
 }
-.premium-free-btn:hover {
-    background: rgba(34, 211, 238, 0.15) !important;
-    border-style: solid !important;
-    color: #ffffff !important;
+.premium-free-btn:hover { background: rgba(34, 211, 238, 0.15) !important; border-style: solid !important; color: #ffffff !important; }
+
+/* Old Day Manager vyer */
+.day-manager-header { text-align: center; margin-bottom: 25px; }
+.day-manager-subtitle { font-size: 11px; text-transform: uppercase; letter-spacing: 3px; color: var(--primary); font-weight: 700; display: block; opacity: 0.8; }
+.day-title.modern-header { margin: 8px 0 10px 0 !important; font-size: 26px !important; display: inline-block; }
+
+/* ==========================================================================
+   8. HISTORIK, SLUTFORDA PASS & DETALJVY
+   ========================================================================== */
+#history-detail-view { position: fixed; inset: 0; background: #0f172a; z-index: 9999; overflow-y: auto !important; padding: 20px; }
+
+.completed-workout-card {
+    background: rgba(15, 23, 42, 0.6) !important; border: 1px solid rgba(16, 185, 129, 0.2) !important;
+    border-left: 4px solid var(--success) !important; border-radius: 20px !important; padding: 18px !important;
+    margin-bottom: 20px !important; backdrop-filter: blur(10px); box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+}
+.workout-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 10px; }
+.workout-card-title { font-size: 18px; color: #ffffff; display: block; font-weight: 800; }
+.workout-card-status { font-size: 11px; color: var(--success); font-weight: 700; text-transform: uppercase; background: rgba(16, 185, 129, 0.1); padding: 4px 10px; border-radius: 20px; }
+.workout-card-actions { display: flex; gap: 10px; }
+
+.action-circle-btn { border: 1px solid var(--glass-border); cursor: pointer; font-size: 14px; width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; }
+.action-circle-btn.edit-btn { background: rgba(34, 211, 238, 0.08); color: var(--primary); }
+.action-circle-btn.delete-btn { background: rgba(239, 68, 68, 0.08); color: var(--danger); }
+
+.status-card { padding: 24px !important; border-radius: 24px !important; text-align: center; margin-bottom: 25px !important; background: rgba(255, 255, 255, 0.02) !important; border: 1px solid var(--glass-border) !important; backdrop-filter: blur(10px); }
+.status-label { margin: 10px 0 20px 0; font-size: 20px; font-weight: 900; color: #ffffff; }
+
+.completed-exercises-container { background: rgba(0, 0, 0, 0.25); padding: 16px; border-radius: 16px; display: flex; flex-direction: column; gap: 14px; }
+.completed-exercise-name { color: var(--text); font-weight: 800; font-size: 15px; }
+.completed-sets-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+.completed-set-badge { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); padding: 6px 12px; border-radius: 12px; display: flex; align-items: center; gap: 6px; }
+.completed-set-badge .set-label { color: var(--primary); font-size: 9px; font-weight: 900; text-transform: uppercase; }
+
+/* ==========================================================================
+   9. EFFEKTER & ANIMATIONER (KEYFRAMES)
+   ========================================================================== */
+#exercise-results > *, #calendar-grid > *, #pass-selector-list > *, #program-exercise-list > * {
+    animation: softAppear 0.35s ease-out forwards !important;
+}
+#workout-modal:not(.hidden) .modal-content {
+    animation: softAppear 0.35s ease-out forwards !important;
 }
 
-/* ANIMATIONER */
-@keyframes pulseGlow {
-    0% { box-shadow: 0 0 20px rgba(34, 211, 238, 0.4); transform: scale(1); }
-    100% { box-shadow: 0 0 35px rgba(34, 211, 238, 0.8); transform: scale(1.05); }
-}
-@keyframes buttonPulse {
-    0% { box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3); }
-    100% { box-shadow: 0 8px 30px rgba(34, 197, 94, 0.7); }
-}
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes calendarCellAppear { 0% { opacity: 0; transform: translateY(2px); } 100% { opacity: 1; transform: translateY(0); } }
+@keyframes softAppear { 0% { opacity: 0; transform: translateY(6px); } 100% { opacity: 1; transform: translateY(0); } }
+@keyframes pulseGlow { 0% { box-shadow: 0 0 20px rgba(34, 211, 238, 0.4); transform: scale(1); } 100% { box-shadow: 0 0 35px rgba(34, 211, 238, 0.8); transform: scale(1.05); } }
+@keyframes buttonPulse { 0% { box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3); } 100% { box-shadow: 0 8px 30px rgba(34, 197, 94, 0.7); } }
+@keyframes smokyMove { 0% { transform: scale(1) translateX(-5%); opacity: 0.4; } 50% { transform: scale(1.1) translateX(5%); opacity: 0.8; } 100% { transform: scale(1) translateX(-5%); opacity: 0.4; } }
+@keyframes mainSmokyMove { 0% { transform: scale(1) translateX(-30%); opacity: 0.3; } 50% { transform: scale(1.1) translateX(30%); opacity: 0.9; } 100% { transform: scale(1) translateX(-30%); opacity: 0.3; } }
