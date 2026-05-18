@@ -507,13 +507,16 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
         });
     } 
     else if (isOngoing) {
-        // HÄR SÄTTER VI "align-items: center !important;" direkt på boxen för att köra över style.css säkert!
         html += `
-        <div class="modern-status-card day-manager-status-box" style="padding-top: 55px !important; align-items: center !important; margin-top: 14px !important;">
+        <div class="modern-status-card day-manager-status-box" style="padding-top: 24px !important; align-items: stretch !important; margin-top: 16px !important;">
             <div class="status-aura" style="background: rgba(245, 158, 11, 0.35);"></div>
             
-            <!-- Rubrik: Centrerad via left: 50% och transform -->
-            <span id="day-manager-status-title" class="status-box-title" style="position: absolute !important; top: 24px !important; left: 50% !important; transform: translateX(-50%) !important; margin: 0 !important; z-index: 5;">Status</span>
+            <!-- STATUS NY DESIGN: Linjeseparator identisk med Ändra planering -->
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px; width: 100%;">
+                <div style="flex-grow: 1; height: 1px; background: rgba(255,255,255,0.08);"></div>
+                <span class="status-box-title" style="font-size: 11px; text-transform: uppercase; color: var(--text-light); font-weight: 700; letter-spacing: 1px; margin: 0 !important; white-space: nowrap;">Status</span>
+                <div style="flex-grow: 1; height: 1px; background: rgba(255,255,255,0.08);"></div>
+            </div>
             
             <div style="margin: 0 0 15px 0; width: 100%; text-align: center !important;">
                 <span class="status-highlight-text" style="color: #f59e0b !important; text-shadow: 0 0 25px rgba(245, 158, 11, 0.8) !important; font-size: 20px; font-weight: 800;">🔥 Pågående Pass</span>
@@ -524,14 +527,17 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
         </div>`;
     }
     else {
-        // ÄVEN HÄR SÄTTER VI "align-items: center !important;" inline för att låsa upp centreringen enbart för denna vy
         html += `
-        <div class="modern-status-card day-manager-status-box" style="padding-top: 55px !important; align-items: center !important; margin-top: 14x !important;">
+        <div class="modern-status-card day-manager-status-box" style="padding-top: 24px !important; align-items: stretch !important; margin-top: 16px !important;">
             
-            <!-- Rubrik: Centrerad via left: 50% och transform -->
-            <span id="day-manager-status-title" class="status-box-title" style="position: absolute !important; top: 24px !important; left: 50% !important; transform: translateX(-50%) !important; margin: 0 !important; z-index: 5;">Status</span>
+            <!-- STATUS NY DESIGN: Linjeseparator identisk med Ändra planering -->
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px; width: 100%;">
+                <div style="flex-grow: 1; height: 1px; background: rgba(255,255,255,0.08);"></div>
+                <span class="status-box-title" style="font-size: 11px; text-transform: uppercase; color: var(--text-light); font-weight: 700; letter-spacing: 1px; margin: 0 !important; white-space: nowrap;">Status</span>
+                <div style="flex-grow: 1; height: 1px; background: rgba(255,255,255,0.08);"></div>
+            </div>
             
-            <p id="current-planned-label" class="status-box-text" style="margin: 0 0 15px 0 !important; text-align: center !important;">
+            <p id="current-planned-label" class="status-box-text" style="margin: 0 0 20px 0 !important; text-align: center !important; font-size: 18px; font-weight: 600;">
                 ${planned ? `📋 <span class="status-highlight-text">${planned.name}</span>` : '🧘 Planerad Vila'}
             </p>
             
@@ -552,7 +558,7 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
 
         // ÄNDRA PLANERING - SEKTIONSAVSKILJARE
         html += `
-        <div style="margin-top: 7px; width: 100%;">
+        <div style="margin-top: 10px; width: 100%;">
             <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px;">
                 <div style="flex-grow: 1; height: 1px; background: rgba(255,255,255,0.08);"></div>
                 <p style="font-size: 11px; text-transform: uppercase; color: var(--text-light); font-weight: 700; letter-spacing: 1px; margin: 0 !important; white-space: nowrap;">Ändra planering</p>
