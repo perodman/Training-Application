@@ -481,16 +481,16 @@ select.log-input { font-size: 16px !important; text-align-last: center; appearan
 .edit-item-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; background: linear-gradient(90deg, rgba(255,255,255,0.03), rgba(255,255,255,0.07)); border: 1px solid var(--glass-border); padding: 12px; border-radius: 16px; }
 .set-locked { opacity: 0.25; pointer-events: none; filter: grayscale(1); }
 
-/* Raderings/Danger-modal */
-.modal-content.danger-modal { border-color: rgba(239, 68, 68, 0.3) !important; text-align: center; }
-.modal-content.danger-modal h3 { color: var(--danger) !important; margin-bottom: 15px; }
-.modal-content.danger-modal p { color: var(--text-light); font-size: 14px; margin-bottom: 25px; line-height: 1.5; }
-.modal-btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-
-/* Allmän statusbox på startsidan */
+/* Det vanliga bas-kortet (t.ex. på din startsida) */
 .modern-status-card {
-    background: var(--card); border: 1px solid var(--glass-border); border-radius: 24px;
-    padding: 16px; display: flex; align-items: center; gap: 15px; margin-bottom: 25px;
+    background: var(--card); 
+    border: 1px solid var(--glass-border); 
+    border-radius: 24px;
+    padding: 16px; 
+    display: flex; 
+    align-items: center; 
+    gap: 15px; 
+    margin-bottom: 25px;
     box-shadow: 0 10px 30px rgba(0,0,0,0.2);
 }
 .status-icon-circle { 
@@ -505,14 +505,16 @@ select.log-input { font-size: 16px !important; text-align-last: center; appearan
 .day-manager-sub-date { font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: var(--text-light); font-weight: 600; display: block; }
 .day-manager-main-date { margin: 4px 0 0 0 !important; display: inline-block; font-size: 26px; }
 
-.modern-status-card.day-manager-status-box {
+/* FIX: Nu appliceras denna lyxiga iOS-effekt direkt på boxen i modalen */
+.modern-status-card.day-manager-status-box,
+.day-manager-status-box {
     display: block !important;
     text-align: center !important;
-    padding: 24px !important;
+    padding: 24px 20px !important;
     border-radius: 28px !important;
     margin-bottom: 30px !important;
-    position: relative;
-    overflow: hidden;
+    position: relative !important;
+    overflow: hidden !important;
     background: linear-gradient(180deg, rgba(30, 41, 59, 0.75) 0%, rgba(15, 23, 42, 0.9) 100%) !important;
     backdrop-filter: blur(30px) !important;
     -webkit-backdrop-filter: blur(30px) !important;
