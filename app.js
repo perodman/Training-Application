@@ -103,8 +103,8 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
 
     const body = document.getElementById("modal-body");
     
-    let html = `
-        <div style="text-align: center; margin-bottom: 25px;">
+   let html = `
+        <div style="text-align: center; margin-top: 20px; margin-bottom: 25px;">
             <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: var(--text-light); font-weight: 600; display: block;">Valt datum</span>
             <h2 class="section-title modern-header" style="margin: 8px 0 12px 0; display: inline-block; font-size: 26px;">
                 ${dateStr}
