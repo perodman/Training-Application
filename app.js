@@ -531,17 +531,17 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
         <div class="modern-status-card day-manager-status-box" style="padding-top: 24px !important; align-items: stretch !important; margin-top: 16px !important;">
             
             <!-- STATUS NY DESIGN: Linjeseparator identisk med Ändra planering -->
-            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px; width: 100%;">
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px; width: 100%;">
                 <div style="flex-grow: 1; height: 1px; background: rgba(255,255,255,0.08);"></div>
                 <span class="status-box-title" style="font-size: 11px; text-transform: uppercase; color: var(--text-light); font-weight: 700; letter-spacing: 1px; margin: 0 !important; white-space: nowrap;">Status</span>
                 <div style="flex-grow: 1; height: 1px; background: rgba(255,255,255,0.08);"></div>
             </div>
             
-            <p id="current-planned-label" class="status-box-text" style="margin: 0 0 20px 0 !important; text-align: center !important; font-size: 18px; font-weight: 600;">
+           <p id="current-planned-label" class="status-box-text" style="margin: 0 0 8px 0 !important; text-align: center !important; font-size: 16px; font-weight: 600; padding: 0 !important; line-height: 1.2 !important;">
                 ${planned ? `📋 <span class="status-highlight-text">${planned.name}</span>` : '🧘 Planerad Vila'}
             </p>
             
-            <div id="day-manager-action-btn-container" class="status-btn-container" style="width: 100% !important; display: flex; flex-direction: column; gap: 10px;">`;
+            <div id="day-manager-action-btn-container" class="status-btn-container" style="width: 125% !important; display: flex; flex-direction: column; gap: 10px;">`;
             if(planned) {
                 html += `
                 <button class="mode-btn premium-action-btn premium-green-btn" onclick="prepareStart('${dateStr}', '${planned.id}')" style="width: 100% !important; margin: 0 !important;">
