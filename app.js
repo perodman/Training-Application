@@ -528,33 +528,32 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
     }
     else {
         html += `
-        <div class="modern-status-card day-manager-status-box" style="padding-top: 24px !important; align-items: stretch !important; margin-top: 16px !important;">
-            
-            <!-- STATUS NY DESIGN: Linjeseparator identisk med Ändra planering -->
-            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px; width: 100%;">
-                <div style="flex-grow: 1; height: 1px; background: rgba(255,255,255,0.08);"></div>
-                <span class="status-box-title" style="font-size: 11px; text-transform: uppercase; color: var(--text-light); font-weight: 700; letter-spacing: 1px; margin: 0 !important; white-space: nowrap;">Status</span>
-                <div style="flex-grow: 1; height: 1px; background: rgba(255,255,255,0.08);"></div>
-            </div>
-            
-           <p id="current-planned-label" class="status-box-text" style="margin: 0 0 8px 0 !important; text-align: center !important; font-size: 16px; font-weight: 600; padding: 0 !important; line-height: 1.2 !important;">
-                ${planned ? `📋 <span class="status-highlight-text">${planned.name}</span>` : '🧘 Planerad Vila'}
-            </p>
-            
-            <div id="day-manager-action-btn-container" class="status-btn-container" style="width: 100% !important; display: flex; flex-direction: column; gap: 10px;">`;
-            if(planned) {
-                html += `
-                <button class="mode-btn premium-action-btn premium-green-btn" onclick="prepareStart('${dateStr}', '${planned.id}')" style="width: 100% !important; margin: 0 !important;">
-                    Starta Träning 🔥
-                </button>`;
-            }
+<div class="modern-status-card day-manager-status-box" style="padding: 20px 15px 15px 15px !important; align-items: stretch !important; margin-top: 10px !important;">
+    
+    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px; width: 100%;">
+        <div style="flex-grow: 1; height: 1px; background: rgba(255,255,255,0.08);"></div>
+        <span class="status-box-title" style="font-size: 10px; text-transform: uppercase; color: var(--text-light); font-weight: 700; letter-spacing: 1px; margin: 0 !important; white-space: nowrap;">Status</span>
+        <div style="flex-grow: 1; height: 1px; background: rgba(255,255,255,0.08);"></div>
+    </div>
+    
+    <p id="current-planned-label" class="status-box-text" style="margin: 0 0 8px 0 !important; text-align: center !important; font-size: 16px; font-weight: 600; padding: 0 !important; line-height: 1.2 !important;">
+        ${planned ? `📋 <span class="status-highlight-text">${planned.name}</span>` : '🧘 Planerad Vila'}
+    </p>
+    
+    <div id="day-manager-action-btn-container" class="status-btn-container" style="width: 100% !important; display: flex; flex-direction: column; gap: 10px; margin-top: 5px;">`;
+    if(planned) {
         html += `
-            </div>
-            
-            <button class="mode-btn premium-action-btn premium-free-btn" onclick="closeModal(); startFreeWorkoutOnDate('${dateStr}')" style="width: 100% !important; margin: 10px 0 0 0 !important;">
-                ➕ Starta Fritt Pass
-            </button>
-        </div>`;
+        <button class="mode-btn premium-action-btn premium-green-btn" onclick="prepareStart('${dateStr}', '${planned.id}')" style="width: 100% !important; margin: 0 !important; padding: 12px !important;">
+            Starta Träning 🔥
+        </button>`;
+    }
+html += `
+    </div>
+    
+    <button class="mode-btn premium-action-btn premium-free-btn" onclick="closeModal(); startFreeWorkoutOnDate('${dateStr}')" style="width: 100% !important; margin: 10px 0 0 0 !important; padding: 10px !important;">
+        ➕ Starta Fritt Pass
+    </button>
+</div>`;
 
         // ÄNDRA PLANERING - SEKTIONSAVSKILJARE
         html += `
