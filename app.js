@@ -514,7 +514,7 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
             <!-- STATUS NY DESIGN: Linjeseparator identisk med Ändra planering -->
             <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px; width: 100%;">
                 <div style="flex-grow: 1; height: 1px; background: rgba(255,255,255,0.08);"></div>
-                <span class="status-box-title" style="font-size: 11px; text-transform: uppercase; color: var(--text-light); font-weight: 700; letter-spacing: 1px; margin: 0 !important; white-space: nowrap;">Status</span>
+                <span class="status-box-title" style="font-size: 12px; text-transform: uppercase; color: var(--text-light); font-weight: 700; letter-spacing: 1px; margin: 0 !important; white-space: nowrap;">Status</span>
                 <div style="flex-grow: 1; height: 1px; background: rgba(255,255,255,0.08);"></div>
             </div>
             
