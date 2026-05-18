@@ -608,9 +608,9 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
             </button>
         </div>`;
 
-        // ÄNDRA PLANERING - SEKTIONSAVSKILJARE (Reducerat avstånd från 25px till 5px)
+        // ÄNDRA PLANERING - SEKTIONSAVSKILJARE 
         html += `
-        <div style="margin-top: 5px;">
+        <div style="margin-top: 15px;">
             <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
                 <div style="flex-grow: 1; height: 1px; background: rgba(255,255,255,0.08);"></div>
                 <p style="font-size: 11px; text-transform: uppercase; color: var(--text-light); font-weight: 700; letter-spacing: 1px; margin: 0;">Ändra planering</p>
