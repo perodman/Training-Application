@@ -572,7 +572,7 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
     else if (isOngoing) {
         // ÄNDRING: Lagt till 40px marginal i toppen för att flytta ner boxen vid pågående pass
         html += `
-        <div class="modern-status-card day-manager-status-box" style="margin-top: 30px !important; margin-left: 0 !important; margin-right: 0 !important; margin-bottom: 0 !important;">
+        <div class="modern-status-card day-manager-status-box" style="margin-top: auto !important; margin-left: 0 !important; margin-right: 0 !important; margin-bottom: 0 !important;">
             <div class="status-aura" style="background: rgba(245, 158, 11, 0.35);"></div>
             <span class="status-box-title">Status</span>
             <div style="margin: 2px 0 15px 0;">
@@ -586,7 +586,7 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
     else {
         // ÄNDRING: Lagt till 40px marginal i toppen även här för att matcha positionen
         html += `
-        <div class="modern-status-card day-manager-status-box" style="margin-top: 30px !important; margin-left: 0 !important; margin-right: 0 !important; margin-bottom: 0 !important;">
+        <div class="modern-status-card day-manager-status-box" style="margin-top: auto !important; margin-left: 0 !important; margin-right: 0 !important; margin-bottom: 0 !important;">
             <span class="status-box-title">Status</span>
             
             <p id="current-planned-label" class="status-box-text">
@@ -610,7 +610,7 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
 
         // ÄNDRA PLANERING - SEKTIONSAVSKILJARE 
         html += `
-        <div style="margin-top: 30px;">
+        <div style="margin-top: auto;">
             <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
                 <div style="flex-grow: 1; height: 1px; background: rgba(255,255,255,0.08);"></div>
                 <p style="font-size: 14px; text-transform: uppercase; color: var(--text-light); font-weight: 700; letter-spacing: 1px; margin: 0;">Ändra planering</p>
@@ -640,7 +640,7 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
                         <summary style="list-style: none; font-size: 10px; color: var(--text-light); opacity: 0.6; cursor: pointer; padding: 4px; border-radius: 8px;">
                             Innehåll ▾
                         </summary>
-                        <div style="text-align: left; padding: 8px; border-radius: 10px; margin-top: 4px; max-height: 120px; overflow-y: auto; background: rgba(0,0,0,0.1);">
+                        <div style="text-align: left; padding: 8px; border-radius: 10px; margin-top: auto; max-height: 120px; overflow-y: auto; background: rgba(0,0,0,0.1);">
                             ${exList}
                         </div>
                     </details>
