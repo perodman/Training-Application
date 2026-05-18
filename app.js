@@ -572,7 +572,7 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
     else if (isOngoing) {
         // ÄNDRING: Lagt till 40px marginal i toppen för att flytta ner boxen vid pågående pass
         html += `
-        <div class="modern-status-card day-manager-status-box" style="margin-top: 40px !important; margin-left: 0 !important; margin-right: 0 !important; margin-bottom: 0 !important;">
+        <div class="modern-status-card day-manager-status-box" style="margin-top: 30px !important; margin-left: 0 !important; margin-right: 0 !important; margin-bottom: 0 !important;">
             <div class="status-aura" style="background: rgba(245, 158, 11, 0.35);"></div>
             <span class="status-box-title">Status</span>
             <div style="margin: 5px 0 15px 0;">
@@ -586,7 +586,7 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
     else {
         // ÄNDRING: Lagt till 40px marginal i toppen även här för att matcha positionen
         html += `
-        <div class="modern-status-card day-manager-status-box" style="margin-top: 40px !important; margin-left: 0 !important; margin-right: 0 !important; margin-bottom: 0 !important;">
+        <div class="modern-status-card day-manager-status-box" style="margin-top: 30px !important; margin-left: 0 !important; margin-right: 0 !important; margin-bottom: 0 !important;">
             <span class="status-box-title">Status</span>
             
             <p id="current-planned-label" class="status-box-text">
