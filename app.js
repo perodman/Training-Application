@@ -183,7 +183,7 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
             
             <div class="${sphereClass}">${iconEmoji}</div>
             
-            <div class="status-badge-container">
+            <div class="status-badge-container" style="margin-top: -8px; margin-bottom: 5px;">
                 <span class="status-box-title">STATUS</span>
             </div>
             
