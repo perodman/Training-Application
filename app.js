@@ -509,7 +509,7 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
     else if (isOngoing) {
         // HÄR SÄTTER VI "align-items: center !important;" direkt på boxen för att köra över style.css säkert!
         html += `
-        <div class="modern-status-card day-manager-status-box" style="padding-top: 55px !important; align-items: center !important; margin-top: 16px !important;">
+        <div class="modern-status-card day-manager-status-box" style="padding-top: 55px !important; align-items: center !important; margin-top: 14px !important;">
             <div class="status-aura" style="background: rgba(245, 158, 11, 0.35);"></div>
             
             <!-- Rubrik: Centrerad via left: 50% och transform -->
@@ -526,7 +526,7 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
     else {
         // ÄVEN HÄR SÄTTER VI "align-items: center !important;" inline för att låsa upp centreringen enbart för denna vy
         html += `
-        <div class="modern-status-card day-manager-status-box" style="padding-top: 55px !important; align-items: center !important; margin-top: 16px !important;">
+        <div class="modern-status-card day-manager-status-box" style="padding-top: 55px !important; align-items: center !important; margin-top: 14x !important;">
             
             <!-- Rubrik: Centrerad via left: 50% och transform -->
             <span id="day-manager-status-title" class="status-box-title" style="position: absolute !important; top: 24px !important; left: 50% !important; transform: translateX(-50%) !important; margin: 0 !important; z-index: 5;">Status</span>
