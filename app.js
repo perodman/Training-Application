@@ -103,11 +103,11 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
 
     const body = document.getElementById("modal-body");
     
-    // 1. ÖVRE DATUMYTA (Helt synkad med CSS-strukturen - Trimmad klass för tightare avstånd)
+    // 1. ÖVRE DATUMYTA (Tvingar bort alla dolda toppmarginaler via inline-style)
     let html = `
-        <div class="day-manager-header-area">
-            <span class="day-manager-sub-date">Valt datum</span>
-            <h2 class="day-manager-main-date">${dateStr}</h2>
+        <div class="day-manager-header-area" style="margin: 10px 0 5px 0 !important; padding: 0 !important; text-align: center;">
+            <span class="day-manager-sub-date" style="margin: 0 !important; padding: 0 !important; display: block; font-size: 11px; letter-spacing: 1.5px;">Valt datum</span>
+            <h2 class="day-manager-main-date" style="margin: 5px 0 0 0 !important; padding: 0 !important; line-height: 1.1 !important; font-size: 32px;">${dateStr}</h2>
         </div>
     `;
     
@@ -164,7 +164,7 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
     // Fall B: Det finns ett aktivt utkast i bakgrunden som pågår just nu
     else if (isOngoing) {
         html += `
-        <div class="modern-status-card day-manager-status-box">
+        <div class="modern-status-card day-manager-status-box" style="margin-top: 5px !important; margin-bottom: 15px !important;">
             <div class="status-aura" style="background: rgba(245, 158, 11, 0.35);"></div>
             <span class="status-box-title">Status</span>
             <div style="margin: 5px 0 15px 0;">
@@ -175,23 +175,23 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
             </button>
         </div>`;
     } 
-    // Fall C: Standardvy (Det du ser på skärmklippet - Planerat pass eller Planerad vila)
+    // Fall C: Standardvy (Tvingar ihop avstånden inuti och utanför statusboxen)
     else {
         const auraColor = planned ? "rgba(34, 211, 238, 0.35)" : "rgba(129, 140, 248, 0.25)";
         
         html += `
-        <div class="modern-status-card day-manager-status-box">
+        <div class="modern-status-card day-manager-status-box" style="margin-top: 5px !important; margin-bottom: 20px !important; padding: 20px !important;">
             <div class="status-aura" style="background: ${auraColor};"></div>
             
-            <span class="status-box-title">STATUS</span>
+            <span class="status-box-title" style="margin: 0 !important; display: block;">STATUS</span>
             
-            <div class="status-text-container">
-                <span class="status-highlight-text">
+            <div class="status-text-container" style="margin: 5px 0 15px 0 !important; padding: 0 !important;">
+                <span class="status-highlight-text" style="display: block; line-height: 1.2;">
                     ${planned ? `📋 ${planned.name}` : '🧘 Planerad Vila'}
                 </span>
             </div>
             
-            <div id="day-manager-action-btn-container" class="status-btn-container">`;
+            <div id="day-manager-action-btn-container" class="status-btn-container" style="margin-bottom: 10px !important;">`;
             if(planned) {
                 html += `
                 <button class="premium-green-btn" onclick="prepareStart('${dateStr}', '${planned.id}')">
@@ -208,7 +208,7 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
 
         // ÄNDRA PLANERING - SEKTIONSAVSKILJARE
         html += `
-        <div class="section-divider-container planning-section">
+        <div class="section-divider-container planning-section" style="margin-top: 20px !important; margin-bottom: 15px !important;">
             <div class="divider-line"></div>
             <p class="divider-text">Ändra planering</p>
             <div class="divider-line"></div>
@@ -254,13 +254,33 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
         </div>`;
     }
     
-    // FLYTTAT UT STÄNG-KNAPPEN SÅ DEN LIGGER UTANFÖR ÄNDRA PLANERING-GRIDEN
     html += `
-    <div style="margin-top: 25px;">
+    <div style="margin-top: 25px !important;">
         <button class="mode-btn glass-border" onclick="closeModal()" style="width: 100%; padding: 16px; border-radius: 20px; font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Stäng</button>
     </div>`;
     
     body.innerHTML = html;
+    openModal();
+}
+
+function removeActiveExercise(exIdx) {
+    if (typeof hideDefaultCloseButton === 'function') {
+        hideDefaultCloseButton(true);
+    }
+    const body = document.getElementById("modal-body");
+    
+    body.innerHTML = `
+        <div style="text-align:center; padding:10px;">
+            <div style="font-size:40px; margin-bottom:15px;">🗑️</div>
+            <h3 style="color:var(--danger);">Ta bort övningen?</h3>
+            <p style="color:var(--text-light); margin-bottom:25px; font-size:14px;">Är du säker på att du vill ta bort den här övningen från ditt pågående pass?</p>
+            <button class="mode-btn" style="background:linear-gradient(135deg, #ef4444 0%, #b91c1c 100%); color:white; margin-bottom:12px; font-weight:700;" 
+                onclick="activeDraft.workout.exercises.splice(${exIdx}, 1); activeDraft.data.splice(${exIdx}, 1); saveAll(); closeModal(); renderActiveWorkout();">
+                Ja, radera
+            </button>
+            <button class="mode-btn glass-border" onclick="closeModal()">Avbryt</button>
+        </div>
+    `;
     openModal();
 }
 
