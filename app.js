@@ -507,7 +507,7 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
         body.style.flexDirection = "column";
         body.style.justifyContent = "flex-start"; 
         body.style.alignItems = "stretch";
-        body.style.gap = "50x"; // Kontrollerat, snyggt avstånd mellan alla block
+        body.style.gap = "50x"; 
     }
     
     // 1. ÖVRE DATUMYTA (Nollställda marginaler för att spara vertikalt utrymme)
@@ -571,11 +571,11 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
     } 
     else if (isOngoing) {
         html += `
-        <div class="modern-status-card day-manager-status-box" style="margin-top: 12px !important; margin-left: 0 !important; margin-right: 0 !important; margin-bottom: 0 !important;">
+        <div class="modern-status-card day-manager-status-box" style="margin-top: 12px !important; margin-left: 0 !important; margin-right: 0 !important; margin-bottom: 0 !important; padding-top: 20px !important;">
             <div class="status-aura" style="background: rgba(245, 158, 11, 0.35);"></div>
             
-            <!-- STÄLLE 1: För pågående pass (Justera top/left här) -->
-            <span class="status-box-title" style="top: 25px !important; left: 20px !important;">Status</span>
+            <!-- SPÅR 1: Klassen borttagen, helt fri positionering nu -->
+            <span style="display: block; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-light); font-weight: 700; margin-top: 10px; margin-bottom: 10px; margin-left: 5px;">Status</span>
             
             <div style="margin: 2px 0 15px 0;">
                 <span class="status-highlight-text" style="color: #f59e0b !important; text-shadow: 0 0 25px rgba(245, 158, 11, 0.8) !important;">🔥 Pågående Pass</span>
@@ -587,10 +587,10 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
     }
     else {
         html += `
-        <div class="modern-status-card day-manager-status-box" style="margin-top: 10px !important; margin-left: 0 !important; margin-right: 0 !important; margin-bottom: 0 !important;">
+        <div class="modern-status-card day-manager-status-box" style="margin-top: 10px !important; margin-left: 0 !important; margin-right: 0 !important; margin-bottom: 0 !important; padding-top: 20px !important;">
             
-            <!-- STÄLLE 2: För planerade dagar/vila (Justera top/left här också så det matchar) -->
-            <span class="status-box-title" style="top: 25px !important; left: 20px !important;">Status</span>
+            <!-- SPÅR 2: Klassen borttagen, helt fri positionering nu -->
+            <span style="display: block; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-light); font-weight: 700; margin-top: 10px; margin-bottom: 10px; margin-left: 5px;">Status</span>
             
             <p id="current-planned-label" class="status-box-text">
                 ${planned ? `📋 <span class="status-highlight-text">${planned.name}</span>` : '🧘 Planerad Vila'}
@@ -611,16 +611,16 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
             </button>
         </div>`;
 
-        // ÄNDRA PLANERING - SEKTIONSAVSKILJARE 
+        // ÄNDRA PLANERING - SEKTIONSAVSKILJARE
         html += `
-        <div style="margin-top: 30px;">
+        <div style="margin-top: 15px;">
             <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
                 <div style="flex-grow: 1; height: 1px; background: rgba(255,255,255,0.08);"></div>
-                <p style="font-size: 14px; text-transform: uppercase; color: var(--text-light); font-weight: 700; letter-spacing: 1px; margin: 0;">Ändra planering</p>
+                <p style="font-size: 11px; text-transform: uppercase; color: var(--text-light); font-weight: 700; letter-spacing: 1px; margin: 0;">Ändra planering</p>
                 <div style="flex-grow: 1; height: 1px; background: rgba(255,255,255,0.08);"></div>
             </div>
             
-            <div class="plan-override-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">`;
+            <div class="plan-override-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">`;
             
             programData.routine.forEach(p => {
                 const isSelected = planned && p.id === planned.id;
@@ -643,7 +643,7 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
                         <summary style="list-style: none; font-size: 10px; color: var(--text-light); opacity: 0.6; cursor: pointer; padding: 4px; border-radius: 8px;">
                             Innehåll ▾
                         </summary>
-                        <div style="text-align: left; padding: 8px; border-radius: 10px; margin-top: 10px; max-height: 120px; overflow-y: auto; background: rgba(0,0,0,0.1);">
+                        <div style="text-align: left; padding: 8px; border-radius: 10px; margin-top: 4px; max-height: 120px; overflow-y: auto; background: rgba(0,0,0,0.1);">
                             ${exList}
                         </div>
                     </details>
