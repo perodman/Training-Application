@@ -571,7 +571,7 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
     } 
     else if (isOngoing) {
         html += `
-        <div class="modern-status-card day-manager-status-box" style="margin: 0 !important;">
+        <div class="modern-status-card day-manager-status-box" style="margin-top: 40px !important; margin-left: 0 !important; margin-right: 0 !important; margin-bottom: 0 !important;">
             <div class="status-aura" style="background: rgba(245, 158, 11, 0.35);"></div>
             <span class="status-box-title">Status</span>
             <div style="margin: 5px 0 15px 0;">
@@ -581,7 +581,7 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
                 Fortsätt träningen ⏱️
             </button>
         </div>`;
-    } 
+}
     else {
         // DET NYA PREMIUMSTATUS-KORTET (Nu med nollställd marginal för att förhindra tomrum)
         html += `
