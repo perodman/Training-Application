@@ -96,69 +96,6 @@ function openModal() {
     }, 10);
 }
 
-function removeActiveExercise(exIdx) {
-    if (typeof hideDefaultCloseButton === 'function') {
-        hideDefaultCloseButton(true);
-    }
-    const body = document.getElementById("modal-body");
-    
-    body.innerHTML = `
-        <div style="text-align:center; padding:10px;">
-            <div style="font-size:40px; margin-bottom:15px;">🗑️</div>
-            <h3 style="color:var(--danger);">Ta bort övningen?</h3>
-            <p style="color:var(--text-light); margin-bottom:25px; font-size:14px;">Är du säker på att du vill ta bort den här övningen från ditt pågående pass?</p>
-            <button class="mode-btn" style="background:linear-gradient(135deg, #ef4444 0%, #b91c1c 100%); color:white; margin-bottom:12px; font-weight:700;" 
-                onclick="activeDraft.workout.exercises.splice(${exIdx}, 1); activeDraft.data.splice(${exIdx}, 1); saveAll(); closeModal(); renderActiveWorkout();">
-                Ja, radera
-            </button>
-            <button class="mode-btn glass-border" onclick="closeModal()">Avbryt</button>
-        </div>
-    `;
-    openModal();
-}
-
-function removeActiveExercise(exIdx) {
-    if (typeof hideDefaultCloseButton === 'function') {
-        hideDefaultCloseButton(true);
-    }
-    const body = document.getElementById("modal-body");
-    
-    body.innerHTML = `
-        <div style="text-align:center; padding:10px;">
-            <div style="font-size:40px; margin-bottom:15px;">🗑️</div>
-            <h3 style="color:var(--danger);">Ta bort övningen?</h3>
-            <p style="color:var(--text-light); margin-bottom:25px; font-size:14px;">Är du säker på att du vill ta bort den här övningen från ditt pågående pass?</p>
-            <button class="mode-btn" style="background:linear-gradient(135deg, #ef4444 0%, #b91c1c 100%); color:white; margin-bottom:12px; font-weight:700;" 
-                onclick="activeDraft.workout.exercises.splice(${exIdx}, 1); activeDraft.data.splice(${exIdx}, 1); saveAll(); closeModal(); renderActiveWorkout();">
-                Ja, radera
-            </button>
-            <button class="mode-btn glass-border" onclick="closeModal()">Avbryt</button>
-        </div>
-    `;
-    openModal();
-}
-
-function removeActiveExercise(exIdx) {
-    if (typeof hideDefaultCloseButton === 'function') {
-        hideDefaultCloseButton(true); // Dölj stäng-knappen i HTML under bekräftelsen
-    }
-    const body = document.getElementById("modal-body");
-    
-    body.innerHTML = `
-        <div style="text-align:center; padding:10px;">
-            <div style="font-size:40px; margin-bottom:15px;">🗑️</div>
-            <h3 style="color:var(--danger);">Ta bort övningen?</h3>
-            <p style="color:var(--text-light); margin-bottom:25px; font-size:14px;">Är du säker på att du vill ta bort den här övningen från ditt pågående pass?</p>
-            <button class="mode-btn" style="background:linear-gradient(135deg, #ef4444 0%, #b91c1c 100%); color:white; margin-bottom:12px; font-weight:700;" 
-                onclick="activeDraft.workout.exercises.splice(${exIdx}, 1); activeDraft.data.splice(${exIdx}, 1); saveAll(); closeModal(); renderActiveWorkout();">
-                Ja, radera
-            </button>
-            <button class="mode-btn glass-border" onclick="closeModal()">Avbryt</button>
-        </div>
-    `;
-    openModal();
-}
-
 // --- TIMER LOGIK ---
 function updateTimerDisplay() {
     const hrs = String(Math.floor(secondsElapsed / 3600)).padStart(2, '0');
