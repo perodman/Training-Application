@@ -5,7 +5,7 @@ let activeDraft = JSON.parse(localStorage.getItem("activeWorkoutDraft") || "null
 let calendarOverrides = JSON.parse(localStorage.getItem("calendarOverrides") || "{}");
 let currentViewDate = new Date();
 let currentExerciseCategory = "Ben";
-
+F
 // Timer-variablerrf
 let timerInterval = null;
 let secondsElapsed = 0;
@@ -574,7 +574,7 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
         <div class="modern-status-card day-manager-status-box">
             <div class="status-aura" style="background: rgba(245, 158, 11, 0.35);"></div>
             
-            <!-- HÄR FLYTTAR VI DEN: Ändra top och left i pixlar här under för att placera den exakt var du vill -->
+            <!-- STATUS-RUBRIK -->
             <span id="day-manager-status-title" class="status-box-title" style="position: absolute !important; top: 20px !important; left: 20px !important; margin: 0 !important;">Status</span>
             
             <div style="margin: 2px 0 15px 0;">
@@ -589,7 +589,7 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
         html += `
         <div class="modern-status-card day-manager-status-box">
             
-            <!-- HÄR FLYTTAR VI DEN OCKSÅ: Ändra top och left i pixlar här under så det matchar spåret ovan -->
+            <!-- STATUS-RUBRIK -->
             <span id="day-manager-status-title" class="status-box-title" style="position: absolute !important; top: 20px !important; left: 20px !important; margin: 0 !important;">Status</span>
             
             <p id="current-planned-label" class="status-box-text">
@@ -611,14 +611,12 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
             </button>
         </div>`;
 
-        // ÄNDRA PLANERING - SEKTIONSAVSKILJARE
+        // ÄNDRA PLANERING - NY ENHETLIG DESIGN SOM MATCHAR STATUSBOXEN
         html += `
-        <div style="margin-top: 15px;">
-            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
-                <div style="flex-grow: 1; height: 1px; background: rgba(255,255,255,0.08);"></div>
-                <p style="font-size: 11px; text-transform: uppercase; color: var(--text-light); font-weight: 700; letter-spacing: 1px; margin: 0;">Ändra planering</p>
-                <div style="flex-grow: 1; height: 1px; background: rgba(255,255,255,0.08);"></div>
-            </div>
+        <div style="margin-top: 25px; position: relative !important; padding-top: 30px !important;">
+            
+            <!-- ÄNDRA PLANERING-RUBRIK: Exakt samma egenskaper, ID och positionering som Status-rubriken -->
+            <span id="day-manager-override-title" class="status-box-title" style="position: absolute !important; top: 0px !important; left: 20px !important; margin: 0 !important;">Ändra planering</span>
             
             <div class="plan-override-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">`;
             
