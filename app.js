@@ -508,7 +508,7 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
     } 
     else if (isOngoing) {
         html += `
-        <div class="modern-status-card day-manager-status-box" style="padding-top: 24px !important; align-items: stretch !important; margin-top: 16px !important;">
+       <div class="modern-status-card day-manager-status-box" style="padding: 30px 15px 30px 15px !important; align-items: stretch !important; margin-top: 16px !important;">
             <div class="status-aura" style="background: rgba(245, 158, 11, 0.35);"></div>
             
             <!-- STATUS NY DESIGN: Linjeseparator identisk med Ändra planering -->
@@ -528,7 +528,7 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
     }
     else {
         html += `
-<div class="modern-status-card day-manager-status-box" style="padding: 20px 15px 15px 15px !important; align-items: stretch !important; margin-top: 10px !important;">
+<div class="modern-status-card day-manager-status-box" style="padding: 30px 15px 30px 15px !important; align-items: stretch !important; margin-top: 16px !important;">
     
     <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px; width: 100%;">
         <div style="flex-grow: 1; height: 1px; background: rgba(255,255,255,0.08);"></div>
