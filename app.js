@@ -541,7 +541,7 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
                 ${planned ? `📋 <span class="status-highlight-text">${planned.name}</span>` : '🧘 Planerad Vila'}
             </p>
             
-            <div id="day-manager-action-btn-container" class="status-btn-container" style="width: 125% !important; display: flex; flex-direction: column; gap: 10px;">`;
+            <div id="day-manager-action-btn-container" class="status-btn-container" style="width: 100% !important; display: flex; flex-direction: column; gap: 10px;">`;
             if(planned) {
                 html += `
                 <button class="mode-btn premium-action-btn premium-green-btn" onclick="prepareStart('${dateStr}', '${planned.id}')" style="width: 100% !important; margin: 0 !important;">
