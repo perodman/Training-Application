@@ -408,7 +408,6 @@ function renderExercisePickerForEdit(idx, category = "Ben") {
     html += `</div>`;
 
     html += `<p style="font-size:11px; text-transform:uppercase; color:var(--text-light); text-align:center; margin-bottom:10px;">Övningar (${category}):</p>`;
-    // Punkt 5: Ändrat max-height till 400px för att se 5-6 övningar
     html += `<div style="max-height:400px; overflow-y:auto; padding-right:5px; background:rgba(0,0,0,0.2); border-radius:15px; padding:10px;">`;
     
     const filtered = masterExercises.filter(ex => category === "Armar" ? (ex.target === "Biceps" || ex.target === "Triceps") : ex.target === category);
@@ -517,33 +516,27 @@ function saveNewProgram() {
     openEditProgramModal(newIdx);
 }
 
-// --- SÖK OCH ERSÄTT ÖVNINGSNAMN I TRÄNINGSHISTORIKEN ---
 function updateExerciseNameInHistory(oldName, newName) {
     if (!oldName || !newName || oldName === newName) return;
 
     let updatedCount = 0;
-
-    // Gå igenom hela träningshistoriken
     workoutHistory.forEach(workout => {
         if (workout.exercises && Array.isArray(workout.exercises)) {
-            // Leta efter övningar som har det gamla namnet
             workout.exercises.forEach(exercise => {
                 if (exercise.name === oldName) {
-                    exercise.name = newName; // Byt till det nya namnet!
+                    exercise.name = newName;
                     updatedCount++;
                 }
             });
         }
     });
 
-    // Om vi ändrade namn, spara till localStorage
     if (updatedCount > 0) {
         localStorage.setItem("workoutHistory", JSON.stringify(workoutHistory));
         console.log(`Historiken uppdaterad: Ändrade "${oldName}" till "${newName}" på ${updatedCount} ställen.`);
     }
 }
 
-// --- LOGIK FÖR HISTORIK ---
 function getExerciseHistory(exerciseName) {
     for (let i = workoutHistory.length - 1; i >= 0; i--) {
         const workout = workoutHistory[i];
@@ -558,7 +551,6 @@ function getExerciseHistory(exerciseName) {
     return null;
 }
 
-// --- AKTIVT PASS ---
 function startWorkout(workout, data = null, date = null, isImmediateStart = false) {
     if(!activeDraft || !activeDraft.secondsElapsed) {
         secondsElapsed = 0;
@@ -872,7 +864,6 @@ function renderExercisePicker(category, replaceIndex = null) {
     html += `</div>`;
     
     html += `<p style="font-size:11px; text-transform:uppercase; color:var(--text-light); text-align:center; margin-bottom:10px;">Övningar (${category}):</p>`;
-    // Punkt 5: Även här 400px
     html += `<div style="max-height:400px; overflow-y:auto; padding-right:5px; background:rgba(0,0,0,0.2); border-radius:15px; padding:10px; margin-bottom:15px;">`;
     
     const filtered = masterExercises.filter(ex => category === "Armar" ? (ex.target === "Biceps" || ex.target === "Triceps") : ex.target === category);
@@ -935,9 +926,8 @@ function moveActiveExercise(i, dir) {
     renderActiveWorkout();
 }
 
-// RADERA EN ÖVNING FRÅN DET PÅGÅENDE PASSET
 function removeActiveExercise(exIdx) {
-    hideDefaultCloseButton(true); // Dölj den fasta "Stäng"-knappen i HTML
+    hideDefaultCloseButton(true); 
     const body = document.getElementById("modal-body");
     
     body.innerHTML = `
@@ -955,27 +945,12 @@ function removeActiveExercise(exIdx) {
     openModal();
 }
 
-// --- STANDARD-LOGIK & EVENT-LYSSNARE ---
-document.getElementById("global-home").addEventListener("click", () => {
-    renderHome();         // Bygger om knapparna (utkast etc.)
-    showView("home-view"); // Visar startsidan
-});
-
-document.getElementById("start-new-btn").onclick = () => renderCalendar(true);
-document.getElementById("calendar-mode").onclick = () => renderCalendar(false);
-document.getElementById("view-exercises-btn").onclick = () => { showView("exercises-view"); filterExercises(currentExerciseCategory); };
-document.getElementById("view-programs-btn").onclick = () => renderProgramView();
-document.getElementById("stats-mode").onclick = renderStats;
-document.getElementById("add-custom-pass-btn").onclick = openCreateProgramModal;
-
 function renderHome() {
     showView("home-view");
     
-    // Punkt 1: Permanent avgränsande linje på startsidan
     const homeView = document.getElementById("home-view");
     const headerP = homeView.querySelector("header p");
     
-    // Ta bort ev gamla kopior först för att undvika dubletter vid omladdning
     homeView.querySelectorAll(".home-separator").forEach(s => s.remove());
     
     if (headerP) {
@@ -993,61 +968,6 @@ function renderHome() {
         document.getElementById("start-new-btn").classList.remove("hidden");
         document.getElementById("draft-alert").classList.add("hidden");
     }
-}
-
-document.getElementById("save-workout-btn").onclick = () => {
-    if(!activeDraft.isStarted) {
-        const body = document.getElementById("modal-body");
-        body.innerHTML = `
-            <h3>Kasta träningspass</h3>
-            <p style="text-align:center; color:var(--text-light);">Du har inte startat passet än. Vill du radera utkastet?</p>
-            <button class="mode-btn danger" style="background:var(--danger);" onclick="localStorage.removeItem('activeWorkoutDraft'); location.reload();">Kasta passet</button>
-            <button class="mode-btn glass-border" onclick="closeModal()">Avbryt</button>
-        `;
-        openModal();
-        return;
-    }
-
-    pauseTimer();
-    const finalTime = document.getElementById("workout-timer").textContent;
-    
-    const log = {
-        date: activeDraft.date,
-        programName: activeDraft.workout.name,
-        totalTime: finalTime,
-        exercises: activeDraft.workout.exercises.map((ex, i) => {
-            return {
-                name: ex.name,
-                sets_data: activeDraft.data[i].sets_data 
-            };
-        })
-    };
-    
-    workoutHistory.push(log);
-    saveAll();
-    localStorage.removeItem("activeWorkoutDraft");
-    activeDraft = null; 
-    secondsElapsed = 0;
-    renderCalendar();
-};
-
-document.getElementById("pause-workout-btn").onclick = () => { 
-    location.reload(); 
-};
-
-function renderStats() {
-    const container = document.getElementById("chart-container");
-    container.innerHTML = "";
-    const months = {};
-    workoutHistory.forEach(w => { const m = w.date.substring(0, 7); months[m] = (months[m] || 0) + 1; });
-    Object.entries(months).sort().forEach(([m, val]) => {
-        const bar = document.createElement("div");
-        bar.className = "chart-bar";
-        bar.style.height = (val * 20) + "px";
-        bar.innerHTML = `<span style="position:absolute; top:-20px; width:100%; text-align:center; font-size:10px;">${val}</span>`;
-        container.appendChild(bar);
-    });
-    showView("stats-view");
 }
 
 function changeMonth(off) { currentViewDate.setMonth(currentViewDate.getMonth() + off); renderCalendar(); }
@@ -1104,25 +1024,39 @@ function editLoggedWorkout(date, idx) {
     showView("workout-view");
 }
 
+function renderStats() {
+    const container = document.getElementById("chart-container");
+    container.innerHTML = "";
+    const months = {};
+    workoutHistory.forEach(w => { const m = w.date.substring(0, 7); months[m] = (months[m] || 0) + 1; });
+    Object.entries(months).sort().forEach(([m, val]) => {
+        const bar = document.createElement("div");
+        bar.className = "chart-bar";
+        bar.style.height = (val * 20) + "px";
+        bar.innerHTML = `<span style="position:absolute; top:-20px; width:100%; text-align:center; font-size:10px;">${val}</span>`;
+        container.appendChild(bar);
+    });
+    showView("stats-view");
+}
+
+
 // ==========================================================================
 // ALLA RADERINGSMODALER (ENHETLIG PREMIUM-STIL UTAN "STÄNG"-KNAPP)
 // ==========================================================================
 
-// Hjälpfunktion för att dölja den fasta "Stäng"-knappen i HTML
 function hideDefaultCloseButton(hide) {
     const closeBtn = document.querySelector("#workout-modal .modal-content > button");
     if (closeBtn) {
         if (hide) {
-            closeBtn.style.display = "none"; // Gömmer knappen helt
+            closeBtn.style.display = "none"; 
         } else {
-            closeBtn.style.display = "block"; // Visar den igen (standard)
+            closeBtn.style.display = "block"; 
         }
     }
 }
 
-// 1. RADERA ÖVNING PERMANENT (MED BACK-TO-EDIT LOGIK)
 function deleteMasterExercise(id) {
-    hideDefaultCloseButton(true); // Dölj "Stäng" inför raderingsbekräftelsen
+    hideDefaultCloseButton(true); 
     const body = document.getElementById("modal-body");
     body.innerHTML = `
         <div style="text-align:center; padding:10px;">
@@ -1133,7 +1067,6 @@ function deleteMasterExercise(id) {
                 onclick="masterExercises = masterExercises.filter(e => e.id != ${id}); saveAll(); closeModal(); filterExercises(currentExerciseCategory);">
                 Ja, radera
             </button>
-            
             <button class="mode-btn glass-border" onclick="hideDefaultCloseButton(false); openEditExerciseModal(${id});">
                 Avbryt
             </button>
@@ -1142,9 +1075,8 @@ function deleteMasterExercise(id) {
     openModal();
 }
 
-// 2. RADERA TRÄNINGSPASS/RUTIN PERMANENT
 function deleteEntireProgram(idx) {
-    hideDefaultCloseButton(true); // Dölj "Stäng"
+    hideDefaultCloseButton(true); 
     const body = document.getElementById("modal-body");
     body.innerHTML = `
         <div style="text-align:center; padding:10px;">
@@ -1161,9 +1093,8 @@ function deleteEntireProgram(idx) {
     openModal();
 }
 
-// 3. RADERA LOGGAT PASS FRÅN HISTORIKEN
 function openConfirmDeleteModal(date, idx) {
-    hideDefaultCloseButton(true); // Dölj "Stäng"
+    hideDefaultCloseButton(true); 
     const body = document.getElementById("modal-body");
     body.innerHTML = `
         <div style="text-align:center; padding:10px;">
@@ -1177,9 +1108,8 @@ function openConfirmDeleteModal(date, idx) {
     openModal();
 }
 
-// 4. RADERA PÅGÅENDE UTKAST
 function confirmDiscardActiveWorkout() {
-    hideDefaultCloseButton(true); // Dölj "Stäng"
+    hideDefaultCloseButton(true); 
     const body = document.getElementById("modal-body");
     body.innerHTML = `
         <div style="text-align:center; padding:10px;">
@@ -1192,3 +1122,75 @@ function confirmDiscardActiveWorkout() {
     `;
     openModal();
 }
+
+
+// ==========================================================================
+// NYTT: SÄKER INITIERING NÄR DOM-TRÄDET ÄR HELT REDO
+// ==========================================================================
+document.addEventListener("DOMContentLoaded", () => {
+    // Koppla eventlyssnare på navigeringsknappar på ett säkert sätt
+    const homeBtn = document.getElementById("global-home");
+    if(homeBtn) homeBtn.addEventListener("click", () => { renderHome(); showView("home-view"); });
+
+    const startNewBtn = document.getElementById("start-new-btn");
+    if(startNewBtn) startNewBtn.onclick = () => renderCalendar(true);
+
+    const calModeBtn = document.getElementById("calendar-mode");
+    if(calModeBtn) calModeBtn.onclick = () => renderCalendar(false);
+
+    const viewExBtn = document.getElementById("view-exercises-btn");
+    if(viewExBtn) viewExBtn.onclick = () => { showView("exercises-view"); filterExercises(currentExerciseCategory); };
+
+    const viewProgBtn = document.getElementById("view-programs-btn");
+    if(viewProgBtn) viewProgBtn.onclick = () => renderProgramView();
+
+    const statsModeBtn = document.getElementById("stats-mode");
+    if(statsModeBtn) statsModeBtn.onclick = renderStats;
+
+    const addCustomBtn = document.getElementById("add-custom-pass-btn");
+    if(addCustomBtn) addCustomBtn.onclick = openCreateProgramModal;
+
+    const saveWorkoutBtn = document.getElementById("save-workout-btn");
+    if(saveWorkoutBtn) {
+        saveWorkoutBtn.onclick = () => {
+            if(!activeDraft.isStarted) {
+                const body = document.getElementById("modal-body");
+                body.innerHTML = `
+                    <h3>Kasta träningspass</h3>
+                    <p style="text-align:center; color:var(--text-light);">Du har inte startat passet än. Vill du radera utkastet?</p>
+                    <button class="mode-btn danger" style="background:var(--danger);" onclick="localStorage.removeItem('activeWorkoutDraft'); location.reload();">Kasta passet</button>
+                    <button class="mode-btn glass-border" onclick="closeModal()">Avbryt</button>
+                `;
+                openModal();
+                return;
+            }
+
+            pauseTimer();
+            const finalTime = document.getElementById("workout-timer").textContent;
+            
+            const log = {
+                date: activeDraft.date,
+                programName: activeDraft.workout.name,
+                totalTime: finalTime,
+                exercises: activeDraft.workout.exercises.map((ex, i) => {
+                    return { name: ex.name, sets_data: activeDraft.data[i].sets_data };
+                })
+            };
+            
+            workoutHistory.push(log);
+            saveAll();
+            localStorage.removeItem("activeWorkoutDraft");
+            activeDraft = null; 
+            secondsElapsed = 0;
+            renderCalendar();
+        };
+    }
+
+    const pauseWorkoutBtn = document.getElementById("pause-workout-btn");
+    if(pauseWorkoutBtn) {
+        pauseWorkoutBtn.onclick = () => { location.reload(); };
+    }
+
+    // Kör en första rendering av startsidan när allt laddat klart!
+    renderHome();
+});
