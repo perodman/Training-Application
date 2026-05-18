@@ -1,423 +1,62 @@
-let programData;
-let masterExercises = JSON.parse(localStorage.getItem("masterExercises") || "[]");
-let workoutHistory = JSON.parse(localStorage.getItem("workoutHistory") || "[]");
-let activeDraft = JSON.parse(localStorage.getItem("activeWorkoutDraft") || "null");
-let calendarOverrides = JSON.parse(localStorage.getItem("calendarOverrides") || "{}");
-let currentViewDate = new Date();
-let currentExerciseCategory = "Ben";
-
-// Timer-variablerrf
-let timerInterval = null;
-let secondsElapsed = 0;
-let isTimerRunning = false;
-
-// --- INIT ---
-fetch("program.json")
-.then(r => r.json())
-.then(json => {
-    const savedProgram = JSON.parse(localStorage.getItem("myCustomProgram"));
-    
-    if (masterExercises.length === 0) {
-        json.routine.forEach(p => {
-            p.exercises.forEach(ex => {
-                if (!masterExercises.find(m => m.name === ex.name)) {
-                    let animFile = "";
-                    if (ex.name === "Deadlift") animFile = "Gemini_Generated_Image_sqtn3ksqtn3ksqtn.mp4";
-                    if (ex.name === "Barbell Bench Press") animFile = "Skärmbild 2026-05-11 124104.mp4";
-                    
-                    masterExercises.push({ 
-                        ...ex, 
-                        id: Date.now() + Math.random(),
-                        animation: animFile 
-                    });
-                }
-            });
-        });
-        localStorage.setItem("masterExercises", JSON.stringify(masterExercises));
-    } else {
-        masterExercises.forEach(ex => {
-            if (ex.name === "Deadlift") ex.animation = "Gemini_Generated_Image_sqtn3ksqtn3ksqtn.mp4";
-            if (ex.name === "Barbell Bench Press") ex.animation = "Skärmbild 2026-05-11 124104.mp4";
-        });
-    }
-    
-    programData = savedProgram || json;
-
-    if(activeDraft && activeDraft.isStarted) {
-        secondsElapsed = activeDraft.secondsElapsed || 0;
-        if(activeDraft.wasTimerRunning) {
-            startTimer();
-        } else {
-            updateTimerDisplay();
-        }
-    }
-
-    renderHome();
-});
-
-function saveAll() {
-    localStorage.setItem("myCustomProgram", JSON.stringify(programData));
-    localStorage.setItem("masterExercises", JSON.stringify(masterExercises));
-    localStorage.setItem("workoutHistory", JSON.stringify(workoutHistory));
-    localStorage.setItem("calendarOverrides", JSON.stringify(calendarOverrides));
-}
-
-function showView(id) {
-    const target = document.getElementById(id);
-    if(!target) return;
-    
-    if (target.classList.contains("hidden")) {
-        document.querySelectorAll(".view").forEach(v => v.classList.add("hidden"));
-        target.classList.remove("hidden");
-        target.style.animation = 'none';
-        target.offsetHeight; 
-        target.style.animation = null;
-    }
-    window.scrollTo(0, 0);
-}
-
-function closeModal() {
-    document.getElementById("workout-modal").classList.add("hidden");
-    const video = document.querySelector("#modal-body video");
-    if(video) video.pause();
-    
-    // SÄKERHETSÅTGÄRD: Se till att den fasta stäng-knappen ALLTID visas igen när en modal stängs
-    if (typeof hideDefaultCloseButton === 'function') {
-        hideDefaultCloseButton(false);
-    }
-}
-
-function openModal() {
-    const modal = document.getElementById("workout-modal");
-    modal.classList.remove("hidden");
-    // En liten timeout säkerställer att scrollen faktiskt nollställs efter att innehållet laddats
-    setTimeout(() => {
-        modal.scrollTo(0, 0);
-    }, 10);
-}
-
-function removeActiveExercise(exIdx) {
-    if (typeof hideDefaultCloseButton === 'function') {
-        hideDefaultCloseButton(true);
-    }
-    const body = document.getElementById("modal-body");
-    
-    body.innerHTML = `
-        <div style="text-align:center; padding:10px;">
-            <div style="font-size:40px; margin-bottom:15px;">🗑️</div>
-            <h3 style="color:var(--danger);">Ta bort övningen?</h3>
-            <p style="color:var(--text-light); margin-bottom:25px; font-size:14px;">Är du säker på att du vill ta bort den här övningen från ditt pågående pass?</p>
-            <button class="mode-btn" style="background:linear-gradient(135deg, #ef4444 0%, #b91c1c 100%); color:white; margin-bottom:12px; font-weight:700;" 
-                onclick="activeDraft.workout.exercises.splice(${exIdx}, 1); activeDraft.data.splice(${exIdx}, 1); saveAll(); closeModal(); renderActiveWorkout();">
-                Ja, radera
-            </button>
-            <button class="mode-btn glass-border" onclick="closeModal()">Avbryt</button>
-        </div>
-    `;
-    openModal();
-}
-
-function removeActiveExercise(exIdx) {
-    if (typeof hideDefaultCloseButton === 'function') {
-        hideDefaultCloseButton(true);
-    }
-    const body = document.getElementById("modal-body");
-    
-    body.innerHTML = `
-        <div style="text-align:center; padding:10px;">
-            <div style="font-size:40px; margin-bottom:15px;">🗑️</div>
-            <h3 style="color:var(--danger);">Ta bort övningen?</h3>
-            <p style="color:var(--text-light); margin-bottom:25px; font-size:14px;">Är du säker på att du vill ta bort den här övningen från ditt pågående pass?</p>
-            <button class="mode-btn" style="background:linear-gradient(135deg, #ef4444 0%, #b91c1c 100%); color:white; margin-bottom:12px; font-weight:700;" 
-                onclick="activeDraft.workout.exercises.splice(${exIdx}, 1); activeDraft.data.splice(${exIdx}, 1); saveAll(); closeModal(); renderActiveWorkout();">
-                Ja, radera
-            </button>
-            <button class="mode-btn glass-border" onclick="closeModal()">Avbryt</button>
-        </div>
-    `;
-    openModal();
-}
-
-function removeActiveExercise(exIdx) {
-    if (typeof hideDefaultCloseButton === 'function') {
-        hideDefaultCloseButton(true); // Dölj stäng-knappen i HTML under bekräftelsen
-    }
-    const body = document.getElementById("modal-body");
-    
-    body.innerHTML = `
-        <div style="text-align:center; padding:10px;">
-            <div style="font-size:40px; margin-bottom:15px;">🗑️</div>
-            <h3 style="color:var(--danger);">Ta bort övningen?</h3>
-            <p style="color:var(--text-light); margin-bottom:25px; font-size:14px;">Är du säker på att du vill ta bort den här övningen från ditt pågående pass?</p>
-            <button class="mode-btn" style="background:linear-gradient(135deg, #ef4444 0%, #b91c1c 100%); color:white; margin-bottom:12px; font-weight:700;" 
-                onclick="activeDraft.workout.exercises.splice(${exIdx}, 1); activeDraft.data.splice(${exIdx}, 1); saveAll(); closeModal(); renderActiveWorkout();">
-                Ja, radera
-            </button>
-            <button class="mode-btn glass-border" onclick="closeModal()">Avbryt</button>
-        </div>
-    `;
-    openModal();
-}
-
-// --- TIMER LOGIK ---
-function updateTimerDisplay() {
-    const hrs = String(Math.floor(secondsElapsed / 3600)).padStart(2, '0');
-    const mins = String(Math.floor((secondsElapsed % 3600) / 60)).padStart(2, '0');
-    const secs = String(secondsElapsed % 60).padStart(2, '0');
-    document.getElementById("workout-timer").textContent = `${hrs}:${mins}:${secs}`;
-}
-
-function startTimer() {
-    if (isTimerRunning) return;
-    isTimerRunning = true;
-    if(activeDraft) activeDraft.wasTimerRunning = true;
-    document.getElementById("timer-toggle-btn").textContent = "Pausa ⏸️";
-    timerInterval = setInterval(() => {
-        secondsElapsed++;
-        updateTimerDisplay();
-        if(activeDraft) {
-            activeDraft.secondsElapsed = secondsElapsed;
-            localStorage.setItem("activeWorkoutDraft", JSON.stringify(activeDraft));
-        }
-    }, 1000);
-}
-
-function pauseTimer() {
-    isTimerRunning = false;
-    if(activeDraft) activeDraft.wasTimerRunning = false;
-    clearInterval(timerInterval);
-    document.getElementById("timer-toggle-btn").textContent = "Fortsätt ▶️";
-    if(activeDraft) localStorage.setItem("activeWorkoutDraft", JSON.stringify(activeDraft));
-}
-
-document.getElementById("timer-toggle-btn").onclick = () => {
-    if (isTimerRunning) pauseTimer();
-    else startTimer();
-};
-
-// --- ÖVNINGAR & INSTÄLLNINGAR ---
-function openCreateExerciseModal(callback = null) {
-    const body = document.getElementById("modal-body");
-    
-    // ÄNDRING 1: Istället för att alltid välja "Ben", kollar vi vad du har valt i vyn just nu
-    let selectedCategory = currentExerciseCategory || "Ben"; 
-
-    const categories = [
-        { id: "Ben", icon: "🦵" },
-        { id: "Bröst", icon: "🏋️" },
-        { id: "Rygg", icon: "🪵" },
-        { id: "Axlar", icon: "👐" },
-        { id: "Armar", icon: "💪" },
-        { id: "Bål", icon: "🧘" }
-    ];
-
-    body.innerHTML = `
-        <h3 style="text-align:center; margin-bottom: 20px;">Skapa Ny Övning</h3>
-        
-        <div style="display: flex; flex-direction: column; align-items: center; gap: 10px;">
-            <div style="width: 100%; max-width: 300px;">
-                <label style="font-size:11px; color:var(--text-light); text-transform: uppercase; letter-spacing: 1px; display:block; margin-bottom: 8px; text-align: center;">Namn på övning</label>
-                <input type="text" id="new-ex-name" class="log-input" placeholder="T.ex. Knäböj" style="text-align: center;">
-            </div>
-
-            <div style="width: 100%;">
-                <label style="font-size:11px; color:var(--text-light); text-transform: uppercase; letter-spacing: 1px; display:block; margin-bottom: 12px; text-align: center;">Välj Kategori</label>
-                
-                <div id="category-selector-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 0 10px;">
-                    ${categories.map(cat => `
-                        <div class="cat-select-item ${cat.id === selectedCategory ? 'active' : ''}" 
-                             onclick="window.selectModalCategory('${cat.id}')"
-                             id="modal-cat-${cat.id}"
-                             style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 12px 5px; border-radius: 12px; text-align: center; cursor: pointer; transition: all 0.2s ease;">
-                            <div style="font-size: 20px; margin-bottom: 4px;">${cat.icon}</div>
-                            <div style="font-size: 10px; font-weight: 700; color: var(--text-light);">${cat.id}</div>
-                        </div>
-                    `).join('')}
-                </div>
-            </div>
-
-            <button class="mode-btn blue" id="save-new-ex-btn" style="width: 100%; max-width: 300px; margin-top: 10px;">Spara Övning</button>
-        </div>
-
-        <style>
-            .cat-select-item.active {
-                background: rgba(59, 130, 246, 0.2) !important;
-                border-color: var(--primary) !important;
-                box-shadow: 0 0 15px rgba(59, 130, 246, 0.2);
-            }
-            .cat-select-item.active div {
-                color: var(--text) !important;
-            }
-        </style>
-    `;
-
-    window.selectModalCategory = (catId) => {
-        selectedCategory = catId;
-        document.querySelectorAll('.cat-select-item').forEach(el => el.classList.remove('active'));
-        document.getElementById(`modal-cat-${catId}`).classList.add('active');
-    };
-
-    document.getElementById("save-new-ex-btn").onclick = () => {
-        const name = document.getElementById("new-ex-name").value.trim();
-        if(!name) return alert("Ange ett namn!");
-        
-        const newEx = { 
-            id: Date.now(), 
-            name, 
-            target: selectedCategory, 
-            defaultSets: 3, 
-            animation: "" 
-        };
-        
-        masterExercises.push(newEx);
-        saveAll();
-        
-        if(callback) callback(newEx);
-        else { 
-            closeModal(); 
-            // ÄNDRING 2: Vi filtrerar på 'selectedCategory' så att vyn hoppar till den nya övningens kategori
-            filterExercises(selectedCategory); 
-        }
-    };
-    
-    openModal();
-}
-
-function filterExercises(category) {
-    currentExerciseCategory = category;
-    document.querySelectorAll(".cat-btn").forEach(b => b.classList.toggle("active", b.dataset.cat === category));
-    const results = document.getElementById("exercise-results");
-    results.innerHTML = "";
-    const filtered = masterExercises.filter(ex => category === "Armar" ? (ex.target === "Biceps" || ex.target === "Triceps") : ex.target === category);
-    filtered.forEach(ex => {
-        const div = document.createElement("div");
-        div.className = "card glass";
-        div.style.cssText = "padding:15px; display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; cursor:pointer;";
-        
-        div.onclick = (e) => {
-            if(e.target.tagName !== 'BUTTON') {
-                showExerciseAnimation(ex.id);
-            }
-        };
-
-        div.innerHTML = `<div><strong style="font-size:16px;">${ex.name}</strong><br><small style="color:var(--primary); font-weight:800; text-transform:uppercase; font-size:10px;">${ex.target}</small></div>
-        <button style="background:none; border:none; font-size:18px; cursor:pointer;" onclick="openEditExerciseModal(${ex.id})"> ⚙️ </button>`;
-        results.appendChild(div);
-    });
-}
-
-function showExerciseAnimation(id) {
-    const ex = masterExercises.find(e => e.id == id);
-    if(!ex) return;
-    
-    const body = document.getElementById("modal-body");
-    let videoHtml = "";
-    
-    if(ex.animation) {
-        videoHtml = `
-            <div style="border-radius:16px; overflow:hidden; background:#000; margin-bottom:15px; border:1px solid var(--glass-border);">
-                <video src="${ex.animation}" autoplay loop muted playsinline style="width:100%; display:block;"></video>
-            </div>
-        `;
-    } else {
-        videoHtml = `
-            <div style="padding:40px 20px; text-align:center; background:rgba(255,255,255,0.05); border-radius:16px; margin-bottom:15px; color:var(--text-light); font-size:14px;">
-                Ingen videoanimation tillgänglig för denna övning. 🎥
-            </div>
-        `;
-    }
-
-    body.innerHTML = `
-        <h3>${ex.name}</h3>
-        ${videoHtml}
-        <div style="text-align:left; color:var(--text-light); font-size:14px; padding:10px;">
-            <p><strong>Muskelgrupp:</strong> ${ex.target}</p>
-        </div>
-    `;
-    openModal();
-}
+// ==========================================================================
+// DEL 1: GRUNDLÄGGANDE FUNKTIONER & ÖVNINGSBANK
+// ==========================================================================
 
 function openEditExerciseModal(id) {
     const ex = masterExercises.find(e => e.id == id);
-    if(!ex) return;
+    if (!ex) return;
+
+    // SÄKERHETSÅTGÄRD: Återställ och visa kryssknappen om den döljts tidigare
+    if (typeof hideDefaultCloseButton === 'function') {
+        hideDefaultCloseButton(false);
+    }
+
     const body = document.getElementById("modal-body");
-    
-    let selectedCategory = ex.target; 
-
-    const categories = [
-        { id: "Ben", icon: "🦵" },
-        { id: "Bröst", icon: "🏋️" },
-        { id: "Rygg", icon: "🪵" },
-        { id: "Axlar", icon: "👐" },
-        { id: "Armar", icon: "💪" },
-        { id: "Bål", icon: "🧘" }
-    ];
-
     body.innerHTML = `
-        <h3 style="text-align:center; margin-bottom: 20px;">Redigera Övning</h3>
+        <h3>Redigera övning</h3>
         
-        <div style="display: flex; flex-direction: column; align-items: center; gap: 10px;">
-            
-            <div style="width: 100%; max-width: 300px; margin-bottom: 10px;">
-                <label style="font-size:11px; color:var(--text-light); text-transform: uppercase; letter-spacing: 1px; display:block; margin-bottom: 8px; text-align: center;">Namn på övning</label>
-                <input type="text" id="edit-ex-name" class="log-input" value="${ex.name}" style="text-align: center;">
-            </div>
-
-            <div style="width: 100%;">
-                <label style="font-size:11px; color:var(--text-light); text-transform: uppercase; letter-spacing: 1px; display:block; margin-bottom: 12px; text-align: center;">Välj Kategori</label>
-                
-                <div id="edit-category-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 0 10px;">
-                    ${categories.map(cat => `
-                        <div class="cat-select-item ${cat.id === selectedCategory ? 'active' : ''}" 
-                             onclick="window.selectEditModalCategory('${cat.id}')"
-                             id="edit-modal-cat-${cat.id}"
-                             style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 12px 5px; border-radius: 12px; text-align: center; cursor: pointer; transition: all 0.2s ease;">
-                            <div style="font-size: 20px; margin-bottom: 4px;">${cat.icon}</div>
-                            <div style="font-size: 10px; font-weight: 700; color: var(--text-light);">${cat.id}</div>
-                        </div>
-                    `).join('')}
-                </div>
-            </div>
-
-            <button class="mode-btn blue" style="width: 100%; max-width: 300px; margin-top: 15px;" onclick="handleUpdateExercise(${id})">Uppdatera</button>
-            <button class="mode-btn" style="color:var(--danger); background:none; font-size:13px; margin-top: 15px; padding: 5px;" onclick="deleteMasterExercise(${id})">Radera övning permanent</button>
-        </div>
-
-        <style>
-            .cat-select-item.active {
-                background: rgba(59, 130, 246, 0.2) !important;
-                border-color: var(--primary) !important;
-                box-shadow: 0 0 15px rgba(59, 130, 246, 0.2);
-            }
-            .cat-select-item.active div {
-                color: var(--text) !important;
-            }
-        </style>
+        <label style="font-size:12px; color:var(--text-light); text-align:left; display:block; margin-left:10px;">NAMN PÅ ÖVNING</label>
+        <input type="text" id="edit-ex-name" class="log-input" value="${ex.name}">
+        
+        <label style="font-size:12px; color:var(--text-light); text-align:left; display:block; margin-left:10px; margin-top:15px;">KATEGORI / MUSKELGRUPP</label>
+        <select id="edit-ex-cat" class="log-input" style="background:var(--card); color:white; border:1px solid rgba(255,255,255,0.1);">
+            <option value="Ben" ${ex.target === 'Ben' ? 'selected' : ''}>Ben</option>
+            <option value="Bröst" ${ex.target === 'Bröst' ? 'selected' : ''}>Bröst</option>
+            <option value="Rygg" ${ex.target === 'Rygg' ? 'selected' : ''}>Rygg</option>
+            <option value="Axlar" ${ex.target === 'Axlar' ? 'selected' : ''}>Axlar</option>
+            <option value="Biceps" ${ex.target === 'Biceps' ? 'selected' : ''}>Biceps (Armar)</option>
+            <option value="Triceps" ${ex.target === 'Triceps' ? 'selected' : ''}>Triceps (Armar)</option>
+            <option value="Bål" ${ex.target === 'Bål' ? 'selected' : ''}>Bål</option>
+        </select>
+        
+        <label style="font-size:12px; color:var(--text-light); text-align:left; display:block; margin-left:10px; margin-top:15px;">LÄNK TILL ANIMATION / VIDEO (VALFRITT)</label>
+        <input type="text" id="edit-ex-anim" class="log-input" value="${ex.animation || ''}" placeholder="https://...">
+        
+        <button class="mode-btn blue" style="margin-top:20px;" id="save-ex-btn">Spara ändringar</button>
+        
+        <div class="separator" style="margin:20px 0;"></div>
+        
+        <button class="mode-btn" style="background:none; color:var(--danger); font-size:13px; font-weight:600; padding:5px;" onclick="deleteMasterExercise(${ex.id})">
+            🗑️ Radera övning från banken permanent
+        </button>
     `;
 
-    window.selectEditModalCategory = (catId) => {
-        selectedCategory = catId;
-        document.querySelectorAll('#edit-category-grid .cat-select-item').forEach(el => el.classList.remove('active'));
-        document.getElementById(`edit-modal-cat-${catId}`).classList.add('active');
-    };
+    document.getElementById("save-ex-btn").onclick = () => {
+        const newName = document.getElementById("edit-ex-name").value.trim();
+        if (!newName) return alert("Övningen måste ha ett namn!");
 
-    window.handleUpdateExercise = (exId) => {
-        const nameInput = document.getElementById("edit-ex-name").value.trim();
-        if(!nameInput) return alert("Namnet får inte vara tomt!");
-        
-        const exIndex = masterExercises.findIndex(e => e.id == exId);
-        if(exIndex !== -1) {
-            // AUTOMATISERING: Spara det gamla namnet innan det skrivs över, och uppdatera historiken
-            const oldName = masterExercises[exIndex].name;
-            updateExerciseNameInHistory(oldName, nameInput);
-
-            // Din befintliga sparlogik
-            masterExercises[exIndex].name = nameInput;
-            masterExercises[exIndex].target = selectedCategory; 
-            saveAll();
-            closeModal();
-            filterExercises(currentExerciseCategory);
+        // Kör sök-och-ersätt i träningshistoriken om namnet faktiskt ändrats
+        if (ex.name !== newName) {
+            updateExerciseNameInHistory(ex.name, newName);
         }
+
+        ex.name = newName;
+        ex.target = document.getElementById("edit-ex-cat").value;
+        ex.animation = document.getElementById("edit-ex-anim").value.trim();
+
+        saveAll();
+        closeModal();
+        filterExercises(currentExerciseCategory);
     };
 
     openModal();
@@ -432,7 +71,10 @@ function updateExercise(id) {
 }
 
 
-// --- KALENDER ---
+// ==========================================================================
+// DEL 2: KALENDER & DAGSHANTERING
+// ==========================================================================
+
 function renderCalendar(isFromStartBtn = false) {
     const grid = document.getElementById("calendar-grid");
     const label = document.getElementById("month-label");
@@ -507,7 +149,7 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
         body.style.flexDirection = "column";
         body.style.justifyContent = "flex-start"; 
         body.style.alignItems = "stretch";
-        body.style.gap = "50x"; // Kontrollerat, snyggt avstånd mellan alla block
+        body.style.gap = "5px"; // Kontrollerat, snyggt avstånd mellan alla block
     }
     
     // 1. ÖVRE DATUMYTA (Nollställda marginaler för att spara vertikalt utrymme)
@@ -694,7 +336,11 @@ function openMonthPicker() {
 
 function selectMonth(m) { currentViewDate.setMonth(m); closeModal(); renderCalendar(); }
 
-// --- PROGRAM & REDIGERING ---
+
+// ==========================================================================
+// DEL 3: PROGRAMVY, UTKAST & AKTIVT TRÄNINGSPASS
+// ==========================================================================
+
 function renderProgramView(activeIdx = null) {
     const selector = document.getElementById("pass-selector-list");
     selector.innerHTML = "";
@@ -827,8 +473,6 @@ function openEditProgramModal(idx) {
 
 function createNewExForPass(pIdx) {
     openCreateExerciseModal((newEx) => {
-        // Kontrollera om en övning med samma namn (men gammal stavning) fanns här innan, 
-        // eller om du döper om via banken – då körs uppdateringen i historiken.
         programData.routine[pIdx].exercises.push({ name: newEx.name, target: newEx.target, defaultSets: 3 });
         openEditProgramModal(pIdx);
     });
@@ -845,11 +489,6 @@ function moveExercise(pIdx, eIdx, dir) {
 function removeExFromPass(pIdx, eIdx) {
     programData.routine[pIdx].exercises.splice(eIdx, 1);
     openEditProgramModal(pIdx);
-}
-
-function saveProgramEdit(idx) {
-    programData.routine[idx].name = document.getElementById("edit-pass-name").value;
-    saveAll(); closeModal(); renderProgramView(idx); showProgramDetails(idx);
 }
 
 function saveProgramEdit(idx) {
@@ -1138,7 +777,6 @@ function toggleExercise(index) {
     const scrollPos = window.scrollY;
     
     if (!activeDraft.ui_state) activeDraft.ui_state = {};
-    // Säkerställ att vi har en array för öppna övningar
     if (!activeDraft.ui_state.openExercises) {
         activeDraft.ui_state.openExercises = [];
     }
@@ -1146,10 +784,8 @@ function toggleExercise(index) {
     const openIdx = activeDraft.ui_state.openExercises.indexOf(index);
 
     if (openIdx > -1) {
-        // Om den finns -> ta bort (stäng)
         activeDraft.ui_state.openExercises.splice(openIdx, 1);
     } else {
-        // Om den inte finns -> lägg till (öppna)
         activeDraft.ui_state.openExercises.push(index);
     }
 
@@ -1157,7 +793,6 @@ function toggleExercise(index) {
     renderActiveWorkout();
     window.scrollTo(0, scrollPos);
 }
-
 
 function addSetToExercise(exIdx) {
     const scrollPos = window.scrollY;
@@ -1203,6 +838,11 @@ function openReplaceExerciseModal(index) {
     renderExercisePicker("Ben", index);
     openModal();
 }
+
+
+// ==========================================================================
+// DEL 4: ÖVNINGSVÄLJARE, EVENT-LYSSNARE & ENHETLIGA RADERINGSMODALER
+// ==========================================================================
 
 function renderExercisePicker(category, replaceIndex = null) {
     const body = document.getElementById("modal-body");
@@ -1315,7 +955,7 @@ function removeActiveExercise(exIdx) {
     openModal();
 }
 
-// --- STANDARD-LOGIK ---
+// --- STANDARD-LOGIK & EVENT-LYSSNARE ---
 document.getElementById("global-home").addEventListener("click", () => {
     renderHome();         // Bygger om knapparna (utkast etc.)
     showView("home-view"); // Visar startsidan
@@ -1470,7 +1110,6 @@ function editLoggedWorkout(date, idx) {
 
 // Hjälpfunktion för att dölja den fasta "Stäng"-knappen i HTML
 function hideDefaultCloseButton(hide) {
-    // Letar upp stängknappen som ligger direkt efter #modal-body i din index.html
     const closeBtn = document.querySelector("#workout-modal .modal-content > button");
     if (closeBtn) {
         if (hide) {
@@ -1481,7 +1120,7 @@ function hideDefaultCloseButton(hide) {
     }
 }
 
-// 1. RADERA ÖVNING PERMANENT (UPPDATERAD MED BACK-TO-EDIT LOGIK)
+// 1. RADERA ÖVNING PERMANENT (MED BACK-TO-EDIT LOGIK)
 function deleteMasterExercise(id) {
     hideDefaultCloseButton(true); // Dölj "Stäng" inför raderingsbekräftelsen
     const body = document.getElementById("modal-body");
