@@ -575,7 +575,7 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
         <div class="modern-status-card day-manager-status-box" style="margin-top: 30px !important; margin-left: 0 !important; margin-right: 0 !important; margin-bottom: 0 !important;">
             <div class="status-aura" style="background: rgba(245, 158, 11, 0.35);"></div>
             <span class="status-box-title">Status</span>
-            <div style="margin: 5px 0 15px 0;">
+            <div style="margin: 2px 0 15px 0;">
                 <span class="status-highlight-text" style="color: #f59e0b !important; text-shadow: 0 0 25px rgba(245, 158, 11, 0.8) !important;">🔥 Pågående Pass</span>
             </div>
             <button class="premium-green-btn" onclick="closeModal(); startWorkout(activeDraft.workout, activeDraft.data, activeDraft.date)" style="border: 2px solid #f59e0b !important; background: linear-gradient(135deg, #d97706 0%, #f59e0b 100%) !important;">
@@ -610,10 +610,10 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
 
         // ÄNDRA PLANERING - SEKTIONSAVSKILJARE 
         html += `
-        <div style="margin-top: 20px;">
+        <div style="margin-top: 30px;">
             <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
                 <div style="flex-grow: 1; height: 1px; background: rgba(255,255,255,0.08);"></div>
-                <p style="font-size: 12px; text-transform: uppercase; color: var(--text-light); font-weight: 700; letter-spacing: 1px; margin: 0;">Ändra planering</p>
+                <p style="font-size: 14px; text-transform: uppercase; color: var(--text-light); font-weight: 700; letter-spacing: 1px; margin: 0;">Ändra planering</p>
                 <div style="flex-grow: 1; height: 1px; background: rgba(255,255,255,0.08);"></div>
             </div>
             
