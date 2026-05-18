@@ -617,7 +617,7 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
                 <div style="flex-grow: 1; height: 1px; background: rgba(255,255,255,0.08);"></div>
             </div>
             
-            <div class="plan-override-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">`;
+            <div class="plan-override-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">`;
             
             programData.routine.forEach(p => {
                 const isSelected = planned && p.id === planned.id;
