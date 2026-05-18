@@ -570,11 +570,13 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
         });
     } 
     else if (isOngoing) {
-        // ÄNDRING: Lagt till 40px marginal i toppen för att flytta ner boxen vid pågående pass
         html += `
         <div class="modern-status-card day-manager-status-box" style="margin-top: 12px !important; margin-left: 0 !important; margin-right: 0 !important; margin-bottom: 0 !important;">
             <div class="status-aura" style="background: rgba(245, 158, 11, 0.35);"></div>
-            <span class="status-box-title">Status</span>
+            
+            <!-- STÄLLE 1: För pågående pass (Justera top/left här) -->
+            <span class="status-box-title" style="top: 25px !important; left: 20px !important;">Status</span>
+            
             <div style="margin: 2px 0 15px 0;">
                 <span class="status-highlight-text" style="color: #f59e0b !important; text-shadow: 0 0 25px rgba(245, 158, 11, 0.8) !important;">🔥 Pågående Pass</span>
             </div>
@@ -584,10 +586,11 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
         </div>`;
     }
     else {
-        // ÄNDRING: Lagt till 40px marginal i toppen även här för att matcha positionen
         html += `
         <div class="modern-status-card day-manager-status-box" style="margin-top: 10px !important; margin-left: 0 !important; margin-right: 0 !important; margin-bottom: 0 !important;">
-            <span class="status-box-title" style="display: block; margin-top: 50px; margin-left: 5px;">Status</span>
+            
+            <!-- STÄLLE 2: För planerade dagar/vila (Justera top/left här också så det matchar) -->
+            <span class="status-box-title" style="top: 25px !important; left: 20px !important;">Status</span>
             
             <p id="current-planned-label" class="status-box-text">
                 ${planned ? `📋 <span class="status-highlight-text">${planned.name}</span>` : '🧘 Planerad Vila'}
