@@ -103,15 +103,15 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
 
     const body = document.getElementById("modal-body");
     
+    // 1. ÖVRE DATUMYTA (Helt synkad med CSS-strukturen)
     let html = `
-        <div style="text-align: center; margin-top: 20px; margin-bottom: 25px;">
-            <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: var(--text-light); font-weight: 600; display: block;">Valt datum</span>
-            <h2 class="section-title modern-header" style="margin: 8px 0 12px 0; display: inline-block; font-size: 26px;">
-                ${dateStr}
-            </h2>
+        <div class="day-manager-header-area">
+            <span class="day-manager-sub-date">Valt datum</span>
+            <h2 class="section-title modern-header day-manager-main-date">${dateStr}</h2>
         </div>
     `;
     
+    // Fall A: Användaren har redan slutfört ett eller flera pass denna dag
     if (completed.length > 0) {
         completed.forEach((w, idx) => {
             const timeStr = w.totalTime ? `⏱️ ${w.totalTime}` : "";
@@ -143,11 +143,8 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
                         html += `
                         <div style="background: rgba(59, 130, 246, 0.08); border: 1px solid var(--primary); padding: 6px 12px; border-radius: 8px; width: fit-content; display: flex; align-items: center; gap: 8px;">
                             <span style="color: var(--primary); font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">Set ${sIdx+1}</span> 
-                            
                             <span style="color: #ffffff; font-size: 13px; font-weight: 600;">${wVal} <small style="color: var(--primary); font-weight:400;">kg</small></span> 
-                            
                             <span style="color: var(--primary); opacity: 0.4;">×</span> 
-                            
                             <span style="color: #ffffff; font-size: 13px; font-weight: 600;">${rVal} <small style="color: var(--primary); font-weight:400;">reps</small></span>
                         </div>`;
                     });
@@ -164,59 +161,59 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
             html += `</div></div>`;
         });
     } 
+    // Fall B: Det finns ett aktivt utkast i bakgrunden som pågår just nu
     else if (isOngoing) {
         html += `
-        <div style="padding: 20px 10px; text-align: center;">
-            <button class="mode-btn orange ongoing-btn" onclick="closeModal(); startWorkout(activeDraft.workout, activeDraft.data, activeDraft.date)" style="width: 100%; padding: 16px; font-size: 16px; font-weight: bold; border-radius: 14px; box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);">
-                Fortsätt pågående pass 🔥
+        <div class="modern-status-card day-manager-status-box">
+            <div class="status-aura" style="background: rgba(245, 158, 11, 0.35);"></div>
+            <span class="status-box-title">Status</span>
+            <div style="margin: 10px 0 20px 0;">
+                <span class="status-highlight-text" style="color: #f59e0b !important; text-shadow: 0 0 25px rgba(245, 158, 11, 0.8) !important;">🔥 Pågående Pass</span>
+            </div>
+            <button class="premium-green-btn" onclick="closeModal(); startWorkout(activeDraft.workout, activeDraft.data, activeDraft.date)" style="border: 2px solid #f59e0b !important; background: linear-gradient(135deg, #d97706 0%, #f59e0b 100%) !important;">
+                Fortsätt träningen ⏱️
             </button>
         </div>`;
     } 
+    // Fall C: Standardvy (Det du ser på skärmklippet - Planerat pass eller Planerad vila)
     else {
-        const auraClass = planned ? "status-aura aura-planned" : "status-aura aura-rest";
-        const sphereClass = planned ? "status-icon-sphere sphere-planned" : "status-icon-sphere sphere-rest";
-        const iconEmoji = planned ? "⚡" : "🧘";
-
+        const auraColor = planned ? "rgba(34, 211, 238, 0.35)" : "rgba(129, 140, 248, 0.25)";
+        
         html += `
-        <div class="modern-status-card day-manager-status-box" style="margin-top: -15px;">
-            <div class="${auraClass}"></div>
+        <div class="modern-status-card day-manager-status-box">
+            <div class="status-aura" style="background: ${auraColor};"></div>
             
-            <div class="${sphereClass}">${iconEmoji}</div>
-            
-            <div class="status-badge-container" style="margin-top: 0px; margin-bottom: 0px; line-height: 1;">
-                <span class="status-box-title" style="display: inline-block; margin: 0; padding: 0;">STATUS</span>
+            <span class="status-box-title">STATUS</span>
+            <div style="margin: 10px 0 20px 0;">
+                <span class="status-highlight-text">
+                    ${planned ? `📋 ${planned.name}` : '🧘 Planerad Vila'}
+                </span>
             </div>
-            
-            <p id="current-planned-label" class="status-box-text" style="margin-top: 8px; margin-bottom: 0px;">
-                ${planned ? `📋 <span class="status-highlight-text">${planned.name}</span>` : '🧘 Planerad Vila'}
-            </p>
             
             <div id="day-manager-action-btn-container" class="status-btn-container">`;
             if(planned) {
                 html += `
-                <button class="mode-btn premium-action-btn premium-green-btn" onclick="prepareStart('${dateStr}', '${planned.id}')">
-                    Starta ${planned.name} 🔥
+                <button class="premium-green-btn" onclick="prepareStart('${dateStr}', '${planned.id}')">
+                    STARTA TRÄNING 🔥
                 </button>`;
             }
         html += `
             </div>
             
-            <button class="mode-btn premium-action-btn premium-free-btn" onclick="closeModal(); startFreeWorkoutOnDate('${dateStr}')">
-                ➕ Starta ett tomt/fritt pass
+            <button class="premium-free-btn" onclick="closeModal(); startFreeWorkoutOnDate('${dateStr}')">
+                ➕ Starta Fritt Pass
             </button>
         </div>`;
 
+        // ÄNDRA PLANERING - SEKTIONSAVSKILJARE
         html += `
-        <div style="margin-top: 25px;">
-            <div style="display: flex; align-items: center; justify-content: center; gap: 15px; margin-bottom: 20px;">
-                <div style="flex-grow: 1; height: 1px; background: linear-gradient(90deg, transparent, rgba(56, 189, 248, 0.3));"></div>
-                <div class="status-badge-container" style="margin-bottom: 0;">
-                    <span class="status-box-title">ÄNDRA PLANERING</span>
-                </div>
-                <div style="flex-grow: 1; height: 1px; background: linear-gradient(90deg, rgba(56, 189, 248, 0.3), transparent);"></div>
-            </div>
-            
-            <div class="plan-override-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">`;
+        <div class="section-divider-container planning-section">
+            <div class="divider-line"></div>
+            <p class="divider-text">Ändra planering</p>
+            <div class="divider-line"></div>
+        </div>
+        
+        <div class="plan-override-grid">`;
             
             programData.routine.forEach(p => {
                 const isSelected = planned && p.id === planned.id;
@@ -227,19 +224,16 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
                 `).join('');
 
                 html += `
-                <div style="display: flex; flex-direction: column; gap: 5px;">
+                <div class="override-item-wrapper">
                     <button class="mode-btn plan-override-btn ${isSelected ? 'active-choice' : ''}" 
                             id="btn-ovr-${p.id}" 
-                            onclick="setOverrideSilent('${dateStr}', '${p.id}')"
-                            style="margin: 0; padding: 12px; font-size: 13px; border-radius: 12px; font-weight: 600; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; width:100%;">
+                            onclick="setOverrideSilent('${dateStr}', '${p.id}')">
                         ${p.name}
                     </button>
                     
-                    <details style="width: 100%; text-align: center;">
-                        <summary style="list-style: none; font-size: 10px; color: var(--text-light); opacity: 0.6; cursor: pointer; padding: 4px; border-radius: 8px;">
-                            Innehåll ▾
-                        </summary>
-                        <div style="text-align: left; padding: 8px; border-radius: 10px; margin-top: 4px; max-height: 120px; overflow-y: auto; background: rgba(0,0,0,0.1);">
+                    <details class="override-details">
+                        <summary>Innehåll ▾</summary>
+                        <div style="text-align: left; padding: 8px; border-radius: 10px; margin-top: 4px; max-height: 120px; overflow-y: auto; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.05);">
                             ${exList}
                         </div>
                     </details>
@@ -250,20 +244,19 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
             html += `
                 <button class="mode-btn plan-override-btn override-rest-btn ${isRestSelected ? 'active-choice' : ''}" 
                         id="btn-ovr-none"
-                        onclick="setOverrideSilent('${dateStr}', 'none')"
-                        style="margin: 0; padding: 12px; font-size: 13px; border-radius: 12px; font-weight: bold; grid-column: span 2; border-color: rgba(253, 224, 71, 0.4); color: #fde047; background: rgba(253, 224, 71, 0.05);">
+                        onclick="setOverrideSilent('${dateStr}', 'none')">
                     🧘 Vila
                 </button>
             `;
             
         html += `
-            </div>
         </div>`;
     }
     
+    // FLYTTAT UT STÄNG-KNAPPEN SÅ DEN LIGGER UTANFÖR ÄNDRA PLANERING-GRIDEN
     html += `
-    <div style="margin-top: 20px;">
-        <button class="mode-btn glass-border" onclick="closeModal()" style="width: 100%; padding: 14px; border-radius: 14px; font-size: 14px; font-weight: 600;">Stäng</button>
+    <div style="margin-top: 25px;">
+        <button class="mode-btn glass-border" onclick="closeModal()" style="width: 100%; padding: 16px; border-radius: 20px; font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Stäng</button>
     </div>`;
     
     body.innerHTML = html;
