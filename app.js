@@ -430,15 +430,64 @@ function renderCalendar(isFromStartBtn = false) {
     showView("calendar-view");
 }
 
+// NY FUNKTION: Öppnar en renodlad popup-ruta med övningarna (Likt showProgramDetails fast som modal)
+function openProgramPreviewModal(idx) {
+    const pass = programData.routine[idx];
+    
+    // Skapa ett temporärt modalelement om det inte redan finns
+    let previewModal = document.getElementById("preview-modal");
+    if (!previewModal) {
+        previewModal = document.createElement("div");
+        previewModal.id = "preview-modal";
+        previewModal.style.position = "fixed";
+        previewModal.style.top = "0";
+        previewModal.style.left = "0";
+        previewModal.style.width = "100vw";
+        previewModal.style.height = "100vh";
+        previewModal.style.backgroundColor = "rgba(0, 0, 0, 0.75)";
+        previewModal.style.backdropFilter = "blur(8px)";
+        previewModal.style.display = "flex";
+        previewModal.style.justifyContent = "center";
+        previewModal.style.alignItems = "center";
+        previewModal.style.zIndex = "10000"; // Se till att den hamnar överst av allt
+        document.body.appendChild(previewModal);
+    }
+
+    // Generera innehållet till popupen
+    previewModal.innerHTML = `
+        <div class="card glass" style="width: 90%; max-width: 400px; padding: 20px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); background: rgba(15, 23, 42, 0.95); animation: modalFadeIn 0.2s ease-out;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.08);">
+                <h3 style="margin: 0; font-size: 20px; color: #fff;">${pass.name}</h3>
+                <button onclick="document.getElementById('preview-modal').style.display='none'" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: var(--text-light); cursor: pointer; font-size: 14px; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">✖</button>
+            </div>
+            
+            <div style="max-height: 300px; overflow-y: auto; display: flex; flex-direction: column; gap: 2px;">
+                ${pass.exercises.map(e => `
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 4px; border-bottom: 1px solid rgba(255,255,255,0.03);">
+                        <span style="font-weight: 600; color: #ffffff; font-size: 14px;">${e.name}</span>
+                        <small style="color: var(--primary); font-weight: 800; text-transform: uppercase; font-size: 10px; background: rgba(59, 130, 246, 0.1); padding: 4px 8px; border-radius: 6px;">${e.target || 'Övning'}</small>
+                    </div>
+                `).join("")}
+            </div>
+            
+            <button onclick="document.getElementById('preview-modal').style.display='none'" style="width: 100%; margin-top: 20px; padding: 12px; background: var(--primary); color: #0f172a; border: none; border-radius: 12px; font-weight: 700; cursor: pointer;">
+                Stäng översikt
+            </button>
+        </div>
+    `;
+
+    // Visa modalen
+    previewModal.style.display = "flex";
+}
+
+// HUVUDFUNKTIONEN (Uppdaterad med snygga info-knappar istället för trånga detaljlistor)
 function openDayManager(dateStr, planned, completed, isOngoing) {
-    // SÄKERHETSÅTGÄRD: Försäkra oss om att stäng-knappen är synlig när vi öppnar kalenderdagarna
     if (typeof hideDefaultCloseButton === 'function') {
         hideDefaultCloseButton(false);
     }
 
     const body = document.getElementById("modal-body");
     
-    // Tvinga föräldraboxen (#modal-body) att stapla elementen tätt från toppen utan extra tomrum
     if (body) {
         body.style.display = "flex";
         body.style.flexDirection = "column";
@@ -447,7 +496,6 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
         body.style.gap = "20px"; 
     }
     
-    // 1. ÖVRE DATUMYTA (Nollställda marginaler för att spara vertikalt utrymme)
     let html = `
         <div style="text-align: center; margin: 0 !important; padding: 0 !important;">
             <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: var(--text-light); font-weight: 600; display: block; margin: 0 !important; padding: 0 !important;">Valt datum</span>
@@ -570,50 +618,35 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
             programData.routine.forEach((p, idx) => {
                 const isSelected = planned && p.id === planned.id;
                 
-                // En palett med RGB-baserade färger
                 const colors = [
-                    { r: 239, g: 68,  b: 68 },   // 0: Röd
-                    { r: 59,  g: 130, b: 246 },  // 1: Blå
-                    { r: 16,  g: 185, b: 129 },  // 2: Grön
-                    { r: 168, g: 85,  b: 247 }   // 3: Lila
+                    { r: 239, g: 68,  b: 68 },   // Röd
+                    { r: 59,  g: 130, b: 246 },  // Blå
+                    { r: 16,  g: 185, b: 129 },  // Grön
+                    { r: 168, g: 85,  b: 247 }   // Lila
                 ];
                 
                 const colorIndex = idx % colors.length;
                 const c = colors[colorIndex];
-
-                // Om vald: full färg (1). Om ej vald: 25% styrka (0.25) på kantlinjen
                 const currentOpacity = isSelected ? "1" : "0.25";
-                
                 const borderColor = `rgba(${c.r}, ${c.g}, ${c.b}, ${currentOpacity})`;
                 const btnBg = `rgba(${c.r}, ${c.g}, ${c.b}, 0.04)`;
 
-                const exList = p.exercises.map(e => `
-                    <div style="background: rgba(255,255,255,0.05); padding: 6px 10px; border-radius: 6px; margin-bottom: 5px; border-left: 2px solid rgba(${c.r}, ${c.g}, ${c.b}, 0.6); font-size: 11px; color: #ddd; display: flex; align-items: center;">
-                        <span style="margin-right: 6px; opacity: 0.5;">•</span> ${e.name}
-                    </div>
-                `).join('');
-
                 html += `
-                <div style="display: flex; flex-direction: column; background: rgba(255, 255, 255, 0.02); border-radius: 12px; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.06); box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                <div style="display: flex; position: relative; background: ${isSelected ? 'rgba(255,255,255,0.1)' : btnBg}; border-radius: 12px; border-top: 2px solid ${borderColor}; box-shadow: 0 4px 6px rgba(0,0,0,0.1); overflow: hidden;">
                     
                     <button class="mode-btn plan-override-btn ${isSelected ? 'active-choice' : ''}" 
                             id="btn-ovr-${p.id}" 
                             onclick="setOverrideSilent('${dateStr}', '${p.id}')"
-                            style="margin: 0; padding: 14px 12px; font-size: 13px; border-radius: 12px 12px 0 0; font-weight: 600; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; width:100%; border: none;
-                                   background: ${isSelected ? 'rgba(255,255,255,0.1)' : btnBg} !important;
-                                   border-top: 2px solid ${borderColor} !important;
-                                   color: ${isSelected ? '#ffffff' : 'var(--text-light)'} !important;">
+                            style="margin: 0; padding: 15px 35px 15px 12px; font-size: 13px; font-weight: 600; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; width: 100%; border: none; background: transparent !important;
+                                   color: ${isSelected ? '#ffffff' : 'var(--text-light)'} !important; text-align: left;">
                         ${p.name}
                     </button>
                     
-                    <details style="width: 100%; background: rgba(0, 0, 0, 0.15); display: block;">
-                        <summary style="display: block !important; width: 100% !important; box-sizing: border-box; font-size: 10px; color: var(--text-light); opacity: 0.7; cursor: pointer; padding: 10px 6px; text-align: center; border-top: 1px solid rgba(255,255,255,0.04); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; user-select: none; background: rgba(255,255,255,0.01);">
-                            Innehåll ▾
-                        </summary>
-                        <div style="text-align: left; padding: 10px; border-top: 1px solid rgba(0,0,0,0.2); max-height: 140px; overflow-y: auto; background: rgba(0,0,0,0.2);">
-                            ${exList}
-                        </div>
-                    </details>
+                    <div onclick="openProgramPreviewModal(${idx})" 
+                         style="position: absolute; right: 0; top: 0; bottom: 0; width: 35px; display: flex; align-items: center; justify-content: center; cursor: pointer; background: rgba(0,0,0,0.2); border-left: 1px solid rgba(255,255,255,0.05); font-size: 12px; user-select: none;"
+                         title="Visa övningar">
+                        ℹ️
+                    </div>
                 </div>`;
             });
             
