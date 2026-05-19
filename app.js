@@ -484,29 +484,32 @@ function openProgramPreviewModal(idx) {
 
 // GLOBALA VARIABLER FÖR LÅNGTRYCK OCH SCROLL-ACCURACY
 let pressTimer;
+let touchTimeout = null;
 let isLongPress = false;
 let touchStartY = 0;
 let hasScrolled = false;
 
 function startPress(idx, event) {
-    // 1. SÄKERHETSKONTROLL: Endast för rätt knappar
+    // 1. SÄKERHETSKONTROLL: Endast för knappar med rätt klass
     if (!event.target.classList.contains('plan-override-btn')) return;
 
-    // Återställ tillstånd
     isLongPress = false;
     hasScrolled = false;
     
-    // Hämta startposition för att kunna mäta scroll
+    // Spara startposition för att upptäcka scroll
     if (event.touches) {
         touchStartY = event.touches[0].clientY;
     }
-    
-    // Starta timern på 500ms
+
+    // 2. Starta båda timers (pressTimer för övningar, touchTimeout för preview)
     pressTimer = setTimeout(() => {
-        if (!hasScrolled) {
-            isLongPress = true;
-            openProgramPreviewModal(idx);
-        }
+        isLongPress = true;
+        showExercisesForWorkout(idx); 
+    }, 500);
+
+    touchTimeout = setTimeout(() => {
+        isLongPress = true;
+        openProgramPreviewModal(idx);
     }, 500);
 }
 
@@ -515,14 +518,18 @@ function cancelPress() {
         clearTimeout(pressTimer);
         pressTimer = null;
     }
+    if (touchTimeout) {
+        clearTimeout(touchTimeout);
+        touchTimeout = null;
+    }
 }
 
 function handleTouchMove(event) {
-    if (event && event.touches && event.touches[0]) {
+    if (event && event.touches && event.touches[0] && touchStartY > 0) {
         const currentY = event.touches[0].clientY;
         const moveDistance = Math.abs(currentY - touchStartY);
         
-        // Om användaren flyttar fingret mer än 6 pixlar, avbryt allt!
+        // Om användaren flyttar fingret mer än 6 pixlar, markera som scrollat och avbryt
         if (moveDistance > 6) { 
             hasScrolled = true;
             cancelPress();
@@ -533,20 +540,25 @@ function handleTouchMove(event) {
 function handleTouchEnd(idx, dateStr, programId, event) {
     cancelPress();
     
-    // Om vi har scrollat eller gjort ett långtryck: gör inget mer
+    // Om användaren har scrollat eller om det var ett långtryck: avbryt klick
     if (hasScrolled || isLongPress) {
         if (event) {
-            event.preventDefault();
+            if (event.cancelable) event.preventDefault();
             event.stopPropagation();
         }
         return false;
     }
     
-    // Annars: utför klicket
+    // Stoppa eventuella virtuella klick för säkerhets skull
+    if (event && event.cancelable) {
+        event.preventDefault();
+    }
+    
+    // Detta var ett rent, snabbt klick utan scroll – utför bytet!
     setOverrideSilent(dateStr, programId);
 }
 
-// FUNKTION: Öppnar en renodlad popup-ruta med övningarna
+// FUNKTION: Öppnar en renodlad popup-ruta med övningarna (Med mjuk animation)
 function openProgramPreviewModal(idx) {
     const pass = programData.routine[idx];
     
