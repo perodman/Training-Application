@@ -480,27 +480,48 @@ function openProgramPreviewModal(idx) {
     previewModal.style.display = "flex";
 }
 
-// GLOBALA VARIABLER FÖR ATT HÅLLA KOLL PÅ LÅNGTRYCKET
+// GLOBALA VARIABLER FÖR LÅNGTRYCK OCH SCROLL-ACCURACY
 let touchTimeout = null;
 let isLongPress = false;
+let touchStartY = 0;
 
-function startPress(idx) {
+function startPress(idx, event) {
     isLongPress = false;
-    // Starta en timer på 500ms (ett halvt sekund)
+    
+    // Om det är ett touch-event (mobil), spara startpositionen i Y-led
+    if (event && event.touches && event.touches[0]) {
+        touchStartY = event.touches[0].clientY;
+    } else {
+        touchStartY = 0;
+    }
+
+    // Starta timern på 500ms
     touchTimeout = setTimeout(() => {
         isLongPress = true;
         openProgramPreviewModal(idx);
     }, 500);
 }
 
-function cancelPress() {
-    // Om användaren släpper eller flyttar fingret innan 500ms, avbryt timern
-    if (touchTimeout) {
-        clearTimeout(touchTimeout);
+function handleTouchMove(event) {
+    // Om användaren flyttar fingret mer än 6 pixlar under trycket, avbryt (eftersom de scrollar)
+    if (event && event.touches && event.touches[0] && touchStartY > 0) {
+        const currentY = event.touches[0].clientY;
+        const moveDistance = Math.abs(currentY - touchStartY);
+        
+        if (moveDistance > 6) { 
+            cancelPress();
+        }
     }
 }
 
-// NY FUNKTION: Öppnar en renodlad popup-ruta med övningarna (Nu med mjuk animation!)
+function cancelPress() {
+    if (touchTimeout) {
+        clearTimeout(touchTimeout);
+    }
+    touchStartY = 0;
+}
+
+// FUNKTION: Öppnar en renodlad popup-ruta med övningarna (Med mjuk animation)
 function openProgramPreviewModal(idx) {
     const pass = programData.routine[idx];
     
@@ -520,12 +541,10 @@ function openProgramPreviewModal(idx) {
         previewModal.style.alignItems = "flex-start"; 
         previewModal.style.zIndex = "10000"; 
         
-        // Mjuk övergång för själva bakgrunden
         previewModal.style.transition = "opacity 0.2s ease-out";
         document.body.appendChild(previewModal);
     }
 
-    // Sätt initial opacity till 0 för att kunna tona in
     previewModal.style.opacity = "0";
     previewModal.style.display = "flex";
 
@@ -552,7 +571,6 @@ function openProgramPreviewModal(idx) {
         </div>
     `;
 
-    // Trigger för animationen (kräver en mikroskopisk fördröjning för att webbläsaren ska hinna med att tona)
     setTimeout(() => {
         previewModal.style.opacity = "1";
         const card = document.getElementById("preview-modal-card");
@@ -563,7 +581,6 @@ function openProgramPreviewModal(idx) {
     }, 10);
 }
 
-// HJÄLPFUNKTION: Stänger modalen med en mjuk uttoning
 function closePreviewModal() {
     const previewModal = document.getElementById("preview-modal");
     const card = document.getElementById("preview-modal-card");
@@ -573,7 +590,6 @@ function closePreviewModal() {
         card.style.transform = "scale(0.95)";
         previewModal.style.opacity = "0";
         
-        // Vänta tills animationen är klar (200ms) innan vi gömmer elementet helt
         setTimeout(() => {
             previewModal.style.display = "none";
         }, 200);
@@ -739,13 +755,13 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
                 <button class="mode-btn plan-override-btn ${isSelected ? 'active-choice' : ''}" 
                         id="btn-ovr-${p.id}" 
                         
-                        onmousedown="startPress(${idx})"
+                        onmousedown="startPress(${idx}, event)"
                         onmouseup="cancelPress(); if(!isLongPress) setOverrideSilent('${dateStr}', '${p.id}');"
                         onmouseleave="cancelPress();"
                         
-                        ontouchstart="startPress(${idx})"
+                        ontouchstart="startPress(${idx}, event)"
                         ontouchend="cancelPress(); if(!isLongPress) setOverrideSilent('${dateStr}', '${p.id}');"
-                        ontouchmove="cancelPress();"
+                        ontouchmove="handleTouchMove(event)"
                         
                         style="margin: 0; padding: 15px 12px; font-size: 13px; border-radius: 12px; font-weight: 600; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; width: 100%;
                                background: ${isSelected ? 'rgba(255,255,255,0.1)' : btnBg} !important;
