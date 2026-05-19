@@ -202,7 +202,7 @@ function openCreateExerciseModal(callback = null) {
         
         masterExercises.push(newEx);
         
-        // Se till att övningen läggs till i det temporära valet direkt
+        // Säkert sätt att lägga till i listan om den finns
         if (typeof temporarySelectedExercises !== 'undefined') {
             temporarySelectedExercises.push(newEx.id);
         }
@@ -212,7 +212,7 @@ function openCreateExerciseModal(callback = null) {
         if(callback) callback(newEx);
         else { 
             closeModal(); 
-            filterExercises(selectedCategory); 
+            if(typeof filterExercises === 'function') filterExercises(selectedCategory);
         }
     };
     openModal();
