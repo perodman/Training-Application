@@ -89,16 +89,22 @@ function closeModal() {
 
 function openModal() {
     const modal = document.getElementById("workout-modal");
+    if (!modal) return; // Säkerhetskoll: Avbryt om modalen inte finns
+    
     modal.classList.remove("hidden");
     
     setTimeout(() => {
-        // 1. Nollställ huvudfönstret i modalen
+        // Nollställ endast om elementet faktiskt existerar
         const modalBody = document.getElementById("modal-body");
-        if (modalBody) modalBody.scrollTop = 0;
+        if (modalBody) {
+            modalBody.scrollTop = 0;
+        }
 
-        // 2. Nollställ den specifika listan med övningar
+        // Nollställ listan endast om den finns i just denna vy
         const exerciseList = document.getElementById("exercise-picker-list");
-        if (exerciseList) exerciseList.scrollTop = 0;
+        if (exerciseList) {
+            exerciseList.scrollTop = 0;
+        }
     }, 10);
 }
 
