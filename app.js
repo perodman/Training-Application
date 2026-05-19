@@ -88,15 +88,17 @@ function closeModal() {
 }
 
 function openModal() {
-    const modal = document.getElementById("workout-modal"); // Använd ditt faktiska ID
-    modal.classList.remove("hidden"); // Behåll din nuvarande klass-hantering
+    const modal = document.getElementById("workout-modal");
+    modal.classList.remove("hidden");
     
-    // Använd setTimeout för att garantera att innehållet hunnit renderas
     setTimeout(() => {
+        // 1. Nollställ huvudfönstret i modalen
         const modalBody = document.getElementById("modal-body");
-        if (modalBody) {
-            modalBody.scrollTop = 0;
-        }
+        if (modalBody) modalBody.scrollTop = 0;
+
+        // 2. Nollställ den specifika listan med övningar
+        const exerciseList = document.getElementById("exercise-picker-list");
+        if (exerciseList) exerciseList.scrollTop = 0;
     }, 10);
 }
 
@@ -920,8 +922,9 @@ function renderExercisePickerForEdit(idx, category = "Ben") {
     html += `</div>`;
 
     html += `<p style="font-size:11px; text-transform:uppercase; color:var(--text-light); text-align:center; margin-bottom:10px;">Övningar (${category}):</p>`;
-    // Punkt 5: Ändrat max-height till 400px för att se 5-6 övningar
-    html += `<div style="max-height:400px; overflow-y:auto; padding-right:5px; background:rgba(0,0,0,0.2); border-radius:15px; padding:10px;">`;
+    
+    // PUNKT 1: Här har jag lagt till id="exercise-picker-list"
+    html += `<div id="exercise-picker-list" style="max-height:400px; overflow-y:auto; padding-right:5px; background:rgba(0,0,0,0.2); border-radius:15px; padding:10px;">`;
     
     const filtered = masterExercises.filter(ex => category === "Armar" ? (ex.target === "Biceps" || ex.target === "Triceps") : ex.target === category);
     
@@ -939,6 +942,14 @@ function renderExercisePickerForEdit(idx, category = "Ben") {
     html += `</div>`;
 
     container.innerHTML = html;
+
+    // PUNKT 3: Här lägger vi till logiken som tvingar listan till toppen varje gång vi renderar
+    setTimeout(() => {
+        const list = document.getElementById("exercise-picker-list");
+        if (list) {
+            list.scrollTop = 0;
+        }
+    }, 10);
 }
 
 function addExerciseToPassDirectly(pIdx, exId) {
