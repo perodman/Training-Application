@@ -569,32 +569,56 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
             <div class="plan-override-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; width: 100%;">`;
             
             programData.routine.forEach(p => {
-                const isSelected = planned && p.id === planned.id;
-                const exList = p.exercises.map(e => `
-                    <div style="background: rgba(255,255,255,0.05); padding: 5px 8px; border-radius: 6px; margin-bottom: 4px; border-left: 2px solid var(--primary); font-size: 10px; color: #ddd; display: flex; align-items: center;">
-                        <span style="margin-right: 6px; opacity: 0.5;">•</span> ${e.name}
-                    </div>
-                `).join('');
+    const isSelected = planned && p.id === planned.id;
+    
+    // 1. BESTÄM FÄRGTEMA BASERAT PÅ PASSNAMN
+    let btnColor = "var(--primary)"; // Standardblå om inget matchar
+    let btnBg = "rgba(59, 130, 246, 0.03)"; // Mycket svag blåton
+    
+    const nameLower = p.name.toLowerCase();
+    if (nameLower.includes("ben") || nameLower.includes("leg")) {
+        btnColor = "#ef4444"; // Röd för tunga benpass
+        btnBg = "rgba(239, 68, 68, 0.03)";
+    } else if (nameLower.includes("över") || nameLower.includes("bröst") || nameLower.includes("push")) {
+        btnColor = "#3b82f6"; // Klarblå för överkropp/push
+        btnBg = "rgba(59, 130, 246, 0.03)";
+    } else if (nameLower.includes("rygg") || nameLower.includes("pull")) {
+        btnColor = "#a855f7"; // Lila för rygg/pull
+        btnBg = "rgba(168, 85, 247, 0.03)";
+    } else if (nameLower.includes("kondition") || nameLower.includes("cardio") || nameLower.includes("pass a")) {
+        btnColor = "#10b981"; // Smaragdgrön för cardio eller Pass A
+        btnBg = "rgba(16, 185, 129, 0.03)";
+    }
 
-                html += `
-                <div style="display: flex; flex-direction: column; gap: 5px;">
-                    <button class="mode-btn plan-override-btn ${isSelected ? 'active-choice' : ''}" 
-                            id="btn-ovr-${p.id}" 
-                            onclick="setOverrideSilent('${dateStr}', '${p.id}')"
-                            style="margin: 0; padding: 12px; font-size: 13px; border-radius: 12px; font-weight: 600; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; width:100%;">
-                        ${p.name}
-                    </button>
-                    
-                    <details style="width: 100%; text-align: center;">
-                        <summary style="list-style: none; font-size: 10px; color: var(--text-light); opacity: 0.6; cursor: pointer; padding: 4px; border-radius: 8px;">
-                            Innehåll ▾
-                        </summary>
-                        <div style="text-align: left; padding: 8px; border-radius: 10px; margin-top: 4px; max-height: 120px; overflow-y: auto; background: rgba(0,0,0,0.1);">
-                            ${exList}
-                        </div>
-                    </details>
-                </div>`;
-            });
+    const exList = p.exercises.map(e => `
+        <div style="background: rgba(255,255,255,0.05); padding: 5px 8px; border-radius: 6px; margin-bottom: 4px; border-left: 2px solid ${btnColor}; font-size: 10px; color: #ddd; display: flex; align-items: center;">
+            <span style="margin-right: 6px; opacity: 0.5;">•</span> ${e.name}
+        </div>
+    `).join('');
+
+    // 2. APPLICERA FÄRGERNA PÅ KNAPPEN
+    html += `
+    <div style="display: flex; flex-direction: column; gap: 5px;">
+        <button class="mode-btn plan-override-btn ${isSelected ? 'active-choice' : ''}" 
+                id="btn-ovr-${p.id}" 
+                onclick="setOverrideSilent('${dateStr}', '${p.id}')"
+                style="margin: 0; padding: 12px; font-size: 13px; border-radius: 12px; font-weight: 600; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; width:100%;
+                       background: ${isSelected ? 'rgba(255,255,255,0.1)' : btnBg} !important;
+                       border-top: 2px solid ${btnColor} !important;
+                       color: ${isSelected ? '#ffffff' : 'var(--text-light)'} !important;">
+            ${p.name}
+        </button>
+        
+        <details style="width: 100%; text-align: center;">
+            <summary style="list-style: none; font-size: 10px; color: var(--text-light); opacity: 0.6; cursor: pointer; padding: 4px; border-radius: 8px;">
+                Innehåll ▾
+            </summary>
+            <div style="text-align: left; padding: 8px; border-radius: 10px; margin-top: 4px; max-height: 120px; overflow-y: auto; background: rgba(0,0,0,0.1);">
+                ${exList}
+            </div>
+        </details>
+    </div>`;
+});
             
             const isRestSelected = !planned;
             html += `
