@@ -1150,11 +1150,29 @@ function renderActiveWorkout() {
         activeDraft.ui_state = {};
     }
     
-    if (!activeDraft.ui_state.hasOwnProperty('openExercises') && activeDraft.workout.exercises.length > 0) {
-        activeDraft.ui_state.openExercises = [0];
-        saveAll(); 
-    } else if (!activeDraft.ui_state.openExercises) {
+    // SÄKERSTÄLL ATT OPENEXERCISES EXISTERAR
+    if (!activeDraft.ui_state.openExercises) {
         activeDraft.ui_state.openExercises = [];
+    }
+
+    // SPECIALHANTERING FÖR "FRITT PASS" VS VANLIGA PASS
+    const isFrittPass = activeDraft.workout.name === "Fritt Pass";
+
+    if (isFrittPass) {
+        // För Fritt Pass: Se till att ALLA övningar automatiskt läggs till i openExercises om de inte redan finns där
+        activeDraft.workout.exercises.forEach((_, i) => {
+            if (!activeDraft.ui_state.openExercises.includes(i)) {
+                activeDraft.ui_state.openExercises.push(i);
+            }
+        });
+        saveAll();
+    } else {
+        // För vanliga pass: Endast första övningen (index 0) är öppen från allra första början
+        if (!activeDraft.ui_state.hasOwnProperty('hasInitializedOpen')) {
+            activeDraft.ui_state.openExercises = [0];
+            activeDraft.ui_state.hasInitializedOpen = true; // Flagga för att inte skriva över användarens egna stängningar senare
+            saveAll();
+        }
     }
     
     const openExercises = activeDraft.ui_state.openExercises;
@@ -1263,6 +1281,13 @@ function renderActiveWorkout() {
     list.appendChild(discardBtn);
 
     showView("workout-view");
+}
+
+function addExerciseToPassDirectly(pIdx, exId) {
+    const ex = masterExercises.find(e => e.id == exId);
+    if (!ex) return;
+    programData.routine[pIdx].exercises.push({ name: ex.name, target: ex.target, defaultSets: 3 });
+    openEditProgramModal(pIdx); 
 }
 
 function updateSetDataOnly(exIdx, setIdx) {
