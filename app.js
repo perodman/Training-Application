@@ -487,15 +487,15 @@ let touchStartY = 0;
 let hasScrolled = false;
 
 function startPress(idx, event) {
+    isLongPress = false;
+    hasScrolled = false;
+
     // Om det är ett touch-event (mobil), spara startpositionen i Y-led
     if (event && event.touches && event.touches[0]) {
         touchStartY = event.touches[0].clientY;
     } else {
         touchStartY = 0;
     }
-    
-    isLongPress = false;
-    hasScrolled = false;
 
     // Starta timern på 500ms
     touchTimeout = setTimeout(() => {
@@ -509,8 +509,8 @@ function handleTouchMove(event) {
         const currentY = event.touches[0].clientY;
         const moveDistance = Math.abs(currentY - touchStartY);
         
-        // Om användaren flyttar fingret mer än 8 pixlar, tolka det som scroll
-        if (moveDistance > 8) { 
+        // Om användaren flyttar fingret mer än 6 pixlar, markera att vi scrollar och avbryt timern
+        if (moveDistance > 6) { 
             hasScrolled = true;
             cancelPress();
         }
@@ -520,16 +520,21 @@ function handleTouchMove(event) {
 function handleTouchEnd(idx, dateStr, programId, event) {
     cancelPress();
     
-    // Om det blev ett långtryck eller om användaren faktiskt scrollade, gör ingenting (avbryt valet)
-    if (isLongPress || hasScrolled) {
-        if (event && event.cancelable) {
-            event.preventDefault();
+    // Om användaren har scrollat eller om det var ett långtryck
+    if (hasScrolled || isLongPress) {
+        if (event) {
+            if (event.cancelable) event.preventDefault();
             event.stopPropagation();
         }
         return false;
     }
     
-    // Annars var det ett snabbt klick – välj passet!
+    // Om eventet är cancelable, stoppa det virtuella klicket här med för säkerhets skull
+    if (event && event.cancelable) {
+        event.preventDefault();
+    }
+    
+    // Detta var ett rent, snabbt klick utan scroll – utför bytet!
     setOverrideSilent(dateStr, programId);
 }
 
