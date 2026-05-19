@@ -944,13 +944,18 @@ function renderExercisePickerForEdit(idx, category = "Ben") {
     container.innerHTML = html;
 
     // PUNKT 3: Här lägger vi till logiken som tvingar listan till toppen varje gång vi renderar
-    setTimeout(() => {
-        const list = document.getElementById("exercise-picker-list");
-        if (list) {
-            list.scrollTop = 0;
-        }
-    }, 10);
-}
+   setTimeout(() => {
+    const list = document.getElementById("exercise-picker-list");
+    if (list) {
+        // Detta tvingar listan att hoppa till toppen, 
+        // oavsett hur CSS är skriven:
+        list.scrollTo({
+            top: 0,
+            left: 0,
+            behavior: 'instant' 
+        });
+    }
+}, 50);
 
 function addExerciseToPassDirectly(pIdx, exId) {
     const ex = masterExercises.find(e => e.id == exId);
