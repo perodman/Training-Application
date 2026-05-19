@@ -89,9 +89,13 @@ function closeModal() {
 
 function openModal() {
     const modal = document.getElementById("workout-modal");
-    if (modal) {
-        modal.classList.remove("hidden");
-    }
+    if (modal) modal.classList.remove("hidden");
+
+    // Samma logik här för att garantera toppen vid öppning
+    setTimeout(() => {
+        const modalContent = document.querySelector('.modal-content');
+        if (modalContent) modalContent.scrollTop = 0;
+    }, 20);
 }
 
 // --- TIMER LOGIK ---
@@ -937,16 +941,19 @@ function renderExercisePickerForEdit(idx, category = "Ben") {
     container.innerHTML = html;
 
     // Tvinga scroll till toppen när innehållet renderats
-    setTimeout(() => {
-        const list = document.getElementById("exercise-picker-list");
-        if (list) {
-            list.scrollTo({
-                top: 0,
-                left: 0,
-                behavior: 'instant' 
-            });
-        }
-    }, 50);
+   setTimeout(() => {
+    // 1. Hitta modalens huvudbehållare (den med overflow-y: auto)
+    const modalContent = document.querySelector('.modal-content');
+    if (modalContent) {
+        modalContent.scrollTop = 0;
+    }
+
+    // 2. Hitta din lista inuti
+    const list = document.getElementById("exercise-picker-list");
+    if (list) {
+        list.scrollTop = 0;
+    }
+}, 50);
 }
 
 function addExerciseToPassDirectly(pIdx, exId) {
