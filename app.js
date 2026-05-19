@@ -915,7 +915,7 @@ function renderExercisePickerForEdit(idx, category = "Ben") {
 
     html += `<p style="font-size:11px; text-transform:uppercase; color:var(--text-light); text-align:center; margin-bottom:10px;">Övningar (${category}):</p>`;
     
-    // PUNKT 1: Här har jag lagt till id="exercise-picker-list"
+    // Lista med unikt ID för scroll-hantering
     html += `<div id="exercise-picker-list" style="max-height:400px; overflow-y:auto; padding-right:5px; background:rgba(0,0,0,0.2); border-radius:15px; padding:10px;">`;
     
     const filtered = masterExercises.filter(ex => category === "Armar" ? (ex.target === "Biceps" || ex.target === "Triceps") : ex.target === category);
@@ -933,21 +933,21 @@ function renderExercisePickerForEdit(idx, category = "Ben") {
     });
     html += `</div>`;
 
+    // Uppdatera DOM
     container.innerHTML = html;
 
-    // PUNKT 3: Här lägger vi till logiken som tvingar listan till toppen varje gång vi renderar
-   setTimeout(() => {
-    const list = document.getElementById("exercise-picker-list");
-    if (list) {
-        // Detta tvingar listan att hoppa till toppen, 
-        // oavsett hur CSS är skriven:
-        list.scrollTo({
-            top: 0,
-            left: 0,
-            behavior: 'instant' 
-        });
-    }
-}, 50);
+    // Tvinga scroll till toppen när innehållet renderats
+    setTimeout(() => {
+        const list = document.getElementById("exercise-picker-list");
+        if (list) {
+            list.scrollTo({
+                top: 0,
+                left: 0,
+                behavior: 'instant' 
+            });
+        }
+    }, 50);
+}
 
 function addExerciseToPassDirectly(pIdx, exId) {
     const ex = masterExercises.find(e => e.id == exId);
