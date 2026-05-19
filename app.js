@@ -88,11 +88,15 @@ function closeModal() {
 }
 
 function openModal() {
-    const modal = document.getElementById("workout-modal");
-    modal.classList.remove("hidden");
-    // En liten timeout säkerställer att scrollen faktiskt nollställs efter att innehållet laddats
+    const modal = document.getElementById("workout-modal"); // Använd ditt faktiska ID
+    modal.classList.remove("hidden"); // Behåll din nuvarande klass-hantering
+    
+    // Använd setTimeout för att garantera att innehållet hunnit renderas
     setTimeout(() => {
-        modal.scrollTo(0, 0);
+        const modalBody = document.getElementById("modal-body");
+        if (modalBody) {
+            modalBody.scrollTop = 0;
+        }
     }, 10);
 }
 
