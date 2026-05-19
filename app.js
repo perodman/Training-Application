@@ -565,17 +565,17 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
                 <div style="flex-grow: 1; height: 1px; background: rgba(255,255,255,0.08);"></div>
             </div>
             
-            <div class="plan-override-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; width: 100%;">`;
+            <div class="plan-override-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; width: 100%;">`;
             
             programData.routine.forEach((p, idx) => {
                 const isSelected = planned && p.id === planned.id;
                 
-                // En palett med RGB-baserade färger istället för Hex
+                // En palett med RGB-baserade färger
                 const colors = [
-                    { r: 239, g: 68,  b: 68 },   // 0: Röd (ef4444)
-                    { r: 59,  g: 130, b: 246 },  // 1: Blå (3b82f6)
-                    { r: 16,  g: 185, b: 129 },  // 2: Grön (10b981)
-                    { r: 168, g: 85,  b: 247 }   // 3: Lila (a855f7)
+                    { r: 239, g: 68,  b: 68 },   // 0: Röd
+                    { r: 59,  g: 130, b: 246 },  // 1: Blå
+                    { r: 16,  g: 185, b: 129 },  // 2: Grön
+                    { r: 168, g: 85,  b: 247 }   // 3: Lila
                 ];
                 
                 const colorIndex = idx % colors.length;
@@ -584,33 +584,33 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
                 // Om vald: full färg (1). Om ej vald: 25% styrka (0.25) på kantlinjen
                 const currentOpacity = isSelected ? "1" : "0.25";
                 
-                // Skapa RGBA-strängarna dynamiskt
                 const borderColor = `rgba(${c.r}, ${c.g}, ${c.b}, ${currentOpacity})`;
-                const btnBg = `rgba(${c.r}, ${c.g}, ${c.b}, 0.04)`; // Mycket svag bakgrundston jämt över alla
+                const btnBg = `rgba(${c.r}, ${c.g}, ${c.b}, 0.04)`;
 
                 const exList = p.exercises.map(e => `
-                    <div style="background: rgba(255,255,255,0.05); padding: 5px 8px; border-radius: 6px; margin-bottom: 4px; border-left: 2px solid rgba(${c.r}, ${c.g}, ${c.b}, 0.6); font-size: 10px; color: #ddd; display: flex; align-items: center;">
+                    <div style="background: rgba(255,255,255,0.05); padding: 6px 10px; border-radius: 6px; margin-bottom: 5px; border-left: 2px solid rgba(${c.r}, ${c.g}, ${c.b}, 0.6); font-size: 11px; color: #ddd; display: flex; align-items: center;">
                         <span style="margin-right: 6px; opacity: 0.5;">•</span> ${e.name}
                     </div>
                 `).join('');
 
                 html += `
-                <div style="display: flex; flex-direction: column; gap: 5px;">
+                <div style="display: flex; flex-direction: column; background: rgba(255, 255, 255, 0.02); border-radius: 12px; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.04);">
+                    
                     <button class="mode-btn plan-override-btn ${isSelected ? 'active-choice' : ''}" 
                             id="btn-ovr-${p.id}" 
                             onclick="setOverrideSilent('${dateStr}', '${p.id}')"
-                            style="margin: 0; padding: 12px; font-size: 13px; border-radius: 12px; font-weight: 600; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; width:100%;
+                            style="margin: 0; padding: 14px 12px; font-size: 13px; border-radius: 12px 12px 0 0; font-weight: 600; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; width:100%; border: none;
                                    background: ${isSelected ? 'rgba(255,255,255,0.1)' : btnBg} !important;
                                    border-top: 2px solid ${borderColor} !important;
                                    color: ${isSelected ? '#ffffff' : 'var(--text-light)'} !important;">
                         ${p.name}
                     </button>
                     
-                    <details style="width: 100%; text-align: center;">
-                        <summary style="list-style: none; font-size: 10px; color: var(--text-light); opacity: 0.6; cursor: pointer; padding: 4px; border-radius: 8px;">
+                    <details style="width: 100%; background: rgba(0, 0, 0, 0.12);">
+                        <summary style="list-style: none; font-size: 10px; color: var(--text-light); opacity: 0.7; cursor: pointer; padding: 8px 4px; text-align: center; border-top: 1px solid rgba(255,255,255,0.03); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; user-select: none;">
                             Innehåll ▾
                         </summary>
-                        <div style="text-align: left; padding: 8px; border-radius: 10px; margin-top: 4px; max-height: 120px; overflow-y: auto; background: rgba(0,0,0,0.1);">
+                        <div style="text-align: left; padding: 10px; border-top: 1px solid rgba(0,0,0,0.2); max-height: 140px; overflow-y: auto; background: rgba(0,0,0,0.2);">
                             ${exList}
                         </div>
                     </details>
@@ -618,7 +618,6 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
             });
             
             const isRestSelected = !planned;
-            // Vila-knappens kantlinje styrs också helt av om den är vald (full gul eller nedtonad gul)
             const restBorderColor = isRestSelected ? "rgba(253, 224, 71, 1)" : "rgba(253, 224, 71, 0.2)";
 
             html += `
