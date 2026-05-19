@@ -142,8 +142,6 @@ document.getElementById("timer-toggle-btn").onclick = () => {
 // --- ÖVNINGAR & INSTÄLLNINGAR ---
 function openCreateExerciseModal(callback = null) {
     const body = document.getElementById("modal-body");
-    
-    // ÄNDRING 1: Istället för att alltid välja "Ben", kollar vi vad du har valt i vyn just nu
     let selectedCategory = currentExerciseCategory || "Ben"; 
 
     const categories = [
@@ -157,16 +155,13 @@ function openCreateExerciseModal(callback = null) {
 
     body.innerHTML = `
         <h3 style="text-align:center; margin-bottom: 20px;">Skapa Ny Övning</h3>
-        
         <div style="display: flex; flex-direction: column; align-items: center; gap: 10px;">
             <div style="width: 100%; max-width: 300px;">
                 <label style="font-size:11px; color:var(--text-light); text-transform: uppercase; letter-spacing: 1px; display:block; margin-bottom: 8px; text-align: center;">Namn på övning</label>
                 <input type="text" id="new-ex-name" class="log-input" placeholder="T.ex. Knäböj" style="text-align: center;">
             </div>
-
             <div style="width: 100%;">
                 <label style="font-size:11px; color:var(--text-light); text-transform: uppercase; letter-spacing: 1px; display:block; margin-bottom: 12px; text-align: center;">Välj Kategori</label>
-                
                 <div id="category-selector-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 0 10px;">
                     ${categories.map(cat => `
                         <div class="cat-select-item ${cat.id === selectedCategory ? 'active' : ''}" 
@@ -179,19 +174,11 @@ function openCreateExerciseModal(callback = null) {
                     `).join('')}
                 </div>
             </div>
-
             <button class="mode-btn blue" id="save-new-ex-btn" style="width: 100%; max-width: 300px; margin-top: 10px;">Spara Övning</button>
         </div>
-
         <style>
-            .cat-select-item.active {
-                background: rgba(59, 130, 246, 0.2) !important;
-                border-color: var(--primary) !important;
-                box-shadow: 0 0 15px rgba(59, 130, 246, 0.2);
-            }
-            .cat-select-item.active div {
-                color: var(--text) !important;
-            }
+            .cat-select-item.active { background: rgba(59, 130, 246, 0.2) !important; border-color: var(--primary) !important; box-shadow: 0 0 15px rgba(59, 130, 246, 0.2); }
+            .cat-select-item.active div { color: var(--text) !important; }
         </style>
     `;
 
@@ -214,16 +201,20 @@ function openCreateExerciseModal(callback = null) {
         };
         
         masterExercises.push(newEx);
+        
+        // Se till att övningen läggs till i det temporära valet direkt
+        if (typeof temporarySelectedExercises !== 'undefined') {
+            temporarySelectedExercises.push(newEx.id);
+        }
+        
         saveAll();
         
         if(callback) callback(newEx);
         else { 
             closeModal(); 
-            // ÄNDRING 2: Vi filtrerar på 'selectedCategory' så att vyn hoppar till den nya övningens kategori
             filterExercises(selectedCategory); 
         }
     };
-    
     openModal();
 }
 
@@ -1577,20 +1568,17 @@ function confirmAndAddAllSelectedExercises() {
     const startIdx = activeDraft.workout.exercises.length;
 
     temporarySelectedExercises.forEach((exId, loopIdx) => {
-        // Hitta övningen i huvudlistan
         let ex = masterExercises.find(e => e.id == exId);
         
-        // Säkerhetskoll: Om den inte hittas, avbryt inte allt, bara hoppa över denna
         if (!ex) {
-            console.warn("Övning med ID saknas i master-listan:", exId);
+            console.warn("Kunde inte hitta övning med ID:", exId);
             return; 
         }
         
         const newExObj = { name: ex.name, target: ex.target };
         let newDataEntry;
-        
-        // Hämta historik korrekt
         const history = getExerciseHistory(ex.name);
+        
         if (history && history.length > 0) {
             newDataEntry = { sets_data: JSON.parse(JSON.stringify(history)), isCompleted: false };
         } else {
@@ -1603,7 +1591,6 @@ function confirmAndAddAllSelectedExercises() {
         activeDraft.workout.exercises.push(newExObj);
         activeDraft.data.push(newDataEntry);
 
-        // UI-logik för att öppna den nya övningen i ett Fritt Pass
         if (isFrittPass) {
             const currentInsertedIndex = startIdx + loopIdx;
             if (!activeDraft.ui_state.openExercises) activeDraft.ui_state.openExercises = [];
@@ -1613,7 +1600,6 @@ function confirmAndAddAllSelectedExercises() {
         }
     });
     
-    // Viktigt: Rensa listan och spara
     temporarySelectedExercises = [];
     persistActiveWorkout();
     closeModal();
