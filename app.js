@@ -89,23 +89,9 @@ function closeModal() {
 
 function openModal() {
     const modal = document.getElementById("workout-modal");
-    if (!modal) return; // Säkerhetskoll: Avbryt om modalen inte finns
-    
-    modal.classList.remove("hidden");
-    
-    setTimeout(() => {
-        // Nollställ endast om elementet faktiskt existerar
-        const modalBody = document.getElementById("modal-body");
-        if (modalBody) {
-            modalBody.scrollTop = 0;
-        }
-
-        // Nollställ listan endast om den finns i just denna vy
-        const exerciseList = document.getElementById("exercise-picker-list");
-        if (exerciseList) {
-            exerciseList.scrollTop = 0;
-        }
-    }, 10);
+    if (modal) {
+        modal.classList.remove("hidden");
+    }
 }
 
 // --- TIMER LOGIK ---
