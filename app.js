@@ -1151,13 +1151,9 @@ function renderActiveWorkout() {
     if (activeDraft && activeDraft.data) {
         activeDraft.data.forEach((exerciseData, i) => {
             if (!exerciseData.isCompleted && exerciseData.sets_data) {
-                const hasInputValues = exerciseData.sets_data.some(s => s.weight || s.reps);
                 const isBrandNewAndGhostChecked = exerciseData.sets_data.every(s => s.userConfirmed === true) && !activeDraft.ui_state?.openExercises?.includes(i);
-                
                 if (isBrandNewAndGhostChecked && exerciseData.sets_data.length > 0) {
-                    exerciseData.sets_data.forEach(set => {
-                        set.userConfirmed = false;
-                    });
+                    exerciseData.sets_data.forEach(set => { set.userConfirmed = false; });
                 }
             }
         });
@@ -1190,16 +1186,13 @@ function renderActiveWorkout() {
     if (!activeDraft.ui_state.openExercises) activeDraft.ui_state.openExercises = [];
 
     const isFrittPass = activeDraft.workout.name === "Fritt Pass";
-    if (!isFrittPass) {
-        if (!activeDraft.ui_state.hasOwnProperty('hasInitializedOpen')) {
-            activeDraft.ui_state.openExercises = [0];
-            activeDraft.ui_state.hasInitializedOpen = true;
-            if (typeof saveAll === "function") saveAll();
-        }
+    if (!isFrittPass && !activeDraft.ui_state.hasOwnProperty('hasInitializedOpen')) {
+        activeDraft.ui_state.openExercises = [0];
+        activeDraft.ui_state.hasInitializedOpen = true;
+        if (typeof saveAll === "function") saveAll();
     }
     
     const openExercises = activeDraft.ui_state.openExercises;
-    // Beräkna timer-texten här
     const timerDisplay = restTimerInterval ? `${Math.floor(restTimerSeconds/60)}:${(restTimerSeconds%60).toString().padStart(2, '0')}` : "⏱️";
 
     activeDraft.workout.exercises.forEach((ex, i) => {
