@@ -558,6 +558,13 @@ function clearLongPress() {
         clearTimeout(touchTimeout);
         touchTimeout = null;
     }
+    
+    // Säkerhetsåtgärd: Om användaren avbryter (t.ex. genom att dra bort fingret),
+    // se till att preview-modalen stängs om den ligger och spökar.
+    const previewModal = document.getElementById("preview-modal");
+    if (previewModal && previewModal.style.display !== "none") {
+        closePreviewModal();
+    }
 }
 
 // Denna funktion anropar vi vid både 'up' och 'leave'
