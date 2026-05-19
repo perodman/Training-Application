@@ -483,27 +483,30 @@ function openProgramPreviewModal(idx) {
 }
 
 // GLOBALA VARIABLER FÖR LÅNGTRYCK OCH SCROLL-ACCURACY
-let touchTimeout = null;
+let pressTimer;
 let isLongPress = false;
 let touchStartY = 0;
 let hasScrolled = false;
 
 function startPress(idx, event) {
+    // 1. SÄKERHETSKONTROLL: ENDAST om det är en knapp med klassen 'plan-override-btn'
+    if (!event.target.classList.contains('plan-override-btn')) return;
+
     isLongPress = false;
     hasScrolled = false;
-
-    // Om det är ett touch-event (mobil), spara startpositionen i Y-led
-    if (event && event.touches && event.touches[0]) {
-        touchStartY = event.touches[0].clientY;
-    } else {
-        touchStartY = 0;
-    }
-
+    
     // Starta timern på 500ms
-    touchTimeout = setTimeout(() => {
+    pressTimer = setTimeout(() => {
         isLongPress = true;
         openProgramPreviewModal(idx);
     }, 500);
+}
+
+function cancelPress() {
+    if (pressTimer) {
+        clearTimeout(pressTimer);
+        pressTimer = null;
+    }
 }
 
 function handleTouchMove(event) {
@@ -540,13 +543,6 @@ function handleTouchEnd(idx, dateStr, programId, event) {
     setOverrideSilent(dateStr, programId);
 }
 
-function cancelPress() {
-    if (touchTimeout) {
-        clearTimeout(touchTimeout);
-        touchTimeout = null;
-    }
-}
-
 // FUNKTION: Öppnar en renodlad popup-ruta med övningarna (Med mjuk animation)
 function openProgramPreviewModal(idx) {
     const pass = programData.routine[idx];
@@ -576,7 +572,7 @@ function openProgramPreviewModal(idx) {
 
     previewModal.innerHTML = `
         <div id="preview-modal-card" class="card glass" style="width: 90%; max-width: 400px; padding: 20px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); background: rgba(15, 23, 42, 0.95); margin-top: 40px; 
-             transition: all 0.2s ease-out; transform: scale(0.95); opacity: 0;">
+           transition: all 0.2s ease-out; transform: scale(0.95); opacity: 0;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.08);">
                 <h3 style="margin: 0; font-size: 20px; color: #fff;">${pass.name}</h3>
                 <button onclick="closePreviewModal()" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: var(--text-light); cursor: pointer; font-size: 14px; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">✖</button>
