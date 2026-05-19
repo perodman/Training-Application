@@ -553,6 +553,18 @@ function clearLongPress() {
     }
 }
 
+let touchTimeout;
+
+function startLongPress(event, idx) {
+    // Rensa eventuella gamla timrar först
+    clearLongPress();
+    
+    // Starta den nya
+    touchTimeout = setTimeout(() => {
+        openProgramPreviewModal(idx);
+    }, 500);
+}
+
 // FUNKTION: Öppnar en renodlad popup-ruta med övningarna (Med mjuk animation)
 function openProgramPreviewModal(idx) {
     const pass = programData.routine[idx];
