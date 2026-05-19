@@ -1353,6 +1353,7 @@ function openReplaceExerciseModal(index) {
     openModal();
 }
 
+// UPPDATERAD FUNKTION: Renderar nu den visuella listan över valda övningar (Varukorgen)
 function renderExercisePicker(category, replaceIndex = null) {
     const body = document.getElementById("modal-body");
     
@@ -1381,7 +1382,7 @@ function renderExercisePicker(category, replaceIndex = null) {
     html += `</div>`;
     
     html += `<p style="font-size:11px; text-transform:uppercase; color:var(--text-light); text-align:center; margin-bottom:10px;">Övningar (${category}):</p>`;
-    html += `<div style="max-height:400px; overflow-y:auto; padding-right:5px; background:rgba(0,0,0,0.2); border-radius:15px; padding:10px; margin-bottom:15px; display:flex; flex-direction:column; gap:8px;">`;
+    html += `<div style="max-height:280px; overflow-y:auto; padding-right:5px; background:rgba(0,0,0,0.2); border-radius:15px; padding:10px; margin-bottom:15px; display:flex; flex-direction:column; gap:8px;">`;
     
     const filtered = masterExercises.filter(ex => category === "Armar" ? (ex.target === "Biceps" || ex.target === "Triceps") : ex.target === category);
     
@@ -1395,9 +1396,13 @@ function renderExercisePicker(category, replaceIndex = null) {
         const currentBorder = isSelectedInBatch ? '1px solid #22c55e' : '1px solid rgba(255,255,255,0.08)';
         const currentIcon = replaceIndex !== null ? '🔄' : (isSelectedInBatch ? '✅' : '+');
 
+        const clickHandler = replaceIndex !== null 
+            ? `confirmAddExerciseToActive(${ex.id}, ${replaceIndex})` 
+            : `toggleSelectExerciseInPicker(${ex.id}, '${category}')`;
+
         html += `
         <div class="card glass" id="picker-ex-${ex.id}" style="padding:12px; margin:0; cursor:pointer; display:flex; justify-content:space-between; align-items:center; border-radius:12px; background: ${currentBg} !important; border: ${currentBorder} !important; transition: all 0.2s;" 
-             onclick="${replaceIndex !== null ? `confirmAddExerciseToActive(${ex.id}, ${replaceIndex})` : `toggleSelectExerciseInPicker(${ex.id}, '${category}')` || ''}">
+             onclick="${clickHandler}">
             <span style="font-size:13px; font-weight:600;">${ex.name}</span>
             <span id="picker-icon-${ex.id}" style="color:${isSelectedInBatch ? '#22c55e' : 'var(--primary)'}; font-size:18px; font-weight:bold;">${currentIcon}</span>
         </div>`;
@@ -1405,12 +1410,10 @@ function renderExercisePicker(category, replaceIndex = null) {
     html += `</div>`;
 
     if (replaceIndex === null) {
-        const hasChoices = temporarySelectedExercises.length > 0;
-        html += `
-            <button id="multi-save-exercises-btn" class="mode-btn green" style="width: 100%; padding: 15px; font-weight: bold; margin-bottom: 15px; box-shadow: 0 4px 15px rgba(34, 197, 94, 0.4); display: ${hasChoices ? 'block' : 'none'};" onclick="confirmAndAddAllSelectedExercises()">
-                Lägg till ${temporarySelectedExercises.length} valda övningar ➕
-            </button>
-        `;
+        // Generera listan över valda övningar (Varukorgen) dynamically
+        html += `<div id="selected-summary-container" style="margin-bottom:15px;">`;
+        html += generateSelectedExercisesSummaryHtml();
+        html += `</div>`;
     }
 
     html += `
@@ -1421,6 +1424,38 @@ function renderExercisePicker(category, replaceIndex = null) {
     body.innerHTML = html;
 }
 
+// NY HJÄLPFUNKTION: Bygger HTML för listan över valda övningar direkt ovanför sparaknappen
+function generateSelectedExercisesSummaryHtml() {
+    const hasChoices = temporarySelectedExercises.length > 0;
+    if (!hasChoices) return "";
+
+    let summaryHtml = `
+        <p style="font-size:11px; text-transform:uppercase; color:var(--text-light); margin-bottom:8px; font-weight:600; letter-spacing:0.5px;">Valda övningar i detta svep:</p>
+        <div style="display:flex; flex-wrap:wrap; gap:6px; background:rgba(255,255,255,0.03); padding:10px; border-radius:12px; border:1px solid rgba(255,255,255,0.05); max-height:100px; overflow-y:auto; margin-bottom:12px;">
+    `;
+
+    temporarySelectedExercises.forEach(exId => {
+        const ex = masterExercises.find(e => e.id == exId);
+        if (ex) {
+            summaryHtml += `
+                <span style="font-size:12px; background:rgba(34, 197, 94, 0.15); color:#22c55e; border:1px solid rgba(34, 197, 94, 0.3); padding:4px 10px; border-radius:20px; display:inline-flex; align-items:center; gap:4px; font-weight:500;">
+                    ${ex.name}
+                </span>
+            `;
+        }
+    });
+
+    summaryHtml += `</div>`;
+    summaryHtml += `
+        <button id="multi-save-exercises-btn" class="mode-btn green" style="width: 100%; padding: 15px; font-weight: bold; box-shadow: 0 4px 15px rgba(34, 197, 94, 0.4);" onclick="confirmAndAddAllSelectedExercises()">
+            Lägg till ${temporarySelectedExercises.length} valda övningar ➕
+        </button>
+    `;
+
+    return summaryHtml;
+}
+
+// UPPDATERAD FUNKTION: Uppdaterar nu varukorgslistan live istället för att bara gömma/visa en knapp
 function toggleSelectExerciseInPicker(exId, category) {
     const index = temporarySelectedExercises.indexOf(exId);
     const card = document.getElementById(`picker-ex-${exId}`);
@@ -1448,10 +1483,10 @@ function toggleSelectExerciseInPicker(exId, category) {
         }
     }
     
-    const saveBtn = document.getElementById("multi-save-exercises-btn");
-    if (saveBtn) {
-        saveBtn.innerHTML = `Lägg till ${temporarySelectedExercises.length} valda övningar ➕`;
-        saveBtn.style.display = temporarySelectedExercises.length > 0 ? "block" : "none";
+    // Uppdatera hela sammanfattningen live!
+    const container = document.getElementById("selected-summary-container");
+    if (container) {
+        container.innerHTML = generateSelectedExercisesSummaryHtml();
     }
 }
 
@@ -1503,29 +1538,23 @@ function confirmAndAddAllSelectedExercises() {
     renderActiveWorkout();
 }
 
-// UPPDATERAD FUNKTION: Hanterar fallet när en helt ny övning har skapats i systemet
 function handleInstantExerciseCreated(newEx, replaceIndex = null) {
     if (replaceIndex !== null) {
-        // Om vi höll på att Byt ut en enskild övning kör vi på som vanligt direkt
         confirmAddExerciseToActive(newEx.id, replaceIndex);
     } else {
-        // Om vi håller på att samla på oss övningar (Fritt pass):
-        // 1. Lägg till den nyskapade övningens ID i vår temporära varukorg direkt!
         if (!temporarySelectedExercises.includes(newEx.id)) {
             temporarySelectedExercises.push(newEx.id);
         }
         
-        // 2. Ta reda på vilken kategori den tillhör så vi kan öppna rätt flik igen
-        let categoryToOpen = "Ben"; // Standardfall
+        let categoryToOpen = "Ben"; 
         if (newEx.target) {
             if (newEx.target === "Biceps" || newEx.target === "Triceps") {
                 categoryToOpen = "Armar";
             } else {
-                categoryToOpen = newEx.target; // T.ex Bröst, Rygg, Axlar...
+                categoryToOpen = newEx.target; 
             }
         }
         
-        // 3. Öppna och rita upp övningsväljaren igen med den nya övningen vald och markerad i listan!
         renderExercisePicker(categoryToOpen, null);
     }
 }
@@ -1582,12 +1611,37 @@ function confirmSet(exIdx, setIdx) {
     window.scrollTo(0, scrollPos);
 }
 
+// UPPDATERAD FUNKTION: Sparar och återställer scrollpositionen så att sidan inte "hoppar upp"
 function moveActiveExercise(i, dir) {
+    const scrollPos = window.scrollY; // 1. Spara nuvarande scrollposition
     const newIdx = i + dir;
     if(newIdx < 0 || newIdx >= activeDraft.workout.exercises.length) return;
+    
     [activeDraft.workout.exercises[i], activeDraft.workout.exercises[newIdx]] = [activeDraft.workout.exercises[newIdx], activeDraft.workout.exercises[i]];
     [activeDraft.data[i], activeDraft.data[newIdx]] = [activeDraft.data[newIdx], activeDraft.data[i]];
+    
+    if (activeDraft.ui_state && activeDraft.ui_state.openExercises) {
+        const openExercises = activeDraft.ui_state.openExercises;
+        const iIsOpen = openExercises.includes(i);
+        const newIdxIsOpen = openExercises.includes(newIdx);
+        
+        if (iIsOpen && !newIdxIsOpen) {
+            openExercises.splice(openExercises.indexOf(i), 1);
+            openExercises.push(newIdx);
+        } else if (!iIsOpen && newIdxIsOpen) {
+            openExercises.splice(openExercises.indexOf(newIdx), 1);
+            openExercises.push(i);
+        }
+    }
+
+    if (typeof saveAll === "function") {
+        saveAll();
+    } else {
+        localStorage.setItem("activeWorkoutDraft", JSON.stringify(activeDraft));
+    }
+    
     renderActiveWorkout();
+    window.scrollTo(0, scrollPos); // 2. Scrolla direkt tillbaka till samma ställe
 }
 
 function removeActiveExercise(exIdx) {
