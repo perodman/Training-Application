@@ -540,29 +540,11 @@ function handleTouchEnd(idx, dateStr, programId, event) {
     setOverrideSilent(dateStr, programId);
 }
 
-let touchTimeout;
-
-function startLongPress(event, idx) {
-    // 1. Rensa alltid först så vi inte har flera timrar igång
-    clearLongPress();
-    
-    // 2. Starta den nya
-    touchTimeout = setTimeout(() => {
-        openProgramPreviewModal(idx);
-        touchTimeout = null; // Nollställ när den väl kört
-    }, 500);
-}
-
-function clearLongPress() {
+function cancelPress() {
     if (touchTimeout) {
         clearTimeout(touchTimeout);
         touchTimeout = null;
     }
-}
-
-// Denna funktion anropar vi vid både 'up' och 'leave'
-function cancelPress() {
-    clearLongPress();
 }
 
 // FUNKTION: Öppnar en renodlad popup-ruta med övningarna (Med mjuk animation)
