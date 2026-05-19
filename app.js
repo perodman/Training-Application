@@ -500,7 +500,7 @@ function cancelPress() {
     }
 }
 
-// NY FUNKTION: Öppnar en renodlad popup-ruta med övningarna
+// NY FUNKTION: Öppnar en renodlad popup-ruta med övningarna (Nu högre upp och rymligare)
 function openProgramPreviewModal(idx) {
     const pass = programData.routine[idx];
     
@@ -517,19 +517,20 @@ function openProgramPreviewModal(idx) {
         previewModal.style.backdropFilter = "blur(8px)";
         previewModal.style.display = "flex";
         previewModal.style.justifyContent = "center";
-        previewModal.style.alignItems = "center";
+        previewModal.style.alignItems = "flex-start"; // Ändrat till flex-start för att trycka upp modalen
         previewModal.style.zIndex = "10000"; 
         document.body.appendChild(previewModal);
     }
 
+    // Ger kortet 40px marginal från toppen av skärmen och tillåter listan att ta upp till 65% av skärmhöjden
     previewModal.innerHTML = `
-        <div class="card glass" style="width: 90%; max-width: 400px; padding: 20px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); background: rgba(15, 23, 42, 0.95); animation: modalFadeIn 0.2s ease-out;">
+        <div class="card glass" style="width: 90%; max-width: 400px; padding: 20px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); background: rgba(15, 23, 42, 0.95); margin-top: 40px; animation: modalFadeIn 0.2s ease-out;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.08);">
                 <h3 style="margin: 0; font-size: 20px; color: #fff;">${pass.name}</h3>
                 <button onclick="document.getElementById('preview-modal').style.display='none'" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: var(--text-light); cursor: pointer; font-size: 14px; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">✖</button>
             </div>
             
-            <div style="max-height: 300px; overflow-y: auto; display: flex; flex-direction: column; gap: 2px;">
+            <div style="max-height: 65vh; overflow-y: auto; display: flex; flex-direction: column; gap: 2px;">
                 ${pass.exercises.map(e => `
                     <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 4px; border-bottom: 1px solid rgba(255,255,255,0.03);">
                         <span style="font-weight: 600; color: #ffffff; font-size: 14px;">${e.name}</span>
@@ -547,7 +548,7 @@ function openProgramPreviewModal(idx) {
     previewModal.style.display = "flex";
 }
 
-// HUVUDFUNKTIONEN (Uppdaterad för att hantera Long-Press istället för klick-ikon)
+// HUVUDFUNKTIONEN (Inkluderar nu den nya tips-texten)
 function openDayManager(dateStr, planned, completed, isOngoing) {
     if (typeof hideDefaultCloseButton === 'function') {
         hideDefaultCloseButton(false);
@@ -671,13 +672,17 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
             </button>
         </div>`;
 
-        // ÄNDRA PLANERING - SEKTIONSAVSKILJARE
+        // ÄNDRA PLANERING - SEKTIONSAVSKILJARE MED DISKRET VEGLEDNINGSTEXT
         html += `
         <div style="margin-top: 1px; width: 100%;">
-            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px;">
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 4px;">
                 <div style="flex-grow: 1; height: 1px; background: rgba(255,255,255,0.08);"></div>
                 <p style="font-size: 12px; text-transform: uppercase; color: var(--text-light); font-weight: 700; letter-spacing: 1px; margin: 0 !important; white-space: nowrap;">Ändra planering</p>
                 <div style="flex-grow: 1; height: 1px; background: rgba(255,255,255,0.08);"></div>
+            </div>
+            
+            <div style="text-align: center; margin-bottom: 12px;">
+                <span style="font-size: 11px; color: var(--text-light); opacity: 0.5; font-weight: 500; letter-spacing: 0.3px;">💡 Håll inne ett pass för att se övningar</span>
             </div>
             
             <div class="plan-override-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; width: 100%;">`;
