@@ -114,7 +114,7 @@ function startTimer() {
         updateTimerDisplay();
         if(activeDraft) {
             activeDraft.secondsElapsed = secondsElapsed;
-            localStorage.setItem("activeWorkoutDraft", JSON.stringify(activeDraft));
+            persistActiveWorkout();
         }
     }, 1000);
 }
@@ -124,7 +124,7 @@ function pauseTimer() {
     if(activeDraft) activeDraft.wasTimerRunning = false;
     clearInterval(timerInterval);
     document.getElementById("timer-toggle-btn").textContent = "Fortsätt ▶️";
-    if(activeDraft) localStorage.setItem("activeWorkoutDraft", JSON.stringify(activeDraft));
+    if(activeDraft) persistActiveWorkout();
 }
 
 document.getElementById("timer-toggle-btn").onclick = () => {
@@ -1101,7 +1101,7 @@ function startWorkout(workout, data = null, date = null, isImmediateStart = fals
         wasTimerRunning: true 
     };
     
-    localStorage.setItem("activeWorkoutDraft", JSON.stringify(activeDraft));
+    persistActiveWorkout();
     renderActiveWorkout();
     updateTimerDisplay();
     startTimer(); 
@@ -1303,7 +1303,7 @@ function toggleExercise(index) {
         activeDraft.ui_state.openExercises.push(index);
     }
 
-    localStorage.setItem("activeWorkoutDraft", JSON.stringify(activeDraft));
+    persistActiveWorkout();
     renderActiveWorkout();
     window.scrollTo(0, scrollPos);
 }
@@ -1316,7 +1316,7 @@ function addSetToExercise(exIdx) {
     activeDraft.data[exIdx].sets_data.push({ weight: newWeight, reps: newReps });
     renderActiveWorkout();
     window.scrollTo(0, scrollPos);
-    localStorage.setItem("activeWorkoutDraft", JSON.stringify(activeDraft));
+    persistActiveWorkout();
 }
 
 function removeSetFromExercise(exIdx, setIdx) {
@@ -1324,7 +1324,7 @@ function removeSetFromExercise(exIdx, setIdx) {
     activeDraft.data[exIdx].sets_data.splice(setIdx, 1);
     renderActiveWorkout();
     window.scrollTo(0, scrollPos);
-    localStorage.setItem("activeWorkoutDraft", JSON.stringify(activeDraft));
+    persistActiveWorkout();
 }
 
 function toggleExerciseDone(exIdx) {
@@ -1332,13 +1332,13 @@ function toggleExerciseDone(exIdx) {
     activeDraft.data[exIdx].isCompleted = !activeDraft.data[exIdx].isCompleted;
     renderActiveWorkout();
     window.scrollTo(0, scrollPos);
-    localStorage.setItem("activeWorkoutDraft", JSON.stringify(activeDraft));
+    persistActiveWorkout();
 }
 
 function actuallyStartWorkout() {
     activeDraft.isStarted = true;
     activeDraft.wasTimerRunning = true;
-    localStorage.setItem("activeWorkoutDraft", JSON.stringify(activeDraft));
+    persistActiveWorkout();
     renderActiveWorkout();
     if (typeof startTimer === "function") startTimer();
 }
@@ -1490,6 +1490,7 @@ function toggleSelectExerciseInPicker(exId, category) {
     }
 }
 
+// 4. Den städade confirmAndAddAllSelectedExercises
 function confirmAndAddAllSelectedExercises() {
     if (temporarySelectedExercises.length === 0) return;
     
@@ -1501,7 +1502,6 @@ function confirmAndAddAllSelectedExercises() {
         if (!ex) return;
         
         const newExObj = { name: ex.name, target: ex.target };
-        
         let newDataEntry;
         const history = getExerciseHistory(ex.name);
         if (history) {
@@ -1515,25 +1515,15 @@ function confirmAndAddAllSelectedExercises() {
 
         if (isFrittPass) {
             const currentInsertedIndex = startIdx + loopIdx;
-            
             if (loopIdx === 0) {
                 if (!activeDraft.ui_state.openExercises.includes(currentInsertedIndex)) {
                     activeDraft.ui_state.openExercises.push(currentInsertedIndex);
-                }
-            } else {
-                const openArrIndex = activeDraft.ui_state.openExercises.indexOf(currentInsertedIndex);
-                if (openArrIndex > -1) {
-                    activeDraft.ui_state.openExercises.splice(openArrIndex, 1);
                 }
             }
         }
     });
     
-    if (typeof saveAll === "function") {
-        saveAll();
-    } else {
-        localStorage.setItem("activeWorkoutDraft", JSON.stringify(activeDraft));
-    }
+    persistActiveWorkout();
     closeModal();
     renderActiveWorkout();
 }
@@ -1584,11 +1574,7 @@ function confirmAddExerciseToActive(exId, replaceIndex = null) {
         }
     }
     
-    if (typeof saveAll === "function") {
-        saveAll();
-    } else {
-        localStorage.setItem("activeWorkoutDraft", JSON.stringify(activeDraft));
-    }
+    persistActiveWorkout();
     closeModal();
     renderActiveWorkout();
 }
@@ -1598,7 +1584,7 @@ function updateSetDataOnly(exIdx, setIdx) {
     const rVal = document.getElementById(`r-${exIdx}-${setIdx}`).value;
     activeDraft.data[exIdx].sets_data[setIdx].weight = wVal;
     activeDraft.data[exIdx].sets_data[setIdx].reps = rVal;
-    localStorage.setItem("activeWorkoutDraft", JSON.stringify(activeDraft));
+    persistActiveWorkout();
 }
 
 function confirmSet(exIdx, setIdx) {
@@ -1606,12 +1592,12 @@ function confirmSet(exIdx, setIdx) {
     const currentState = activeDraft.data[exIdx].sets_data[setIdx].userConfirmed;
     activeDraft.data[exIdx].sets_data[setIdx].userConfirmed = !currentState;
     
-    localStorage.setItem("activeWorkoutDraft", JSON.stringify(activeDraft));
+    persistActiveWorkout();
     renderActiveWorkout();
     window.scrollTo(0, scrollPos);
 }
 
-// 1. Denna funktion fungerar som din "Master-save"
+// --- DIN MASTER-FUNKTION ---
 function persistActiveWorkout() {
     if (typeof saveAll === "function") {
         saveAll();
@@ -1620,17 +1606,16 @@ function persistActiveWorkout() {
     }
 }
 
-// 2. Din uppdaterade, städade moveActiveExercise
+// --- UPPDATERADE FUNKTIONER ---
+
 function moveActiveExercise(i, dir) {
     const scrollPos = window.scrollY;
     const newIdx = i + dir;
     if (newIdx < 0 || newIdx >= activeDraft.workout.exercises.length) return;
     
-    // Flytta övningarna
     [activeDraft.workout.exercises[i], activeDraft.workout.exercises[newIdx]] = [activeDraft.workout.exercises[newIdx], activeDraft.workout.exercises[i]];
     [activeDraft.data[i], activeDraft.data[newIdx]] = [activeDraft.data[newIdx], activeDraft.data[i]];
     
-    // Synka openExercises (håller koll på vilken box som är öppen)
     if (activeDraft.ui_state && activeDraft.ui_state.openExercises) {
         const openExercises = activeDraft.ui_state.openExercises;
         const iIsOpen = openExercises.includes(i);
@@ -1645,9 +1630,7 @@ function moveActiveExercise(i, dir) {
         }
     }
     
-    // Använd din nya, enkla spara-funktion
     persistActiveWorkout();
-    
     renderActiveWorkout();
     window.scrollTo(0, scrollPos);
 }
@@ -1662,7 +1645,7 @@ function removeActiveExercise(exIdx) {
             <h3 style="color:var(--danger);">Ta bort övningen?</h3>
             <p style="color:var(--text-light); margin-bottom:25px; font-size:14px;">Är du säker på att du vill ta bort den här övningen från ditt pågående pass?</p>
             <button class="mode-btn" style="background:linear-gradient(135deg, #ef4444 0%, #b91c1c 100%); color:white; margin-bottom:12px; font-weight:700;" 
-                onclick="activeDraft.workout.exercises.splice(${exIdx}, 1); activeDraft.data.splice(${exIdx}, 1); if(typeof saveAll === 'function'){saveAll();}else{localStorage.setItem('activeWorkoutDraft', JSON.stringify(activeDraft));} closeModal(); renderActiveWorkout();">
+                onclick="activeDraft.workout.exercises.splice(${exIdx}, 1); activeDraft.data.splice(${exIdx}, 1); persistActiveWorkout(); closeModal(); renderActiveWorkout();">
                 Ja, radera
             </button>
             <button class="mode-btn glass-border" onclick="closeModal()">Avbryt</button>
