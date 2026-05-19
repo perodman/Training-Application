@@ -1148,23 +1148,16 @@ function startWorkout(workout, data = null, date = null, isImmediateStart = fals
 let temporarySelectedExercises = [];
 
 function renderActiveWorkout() {
-    if (activeDraft && activeDraft.data) {
-        activeDraft.data.forEach((exerciseData, i) => {
-            if (!exerciseData.isCompleted && exerciseData.sets_data) {
-                const isBrandNewAndGhostChecked = exerciseData.sets_data.every(s => s.userConfirmed === true) && !activeDraft.ui_state?.openExercises?.includes(i);
-                if (isBrandNewAndGhostChecked && exerciseData.sets_data.length > 0) {
-                    exerciseData.sets_data.forEach(set => { set.userConfirmed = false; });
-                }
-            }
-        });
-    }
+    // 1. Spara fokus för att förhindra hopp
+    const activeElement = document.activeElement;
+    const activeId = activeElement ? activeElement.id : null;
 
     document.getElementById("active-title").textContent = activeDraft.workout.name;
     const list = document.getElementById("exercise-list");
     const footer = document.querySelector(".workout-footer");
     list.innerHTML = "";
 
-    if(!activeDraft.isStarted) {
+    if (!activeDraft.isStarted) {
         footer.classList.add("hidden");
         list.innerHTML = `
             <div style="text-align:center; padding:20px 0;">
@@ -1193,7 +1186,6 @@ function renderActiveWorkout() {
     }
     
     const openExercises = activeDraft.ui_state.openExercises;
-    const timerDisplay = restTimerInterval ? `${Math.floor(restTimerSeconds/60)}:${(restTimerSeconds%60).toString().padStart(2, '0')}` : "⏱️";
 
     activeDraft.workout.exercises.forEach((ex, i) => {
         const exerciseData = activeDraft.data[i];
@@ -1208,13 +1200,14 @@ function renderActiveWorkout() {
         const completedSets = exerciseData.sets_data.filter(s => s.userConfirmed).length;
         const totalSets = exerciseData.sets_data.length;
         
+        // Uppdaterad tabellrubrik med VILA
         let setsHtml = `<div style="margin-top:10px;">
-            <div style="display:grid; grid-template-columns: 40px 1fr 1fr 30px 40px; gap:8px; margin-bottom:5px; align-items:center;">
+            <div style="display:grid; grid-template-columns: 40px 1fr 1fr 50px 30px; gap:8px; margin-bottom:5px; align-items:center;">
                 <small style="text-align:left; padding-left:5px; color:var(--text-light); font-size:9px; font-weight:700;">SET</small>
                 <small style="text-align:center; color:var(--text-light); font-size:9px;">KG</small>
                 <small style="text-align:center; color:var(--text-light); font-size:9px;">REPS</small>
-                <span></span>
                 <small style="text-align:center; color:var(--text-light); font-size:9px;">VILA</small>
+                <span></span>
             </div>`;
 
         exerciseData.sets_data.forEach((set, sIdx) => {
@@ -1231,24 +1224,21 @@ function renderActiveWorkout() {
             let circleColor = showSuccess ? '#22c55e' : (isCurrent ? '#facc15' : '#f59e0b');
             const statusContent = showSuccess ? '✅' : `#${sIdx + 1}`;
 
+            // Här behåller vi både din gamla knapp och den nya inputen
             setsHtml += `
-            <div style="display:grid; grid-template-columns: 40px 1fr 1fr 30px 40px; gap:8px; margin-bottom:8px; align-items:center;">
+            <div style="display:grid; grid-template-columns: 40px 1fr 1fr 50px 30px; gap:8px; margin-bottom:8px; align-items:center;">
                 <div onclick="${isLocked && !isDone ? '' : `confirmSet(${i}, ${sIdx})`}" 
-                     style="width:32px; height:32px; border-radius:50%; border:2px solid ${circleColor}; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:10px; font-weight:800; background: ${showSuccess ? 'rgba(34, 197, 94, 0.2)' : (isCurrent ? 'rgba(250, 204, 21, 0.15)' : 'rgba(245, 158, 11, 0.05)')}; color: ${circleColor}; opacity: 1;">
+                     style="width:32px; height:32px; border-radius:50%; border:2px solid ${circleColor}; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:10px; font-weight:800; background: ${showSuccess ? 'rgba(34, 197, 94, 0.2)' : (isCurrent ? 'rgba(250, 204, 21, 0.15)' : 'rgba(245, 158, 11, 0.05)')}; color: ${circleColor};">
                     ${statusContent}
                 </div>
-                <input type="text" inputmode="decimal" id="w-${i}-${sIdx}" class="log-input" style="margin:0; padding:12px; font-size:18px; opacity: ${isCurrent ? '1' : '0.3'};" value="${set.weight || ''}" ${isLocked ? 'readonly' : ''} oninput="updateSetDataOnly(${i}, ${sIdx})">
-                <input type="text" inputmode="decimal" id="r-${i}-${sIdx}" class="log-input" style="margin:0; padding:12px; font-size:18px; opacity: ${isCurrent ? '1' : '0.3'};" value="${set.reps || ''}" ${isLocked ? 'readonly' : ''} oninput="updateSetDataOnly(${i}, ${sIdx})">
-                <button onclick="removeSetFromExercise(${i}, ${sIdx})" style="background:none; border:none; color:var(--danger); font-size:16px; opacity: ${isLocked || showSuccess ? '0.1' : '0.8'};" ${isLocked ? 'disabled' : ''}>×</button>
-                <button onclick="event.stopPropagation(); startRestTimer()" style="background:none; border:none; font-size:11px; opacity:0.6; cursor:pointer;">${timerDisplay}</button>
+                <input type="text" inputmode="decimal" id="w-${i}-${sIdx}" class="log-input" style="padding:8px; font-size:16px; opacity: ${isCurrent ? '1' : '0.3'};" value="${set.weight || ''}" ${isLocked ? 'readonly' : ''} oninput="updateSetDataOnly(${i}, ${sIdx})">
+                <input type="text" inputmode="decimal" id="r-${i}-${sIdx}" class="log-input" style="padding:8px; font-size:16px; opacity: ${isCurrent ? '1' : '0.3'};" value="${set.reps || ''}" ${isLocked ? 'readonly' : ''} oninput="updateSetDataOnly(${i}, ${sIdx})">
+                <div style="display:flex; flex-direction:column; gap:2px;">
+                    <input type="text" inputmode="decimal" id="rest-${i}-${sIdx}" class="log-input" style="padding:4px; font-size:12px; text-align:center; opacity:0.8;" value="${set.restTime || ''}" placeholder="s" oninput="updateSetDataOnly(${i}, ${sIdx})">
+                    <button onclick="event.stopPropagation(); startRestTimer()" style="background:none; border:none; font-size:9px; opacity:0.6; cursor:pointer;">⏱️</button>
+                </div>
+                <button onclick="removeSetFromExercise(${i}, ${sIdx})" style="background:none; border:none; color:var(--danger);" ${isLocked ? 'disabled' : ''}>×</button>
             </div>`;
-
-            if (isCurrent) {
-                setsHtml += `
-                <div style="grid-column: 2 / span 2; margin:-4px 0 8px 0; padding-left:2px; opacity:0.8; font-size:10px; color:var(--primary); font-weight:600; letter-spacing:0.3px;">
-                    💡 Klicka på ${statusContent} för att låsa & gå vidare
-                </div>`;
-            }
         });
 
         div.innerHTML = `
@@ -1290,6 +1280,12 @@ function renderActiveWorkout() {
     discardBtn.innerHTML = "Radera pass 🗑️";
     discardBtn.onclick = confirmDiscardActiveWorkout;
     list.appendChild(discardBtn);
+
+    // Återställ fokus (förhindrar hopp)
+    if (activeId) {
+        const el = document.getElementById(activeId);
+        if (el) el.focus();
+    }
 
     showView("workout-view");
 }
@@ -1366,11 +1362,14 @@ function startRestTimer() {
     restTimerSeconds = 0;
     if (restTimerInterval) clearInterval(restTimerInterval);
     
-    // Uppdatera timer varje sekund
+    // Starta timer
     restTimerInterval = setInterval(() => {
         restTimerSeconds++;
-        // Rendera om för att visa uppdaterad tid
-        if (typeof renderActiveWorkout === "function") renderActiveWorkout();
+        // Uppdatera bara texten i timern istället för att rendera om hela sidan
+        const timerEl = document.getElementById("rest-timer-display");
+        if (timerEl) {
+            timerEl.textContent = `${Math.floor(restTimerSeconds/60)}:${(restTimerSeconds%60).toString().padStart(2, '0')}`;
+        }
     }, 1000);
 }
 
@@ -1639,25 +1638,30 @@ function confirmAddExerciseToActive(exId, replaceIndex = null) {
     renderActiveWorkout();
 }
 
-function updateSetDataOnly(exIdx, setIdx) {
-    const wVal = document.getElementById(`w-${exIdx}-${setIdx}`).value;
-    const rVal = document.getElementById(`r-${exIdx}-${setIdx}`).value;
-    activeDraft.data[exIdx].sets_data[setIdx].weight = wVal;
-    activeDraft.data[exIdx].sets_data[setIdx].reps = rVal;
+function updateSetDataOnly(exIdx, sIdx) {
+    const w = document.getElementById(`w-${exIdx}-${sIdx}`).value;
+    const r = document.getElementById(`r-${exIdx}-${sIdx}`).value;
+    const rest = document.getElementById(`rest-${exIdx}-${sIdx}`) ? document.getElementById(`rest-${exIdx}-${sIdx}`).value : "";
+    
+    activeDraft.data[exIdx].sets_data[sIdx].weight = w;
+    activeDraft.data[exIdx].sets_data[sIdx].reps = r;
+    activeDraft.data[exIdx].sets_data[sIdx].restTime = rest; // Sparar vilotiden
+    
     persistActiveWorkout();
 }
 
-function confirmSet(exIdx, setIdx) {
-    // Stoppa vilan när man börjar logga/bekräfta ett set
-    stopRestTimer(); 
+function confirmSet(exIndex, setIndex) {
+    const exercise = activeDraft.data[exIndex];
+    const set = exercise.sets_data[setIndex];
     
-    const scrollPos = window.scrollY;
-    const currentState = activeDraft.data[exIdx].sets_data[setIdx].userConfirmed;
-    activeDraft.data[exIdx].sets_data[setIdx].userConfirmed = !currentState;
+    set.userConfirmed = !set.userConfirmed;
     
-    persistActiveWorkout();
-    renderActiveWorkout();
-    window.scrollTo(0, scrollPos);
+    // Om vi precis markerade som klart, starta vilan
+    if (set.userConfirmed) {
+        startRestTimer();
+    }
+    
+    renderActiveWorkout(); // Rendera om när du faktiskt klickar
 }
 
 // --- DIN MASTER-FUNKTION ---
