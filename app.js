@@ -547,6 +547,12 @@ function cancelPress() {
     }
 }
 
+function clearLongPress() {
+    if (typeof touchTimeout !== 'undefined') {
+        clearTimeout(touchTimeout);
+    }
+}
+
 // FUNKTION: Öppnar en renodlad popup-ruta med övningarna (Med mjuk animation)
 function openProgramPreviewModal(idx) {
     const pass = programData.routine[idx];
