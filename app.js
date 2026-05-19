@@ -1611,15 +1611,26 @@ function confirmSet(exIdx, setIdx) {
     window.scrollTo(0, scrollPos);
 }
 
-// UPPDATERAD FUNKTION: Sparar och återställer scrollpositionen så att sidan inte "hoppar upp"
+// 1. Denna funktion fungerar som din "Master-save"
+function persistActiveWorkout() {
+    if (typeof saveAll === "function") {
+        saveAll();
+    } else {
+        localStorage.setItem("activeWorkoutDraft", JSON.stringify(activeDraft));
+    }
+}
+
+// 2. Din uppdaterade, städade moveActiveExercise
 function moveActiveExercise(i, dir) {
-    const scrollPos = window.scrollY; // 1. Spara nuvarande scrollposition
+    const scrollPos = window.scrollY;
     const newIdx = i + dir;
-    if(newIdx < 0 || newIdx >= activeDraft.workout.exercises.length) return;
+    if (newIdx < 0 || newIdx >= activeDraft.workout.exercises.length) return;
     
+    // Flytta övningarna
     [activeDraft.workout.exercises[i], activeDraft.workout.exercises[newIdx]] = [activeDraft.workout.exercises[newIdx], activeDraft.workout.exercises[i]];
     [activeDraft.data[i], activeDraft.data[newIdx]] = [activeDraft.data[newIdx], activeDraft.data[i]];
     
+    // Synka openExercises (håller koll på vilken box som är öppen)
     if (activeDraft.ui_state && activeDraft.ui_state.openExercises) {
         const openExercises = activeDraft.ui_state.openExercises;
         const iIsOpen = openExercises.includes(i);
@@ -1633,15 +1644,12 @@ function moveActiveExercise(i, dir) {
             openExercises.push(i);
         }
     }
-
-    if (typeof saveAll === "function") {
-        saveAll();
-    } else {
-        localStorage.setItem("activeWorkoutDraft", JSON.stringify(activeDraft));
-    }
+    
+    // Använd din nya, enkla spara-funktion
+    persistActiveWorkout();
     
     renderActiveWorkout();
-    window.scrollTo(0, scrollPos); // 2. Scrolla direkt tillbaka till samma ställe
+    window.scrollTo(0, scrollPos);
 }
 
 function removeActiveExercise(exIdx) {
@@ -1901,3 +1909,4 @@ function confirmDiscardActiveWorkout() {
     `;
     openModal();
 }
+
