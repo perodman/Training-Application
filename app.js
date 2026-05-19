@@ -578,10 +578,12 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
                     { border: "#a855f7", bg: "rgba(168, 85, 247, 0.05)" }   // 3: Lila
                 ];
                 
-                // Beräknar ett index baserat på loopens varv (0, 1, 2, 3...)
                 const colorIndex = idx % colors.length;
                 const btnColor = colors[colorIndex].border;
                 const btnBg = colors[colorIndex].bg;
+
+                // DYNAMISK OPACITET: 1 (fullt synlig) om vald, annars 0.3 (nedtonad)
+                const lineOpacity = isSelected ? "1" : "0.3";
 
                 const exList = p.exercises.map(e => `
                     <div style="background: rgba(255,255,255,0.05); padding: 5px 8px; border-radius: 6px; margin-bottom: 4px; border-left: 2px solid ${btnColor}; font-size: 10px; color: #ddd; display: flex; align-items: center;">
@@ -597,6 +599,7 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
                             style="margin: 0; padding: 12px; font-size: 13px; border-radius: 12px; font-weight: 600; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; width:100%;
                                    background: ${isSelected ? 'rgba(255,255,255,0.1)' : btnBg} !important;
                                    border-top: 2px solid ${btnColor} !important;
+                                   opacity: ${lineOpacity}; /* Tonar ner hela knappen något om den inte är vald för bättre kontrast */
                                    color: ${isSelected ? '#ffffff' : 'var(--text-light)'} !important;">
                         ${p.name}
                     </button>
@@ -617,7 +620,8 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
                 <button class="mode-btn plan-override-btn override-rest-btn ${isRestSelected ? 'active-choice' : ''}" 
                         id="btn-ovr-none"
                         onclick="setOverrideSilent('${dateStr}', 'none')"
-                        style="margin: 0; padding: 12px; font-size: 13px; border-radius: 12px; font-weight: bold; grid-column: span 2; border-color: rgba(253, 224, 71, 0.4); color: #fde047; background: rgba(253, 224, 71, 0.05);">
+                        style="margin: 0; padding: 12px; font-size: 13px; border-radius: 12px; font-weight: bold; grid-column: span 2; border-color: rgba(253, 224, 71, 0.4); color: #fde047; background: rgba(253, 224, 71, 0.05);
+                               opacity: ${isRestSelected ? '1' : '0.4'};">
                     🧘 Vila
                 </button>
             `;
