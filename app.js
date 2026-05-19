@@ -540,29 +540,29 @@ function handleTouchEnd(idx, dateStr, programId, event) {
     setOverrideSilent(dateStr, programId);
 }
 
-function cancelPress() {
+let touchTimeout;
+
+function startLongPress(event, idx) {
+    // 1. Rensa alltid först så vi inte har flera timrar igång
+    clearLongPress();
+    
+    // 2. Starta den nya
+    touchTimeout = setTimeout(() => {
+        openProgramPreviewModal(idx);
+        touchTimeout = null; // Nollställ när den väl kört
+    }, 500);
+}
+
+function clearLongPress() {
     if (touchTimeout) {
         clearTimeout(touchTimeout);
         touchTimeout = null;
     }
 }
 
-function clearLongPress() {
-    if (typeof touchTimeout !== 'undefined') {
-        clearTimeout(touchTimeout);
-    }
-}
-
-let touchTimeout;
-
-function startLongPress(event, idx) {
-    // Rensa eventuella gamla timrar först
+// Denna funktion anropar vi vid både 'up' och 'leave'
+function cancelPress() {
     clearLongPress();
-    
-    // Starta den nya
-    touchTimeout = setTimeout(() => {
-        openProgramPreviewModal(idx);
-    }, 500);
 }
 
 // FUNKTION: Öppnar en renodlad popup-ruta med övningarna (Med mjuk animation)
