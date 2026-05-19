@@ -1163,7 +1163,7 @@ function renderActiveWorkout() {
         if (!activeDraft.ui_state.hasOwnProperty('hasInitializedOpen')) {
             activeDraft.ui_state.openExercises = [0];
             activeDraft.ui_state.hasInitializedOpen = true;
-            saveAll();
+            if (typeof saveAll === "function") saveAll();
         }
     }
     
@@ -1262,7 +1262,7 @@ function renderActiveWorkout() {
     addBtn.className = "mode-btn glass-border";
     addBtn.style.marginTop = "10px";
     addBtn.innerHTML = "➕ Lägg till övning";
-    addBtn.onclick = openCustomAddExerciseModal; // Ändrad till vår nya intelligenta modal-öppnare
+    addBtn.onclick = openCustomAddExerciseModal;
     list.appendChild(addBtn);
 
     const discardBtn = document.createElement("button");
@@ -1282,151 +1282,10 @@ function addExerciseToPassDirectly(pIdx, exId) {
     openEditProgramModal(pIdx); 
 }
 
-// ==========================================
-// NYA FUNKTIONER FÖR ATT "SAMLA PÅ SIG" ÖVNINGAR
-// ==========================================
-
-// Den här funktionen öppnar din befintliga eller en ny modal, men rensar "varukorgen" först
 function openCustomAddExerciseModal() {
-    temporarySelectedExercises = []; // Töm varukorgen inför ett nytt valtillfälle
-    
-    // Om du har en modal-renderare bygger vi om listan här. 
-    // Det viktiga är att knapparna för övningarna i modalen ska anropa `toggleSelectExercise(exId)` istället för att lägga till direkt.
+    temporarySelectedExercises = []; 
     openAddExerciseToWorkoutModal(); 
-    
-    // Lägg till en "Slutför och lägg till"-knapp längst ned i din befintliga modal om den inte finns där.
-    injectMultiSelectUI();
 }
-
-// Anropas varje gång du klickar på en övning i modalen
-function toggleSelectExercise(exId, buttonElement) {
-    const index = temporarySelectedExercises.indexOf(exId);
-    
-    if (index > -1) {
-        // Övningen var redan vald, ta bort den (ångra)
-        temporarySelectedExercises.splice(index, 1);
-        if (buttonElement) {
-            buttonElement.style.background = ""; // Återställ knappens utseende
-            buttonElement.style.border = "";
-        }
-    } else {
-        // Ny övning vald, lägg till sist i listan
-        temporarySelectedExercises.push(exId);
-        if (buttonElement) {
-            buttonElement.style.background = "rgba(34, 197, 94, 0.15)"; // Grön markering för vald
-            buttonElement.style.border = "1px solid #22c55e";
-        }
-    }
-    
-    // Uppdatera texten på slutför-knappen så man ser hur många man valt
-    const saveBtn = document.getElementById("multi-save-exercises-btn");
-    if (saveBtn) {
-        saveBtn.innerHTML = `Lägg till ${temporarySelectedExercises.length} valda övningar ➕`;
-        saveBtn.style.display = temporarySelectedExercises.length > 0 ? "block" : "none";
-    }
-}
-
-// Hjälpfunktion för att skjuta in slutför-knappen dynamiskt i modalen
-function injectMultiSelectUI() {
-    // Vi letar efter din add-exercise modal (justera ID här så det matchar din modal-container)
-    const modalContainer = document.getElementById("modal-body") || document.getElementById("add-exercise-modal"); 
-    if (!modalContainer) return;
-    
-    // Ta bort gammal knapp om den ligger kvar
-    const oldBtn = document.getElementById("multi-save-exercises-btn");
-    if (oldBtn) oldBtn.remove();
-    
-    const saveBtn = document.createElement("button");
-    saveBtn.id = "multi-save-exercises-btn";
-    saveBtn.className = "mode-btn green";
-    saveBtn.style.cssText = "position: sticky; bottom: 10px; width: 100%; padding: 15px; font-weight: bold; z-index: 10100; display: none; box-shadow: 0 4px 15px rgba(34, 197, 94, 0.4);";
-    saveBtn.onclick = confirmAndAddAllSelectedExercises;
-    
-    modalContainer.appendChild(saveBtn);
-}
-
-// Huvudmotorn som körs när användaren klickar på "Slutför"
-function confirmAndAddAllSelectedExercises() {
-    if (temporarySelectedExercises.length === 0) return;
-    
-    const isFrittPass = activeDraft.workout.name === "Fritt Pass";
-    
-    // Räkna ut var de nya övningarna kommer att börja indexeras ifrån
-    const startIdx = activeDraft.workout.exercises.length;
-
-    temporarySelectedExercises.forEach((exId, loopIdx) => {
-        const ex = masterExercises.find(e => e.id == exId);
-        if (!ex) return;
-        
-        // 1. Skjut in i passets mall (workout.exercises)
-        activeDraft.workout.exercises.push({
-            name: ex.name,
-            target: ex.target || "Övning",
-            defaultSets: 3
-        });
-        
-        // 2. Skjut in i den aktiva datastrukturen (data)
-        const defaultSetsCount = 3;
-        const setsDataArray = [];
-        for (let s = 0; s < defaultSetsCount; s++) {
-            setsDataArray.push({ weight: "", reps: "", userConfirmed: false });
-        }
-        
-        activeDraft.data.push({
-            isCompleted: false,
-            sets_data: setsDataArray
-        });
-
-        // 3. Hantera EXPANDED / COLLAPSED logik för Fritt pass
-        if (isFrittPass) {
-            const currentInsertedIndex = startIdx + loopIdx;
-            
-            if (loopIdx === 0) {
-                // Den allra första övningen som klickades i listan hamnar överst av de nya och ska öppnas
-                if (!activeDraft.ui_state.openExercises.includes(currentInsertedIndex)) {
-                    activeDraft.ui_state.openExercises.push(currentInsertedIndex);
-                }
-            } else {
-                // Resterande övningar i samma valomgång ska vara stängda (tas bort från openExercises om de mot förmodan fanns där)
-                const openArrIndex = activeDraft.ui_state.openExercises.indexOf(currentInsertedIndex);
-                if (openArrIndex > -1) {
-                    activeDraft.ui_state.openExercises.splice(openArrIndex, 1);
-                }
-            }
-        }
-    });
-    
-    saveAll();
-    
-    // Stäng modalen (ersätt med din faktiska stängningsfunktion om den heter något annat)
-    if (typeof closeModal === "function") {
-        closeModal();
-    }
-    
-    // Rendera ut det uppdaterade passet
-    renderActiveWorkout();
-}
-
-function updateSetDataOnly(exIdx, setIdx) {
-    const wVal = document.getElementById(`w-${exIdx}-${setIdx}`).value;
-    const rVal = document.getElementById(`r-${exIdx}-${setIdx}`).value;
-    activeDraft.data[exIdx].sets_data[setIdx].weight = wVal;
-    activeDraft.data[exIdx].sets_data[setIdx].reps = rVal;
-    localStorage.setItem("activeWorkoutDraft", JSON.stringify(activeDraft));
-}
-
-function confirmSet(exIdx, setIdx) {
-    const scrollPos = window.scrollY;
-    const currentState = activeDraft.data[exIdx].sets_data[setIdx].userConfirmed;
-    activeDraft.data[exIdx].sets_data[setIdx].userConfirmed = !currentState;
-    
-    localStorage.setItem("activeWorkoutDraft", JSON.stringify(activeDraft));
-    renderActiveWorkout();
-    window.scrollTo(0, scrollPos);
-}
-
-// Global array för att hålla koll på valda övningar i modalen innan de sparas
-let temporarySelectedExercises = [];
 
 function toggleExercise(index) {
     const scrollPos = window.scrollY;
@@ -1481,11 +1340,11 @@ function actuallyStartWorkout() {
     activeDraft.wasTimerRunning = true;
     localStorage.setItem("activeWorkoutDraft", JSON.stringify(activeDraft));
     renderActiveWorkout();
-    startTimer();
+    if (typeof startTimer === "function") startTimer();
 }
 
 function openAddExerciseToWorkoutModal() {
-    temporarySelectedExercises = []; // Töm varukorgen inför ett nytt valtillfälle
+    temporarySelectedExercises = []; 
     renderExercisePicker("Ben");
     openModal();
 }
@@ -1495,7 +1354,6 @@ function openReplaceExerciseModal(index) {
     openModal();
 }
 
-// UPPDATERAD FUNKTION: Renderar övningsväljaren med stöd för flerval
 function renderExercisePicker(category, replaceIndex = null) {
     const body = document.getElementById("modal-body");
     
@@ -1533,10 +1391,7 @@ function renderExercisePicker(category, replaceIndex = null) {
     }
 
     filtered.forEach(ex => {
-        // Kontrollera om övningen redan är vald i vår temporära lista (för Fritt Pass)
         const isSelectedInBatch = replaceIndex === null && temporarySelectedExercises.includes(ex.id);
-        
-        // Sätt färg och stil baserat på om den är vald eller inte
         const currentBg = isSelectedInBatch ? 'rgba(34, 197, 94, 0.15)' : 'transparent';
         const currentBorder = isSelectedInBatch ? '1px solid #22c55e' : '1px solid rgba(255,255,255,0.08)';
         const currentIcon = replaceIndex !== null ? '🔄' : (isSelectedInBatch ? '✅' : '+');
@@ -1550,7 +1405,6 @@ function renderExercisePicker(category, replaceIndex = null) {
     });
     html += `</div>`;
 
-    // Skapa och visa den stora slutför-knappen om vi inte byter ut en enskild övning och det finns valda övningar
     if (replaceIndex === null) {
         const hasChoices = temporarySelectedExercises.length > 0;
         html += `
@@ -1568,14 +1422,12 @@ function renderExercisePicker(category, replaceIndex = null) {
     body.innerHTML = html;
 }
 
-// NY FUNKTION: Hanterar klick på en övning när man samlar på sig flera
 function toggleSelectExerciseInPicker(exId, category) {
     const index = temporarySelectedExercises.indexOf(exId);
     const card = document.getElementById(`picker-ex-${exId}`);
     const icon = document.getElementById(`picker-icon-${exId}`);
     
     if (index > -1) {
-        // Övningen var redan vald, ta bort den
         temporarySelectedExercises.splice(index, 1);
         if (card) {
             card.style.setProperty('background', 'transparent', 'important');
@@ -1586,7 +1438,6 @@ function toggleSelectExerciseInPicker(exId, category) {
             icon.style.color = "var(--primary)";
         }
     } else {
-        // Ny övning vald, lägg till i listan
         temporarySelectedExercises.push(exId);
         if (card) {
             card.style.setProperty('background', 'rgba(34, 197, 94, 0.15)', 'important');
@@ -1598,7 +1449,6 @@ function toggleSelectExerciseInPicker(exId, category) {
         }
     }
     
-    // Uppdatera eller visa/dölj slutför-knappen i botten
     const saveBtn = document.getElementById("multi-save-exercises-btn");
     if (saveBtn) {
         saveBtn.innerHTML = `Lägg till ${temporarySelectedExercises.length} valda övningar ➕`;
@@ -1606,7 +1456,6 @@ function toggleSelectExerciseInPicker(exId, category) {
     }
 }
 
-// NY FUNKTION: Sparar ner alla samlade övningar i ett svep till Fritt Pass
 function confirmAndAddAllSelectedExercises() {
     if (temporarySelectedExercises.length === 0) return;
     
@@ -1627,21 +1476,17 @@ function confirmAndAddAllSelectedExercises() {
             newDataEntry = { sets_data: [{ weight: "", reps: "" }, { weight: "", reps: "" }, { weight: "", reps: "" }], isCompleted: false };
         }
 
-        // Tryck in övningen i datamodellerna
         activeDraft.workout.exercises.push(newExObj);
         activeDraft.data.push(newDataEntry);
 
-        // Hantera öppen/stängd status (bara för Fritt Pass)
         if (isFrittPass) {
             const currentInsertedIndex = startIdx + loopIdx;
             
             if (loopIdx === 0) {
-                // Den allra första övningen som klickades i listan ska öppnas (expanded)
                 if (!activeDraft.ui_state.openExercises.includes(currentInsertedIndex)) {
                     activeDraft.ui_state.openExercises.push(currentInsertedIndex);
                 }
             } else {
-                // Alla efterföljande övningar blir stängda (collapsed)
                 const openArrIndex = activeDraft.ui_state.openExercises.indexOf(currentInsertedIndex);
                 if (openArrIndex > -1) {
                     activeDraft.ui_state.openExercises.splice(openArrIndex, 1);
@@ -1650,7 +1495,11 @@ function confirmAndAddAllSelectedExercises() {
         }
     });
     
-    localStorage.setItem("activeWorkoutDraft", JSON.stringify(activeDraft));
+    if (typeof saveAll === "function") {
+        saveAll();
+    } else {
+        localStorage.setItem("activeWorkoutDraft", JSON.stringify(activeDraft));
+    }
     closeModal();
     renderActiveWorkout();
 }
@@ -1678,16 +1527,37 @@ function confirmAddExerciseToActive(exId, replaceIndex = null) {
         activeDraft.workout.exercises.push(newExObj);
         activeDraft.data.push(newDataEntry);
         
-        // Säkerställ att den öppnas om man lägger till den manuellt (en och en) utanför flervalet
         const newIdx = activeDraft.workout.exercises.length - 1;
         if (activeDraft.workout.name === "Fritt Pass" && !activeDraft.ui_state.openExercises.includes(newIdx)) {
             activeDraft.ui_state.openExercises.push(newIdx);
         }
     }
     
-    localStorage.setItem("activeWorkoutDraft", JSON.stringify(activeDraft));
+    if (typeof saveAll === "function") {
+        saveAll();
+    } else {
+        localStorage.setItem("activeWorkoutDraft", JSON.stringify(activeDraft));
+    }
     closeModal();
     renderActiveWorkout();
+}
+
+function updateSetDataOnly(exIdx, setIdx) {
+    const wVal = document.getElementById(`w-${exIdx}-${setIdx}`).value;
+    const rVal = document.getElementById(`r-${exIdx}-${setIdx}`).value;
+    activeDraft.data[exIdx].sets_data[setIdx].weight = wVal;
+    activeDraft.data[exIdx].sets_data[setIdx].reps = rVal;
+    localStorage.setItem("activeWorkoutDraft", JSON.stringify(activeDraft));
+}
+
+function confirmSet(exIdx, setIdx) {
+    const scrollPos = window.scrollY;
+    const currentState = activeDraft.data[exIdx].sets_data[setIdx].userConfirmed;
+    activeDraft.data[exIdx].sets_data[setIdx].userConfirmed = !currentState;
+    
+    localStorage.setItem("activeWorkoutDraft", JSON.stringify(activeDraft));
+    renderActiveWorkout();
+    window.scrollTo(0, scrollPos);
 }
 
 function moveActiveExercise(i, dir) {
@@ -1699,7 +1569,7 @@ function moveActiveExercise(i, dir) {
 }
 
 function removeActiveExercise(exIdx) {
-    hideDefaultCloseButton(true);
+    if (typeof hideDefaultCloseButton === "function") hideDefaultCloseButton(true);
     const body = document.getElementById("modal-body");
     
     body.innerHTML = `
@@ -1708,7 +1578,7 @@ function removeActiveExercise(exIdx) {
             <h3 style="color:var(--danger);">Ta bort övningen?</h3>
             <p style="color:var(--text-light); margin-bottom:25px; font-size:14px;">Är du säker på att du vill ta bort den här övningen från ditt pågående pass?</p>
             <button class="mode-btn" style="background:linear-gradient(135deg, #ef4444 0%, #b91c1c 100%); color:white; margin-bottom:12px; font-weight:700;" 
-                onclick="activeDraft.workout.exercises.splice(${exIdx}, 1); activeDraft.data.splice(${exIdx}, 1); saveAll(); closeModal(); renderActiveWorkout();">
+                onclick="activeDraft.workout.exercises.splice(${exIdx}, 1); activeDraft.data.splice(${exIdx}, 1); if(typeof saveAll === 'function'){saveAll();}else{localStorage.setItem('activeWorkoutDraft', JSON.stringify(activeDraft));} closeModal(); renderActiveWorkout();">
                 Ja, radera
             </button>
             <button class="mode-btn glass-border" onclick="closeModal()">Avbryt</button>
