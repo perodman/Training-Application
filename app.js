@@ -636,10 +636,12 @@ function closePreviewModal() {
     const previewModal = document.getElementById("preview-modal");
     const card = document.getElementById("preview-modal-card");
     
-    if (card && previewModal) {
-        card.style.opacity = "0";
-        card.style.transform = "scale(0.95)";
+    if (previewModal) {
         previewModal.style.opacity = "0";
+        if (card) {
+            card.style.opacity = "0";
+            card.style.transform = "scale(0.95)";
+        }
         
         setTimeout(() => {
             previewModal.style.display = "none";
