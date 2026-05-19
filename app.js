@@ -489,16 +489,24 @@ let touchStartY = 0;
 let hasScrolled = false;
 
 function startPress(idx, event) {
-    // 1. SÄKERHETSKONTROLL: ENDAST om det är en knapp med klassen 'plan-override-btn'
+    // 1. SÄKERHETSKONTROLL: Endast för rätt knappar
     if (!event.target.classList.contains('plan-override-btn')) return;
 
+    // Återställ tillstånd
     isLongPress = false;
     hasScrolled = false;
     
+    // Hämta startposition för att kunna mäta scroll
+    if (event.touches) {
+        touchStartY = event.touches[0].clientY;
+    }
+    
     // Starta timern på 500ms
     pressTimer = setTimeout(() => {
-        isLongPress = true;
-        openProgramPreviewModal(idx);
+        if (!hasScrolled) {
+            isLongPress = true;
+            openProgramPreviewModal(idx);
+        }
     }, 500);
 }
 
@@ -510,11 +518,11 @@ function cancelPress() {
 }
 
 function handleTouchMove(event) {
-    if (event && event.touches && event.touches[0] && touchStartY > 0) {
+    if (event && event.touches && event.touches[0]) {
         const currentY = event.touches[0].clientY;
         const moveDistance = Math.abs(currentY - touchStartY);
         
-        // Om användaren flyttar fingret mer än 6 pixlar, markera att vi scrollar och avbryt timern
+        // Om användaren flyttar fingret mer än 6 pixlar, avbryt allt!
         if (moveDistance > 6) { 
             hasScrolled = true;
             cancelPress();
@@ -525,25 +533,20 @@ function handleTouchMove(event) {
 function handleTouchEnd(idx, dateStr, programId, event) {
     cancelPress();
     
-    // Om användaren har scrollat eller om det var ett långtryck
+    // Om vi har scrollat eller gjort ett långtryck: gör inget mer
     if (hasScrolled || isLongPress) {
         if (event) {
-            if (event.cancelable) event.preventDefault();
+            event.preventDefault();
             event.stopPropagation();
         }
         return false;
     }
     
-    // Om eventet är cancelable, stoppa det virtuella klicket här med för säkerhets skull
-    if (event && event.cancelable) {
-        event.preventDefault();
-    }
-    
-    // Detta var ett rent, snabbt klick utan scroll – utför bytet!
+    // Annars: utför klicket
     setOverrideSilent(dateStr, programId);
 }
 
-// FUNKTION: Öppnar en renodlad popup-ruta med övningarna (Med mjuk animation)
+// FUNKTION: Öppnar en renodlad popup-ruta med övningarna
 function openProgramPreviewModal(idx) {
     const pass = programData.routine[idx];
     
