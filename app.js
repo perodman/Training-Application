@@ -570,23 +570,26 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
             programData.routine.forEach((p, idx) => {
                 const isSelected = planned && p.id === planned.id;
                 
-                // En palett med dina fyra färger
+                // En palett med RGB-baserade färger istället för Hex
                 const colors = [
-                    { border: "#ef4444", bg: "rgba(239, 68, 68, 0.05)" },  // 0: Röd
-                    { border: "#3b82f6", bg: "rgba(59, 130, 246, 0.05)" },  // 1: Blå
-                    { border: "#10b981", bg: "rgba(16, 185, 129, 0.05)" },  // 2: Grön
-                    { border: "#a855f7", bg: "rgba(168, 85, 247, 0.05)" }   // 3: Lila
+                    { r: 239, g: 68,  b: 68 },   // 0: Röd (ef4444)
+                    { r: 59,  g: 130, b: 246 },  // 1: Blå (3b82f6)
+                    { r: 16,  g: 185, b: 129 },  // 2: Grön (10b981)
+                    { r: 168, g: 85,  b: 247 }   // 3: Lila (a855f7)
                 ];
                 
                 const colorIndex = idx % colors.length;
-                const btnColor = colors[colorIndex].border;
-                const btnBg = colors[colorIndex].bg;
+                const c = colors[colorIndex];
 
-                // DYNAMISK OPACITET: 1 (fullt synlig) om vald, annars 0.3 (nedtonad)
-                const lineOpacity = isSelected ? "1" : "0.3";
+                // Om vald: full färg (1). Om ej vald: 25% styrka (0.25) på kantlinjen
+                const currentOpacity = isSelected ? "1" : "0.25";
+                
+                // Skapa RGBA-strängarna dynamiskt
+                const borderColor = `rgba(${c.r}, ${c.g}, ${c.b}, ${currentOpacity})`;
+                const btnBg = `rgba(${c.r}, ${c.g}, ${c.b}, 0.04)`; // Mycket svag bakgrundston jämt över alla
 
                 const exList = p.exercises.map(e => `
-                    <div style="background: rgba(255,255,255,0.05); padding: 5px 8px; border-radius: 6px; margin-bottom: 4px; border-left: 2px solid ${btnColor}; font-size: 10px; color: #ddd; display: flex; align-items: center;">
+                    <div style="background: rgba(255,255,255,0.05); padding: 5px 8px; border-radius: 6px; margin-bottom: 4px; border-left: 2px solid rgba(${c.r}, ${c.g}, ${c.b}, 0.6); font-size: 10px; color: #ddd; display: flex; align-items: center;">
                         <span style="margin-right: 6px; opacity: 0.5;">•</span> ${e.name}
                     </div>
                 `).join('');
@@ -598,8 +601,7 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
                             onclick="setOverrideSilent('${dateStr}', '${p.id}')"
                             style="margin: 0; padding: 12px; font-size: 13px; border-radius: 12px; font-weight: 600; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; width:100%;
                                    background: ${isSelected ? 'rgba(255,255,255,0.1)' : btnBg} !important;
-                                   border-top: 2px solid ${btnColor} !important;
-                                   opacity: ${lineOpacity}; /* Tonar ner hela knappen något om den inte är vald för bättre kontrast */
+                                   border-top: 2px solid ${borderColor} !important;
                                    color: ${isSelected ? '#ffffff' : 'var(--text-light)'} !important;">
                         ${p.name}
                     </button>
@@ -616,12 +618,16 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
             });
             
             const isRestSelected = !planned;
+            // Vila-knappens kantlinje styrs också helt av om den är vald (full gul eller nedtonad gul)
+            const restBorderColor = isRestSelected ? "rgba(253, 224, 71, 1)" : "rgba(253, 224, 71, 0.2)";
+
             html += `
                 <button class="mode-btn plan-override-btn override-rest-btn ${isRestSelected ? 'active-choice' : ''}" 
                         id="btn-ovr-none"
                         onclick="setOverrideSilent('${dateStr}', 'none')"
-                        style="margin: 0; padding: 12px; font-size: 13px; border-radius: 12px; font-weight: bold; grid-column: span 2; border-color: rgba(253, 224, 71, 0.4); color: #fde047; background: rgba(253, 224, 71, 0.05);
-                               opacity: ${isRestSelected ? '1' : '0.4'};">
+                        style="margin: 0; padding: 12px; font-size: 13px; border-radius: 12px; font-weight: bold; grid-column: span 2; 
+                               border-top: 2px solid ${restBorderColor} !important; 
+                               color: #fde047; background: rgba(253, 224, 71, 0.05);">
                     🧘 Vila
                 </button>
             `;
