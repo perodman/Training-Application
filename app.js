@@ -534,7 +534,7 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
             <div style="flex-grow: 1; height: 1px; background: rgba(255,255,255,0.08);"></div>
         </div>
         
-        <div class="modern-status-card day-manager-status-box" style="padding: 15px 15px 30px 15px !important; align-items: stretch !important; margin-top: 0 !important;">
+       <div class="modern-status-card day-manager-status-box" style="padding: 30px 15px 30px 15px !important; align-items: stretch !important; margin-top: -10px !important;">
             
             <p id="current-planned-label" class="status-box-text" style="margin: 0 0 8px 0 !important; text-align: center !important; font-size: 16px; font-weight: 600; padding: 0 !important; line-height: 1.2 !important;">
                 ${planned ? `📋 <span class="status-highlight-text">${planned.name}</span>` : '🧘 Planerad Vila'}
