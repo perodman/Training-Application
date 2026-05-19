@@ -1562,7 +1562,7 @@ function toggleSelectExerciseInPicker(exId, category) {
 
 // 4. Den städade confirmAndAddAllSelectedExercises
 function confirmAndAddAllSelectedExercises() {
-    if (!temporarySelectedExercises || temporarySelectedExercises.length === 0) return;
+    if (typeof temporarySelectedExercises === 'undefined' || temporarySelectedExercises.length === 0) return;
     
     const isFrittPass = activeDraft.workout.name === "Fritt Pass";
     const startIdx = activeDraft.workout.exercises.length;
