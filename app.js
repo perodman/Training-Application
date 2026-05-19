@@ -500,7 +500,7 @@ function cancelPress() {
     }
 }
 
-// NY FUNKTION: Öppnar en renodlad popup-ruta med övningarna (Nu högre upp och rymligare)
+// NY FUNKTION: Öppnar en renodlad popup-ruta med övningarna (Nu med mjuk animation!)
 function openProgramPreviewModal(idx) {
     const pass = programData.routine[idx];
     
@@ -517,17 +517,24 @@ function openProgramPreviewModal(idx) {
         previewModal.style.backdropFilter = "blur(8px)";
         previewModal.style.display = "flex";
         previewModal.style.justifyContent = "center";
-        previewModal.style.alignItems = "flex-start"; // Ändrat till flex-start för att trycka upp modalen
+        previewModal.style.alignItems = "flex-start"; 
         previewModal.style.zIndex = "10000"; 
+        
+        // Mjuk övergång för själva bakgrunden
+        previewModal.style.transition = "opacity 0.2s ease-out";
         document.body.appendChild(previewModal);
     }
 
-    // Ger kortet 40px marginal från toppen av skärmen och tillåter listan att ta upp till 65% av skärmhöjden
+    // Sätt initial opacity till 0 för att kunna tona in
+    previewModal.style.opacity = "0";
+    previewModal.style.display = "flex";
+
     previewModal.innerHTML = `
-        <div class="card glass" style="width: 90%; max-width: 400px; padding: 20px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); background: rgba(15, 23, 42, 0.95); margin-top: 40px; animation: modalFadeIn 0.2s ease-out;">
+        <div id="preview-modal-card" class="card glass" style="width: 90%; max-width: 400px; padding: 20px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); background: rgba(15, 23, 42, 0.95); margin-top: 40px; 
+             transition: all 0.2s ease-out; transform: scale(0.95); opacity: 0;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.08);">
                 <h3 style="margin: 0; font-size: 20px; color: #fff;">${pass.name}</h3>
-                <button onclick="document.getElementById('preview-modal').style.display='none'" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: var(--text-light); cursor: pointer; font-size: 14px; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">✖</button>
+                <button onclick="closePreviewModal()" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: var(--text-light); cursor: pointer; font-size: 14px; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">✖</button>
             </div>
             
             <div style="max-height: 65vh; overflow-y: auto; display: flex; flex-direction: column; gap: 2px;">
@@ -539,16 +546,41 @@ function openProgramPreviewModal(idx) {
                 `).join("")}
             </div>
             
-            <button onclick="document.getElementById('preview-modal').style.display='none'" style="width: 100%; margin-top: 20px; padding: 12px; background: var(--primary); color: #0f172a; border: none; border-radius: 12px; font-weight: 700; cursor: pointer;">
+            <button onclick="closePreviewModal()" style="width: 100%; margin-top: 20px; padding: 12px; background: var(--primary); color: #0f172a; border: none; border-radius: 12px; font-weight: 700; cursor: pointer;">
                 Stäng översikt
             </button>
         </div>
     `;
 
-    previewModal.style.display = "flex";
+    // Trigger för animationen (kräver en mikroskopisk fördröjning för att webbläsaren ska hinna med att tona)
+    setTimeout(() => {
+        previewModal.style.opacity = "1";
+        const card = document.getElementById("preview-modal-card");
+        if (card) {
+            card.style.opacity = "1";
+            card.style.transform = "scale(1)";
+        }
+    }, 10);
 }
 
-// HUVUDFUNKTIONEN (Inkluderar nu den nya tips-texten)
+// HJÄLPFUNKTION: Stänger modalen med en mjuk uttoning
+function closePreviewModal() {
+    const previewModal = document.getElementById("preview-modal");
+    const card = document.getElementById("preview-modal-card");
+    
+    if (card && previewModal) {
+        card.style.opacity = "0";
+        card.style.transform = "scale(0.95)";
+        previewModal.style.opacity = "0";
+        
+        // Vänta tills animationen är klar (200ms) innan vi gömmer elementet helt
+        setTimeout(() => {
+            previewModal.style.display = "none";
+        }, 200);
+    }
+}
+
+// HUVUDFUNKTIONEN
 function openDayManager(dateStr, planned, completed, isOngoing) {
     if (typeof hideDefaultCloseButton === 'function') {
         hideDefaultCloseButton(false);
@@ -672,7 +704,7 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
             </button>
         </div>`;
 
-        // ÄNDRA PLANERING - SEKTIONSAVSKILJARE MED DISKRET VEGLEDNINGSTEXT
+        // ÄNDRA PLANERING - SEKTIONSAVSKILJARE
         html += `
         <div style="margin-top: 1px; width: 100%;">
             <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 4px;">
