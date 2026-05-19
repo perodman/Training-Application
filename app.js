@@ -81,10 +81,13 @@ function closeModal() {
     const video = document.querySelector("#modal-body video");
     if(video) video.pause();
     
-    // SÄKERHETSÅTGÄRD: Se till att den fasta stäng-knappen ALLTID visas igen när en modal stängs
+    // SÄKERHETSÅTGÄRD: Se till att den fasta stäng-knappen ALLTID visas igen
     if (typeof hideDefaultCloseButton === 'function') {
         hideDefaultCloseButton(false);
     }
+
+    // HÄR ÅTERSTÄLLER VI DIN DRAFT
+    restoreDraftState();
 }
 
 function openModal() {
@@ -1450,7 +1453,11 @@ function renderExercisePicker(category, replaceIndex = null) {
 
     html += `
         <div class="separator" style="margin:15px 0;"></div>
-        <button class="mode-btn glass-border" style="font-size:13px;" onclick="openCreateExerciseModal((newEx) => handleInstantExerciseCreated(newEx, ${replaceIndex}))">+ Skapa ny övning som inte finns</button>
+        <button class="mode-btn glass-border" 
+        style="font-size:13px;" 
+        onclick="saveDraftState(); openCreateExerciseModal((newEx) => handleInstantExerciseCreated(newEx, ${replaceIndex}))">
+    + Skapa ny övning som inte finns
+</button>
     `;
     
     body.innerHTML = html;
@@ -1485,6 +1492,24 @@ function generateSelectedExercisesSummaryHtml() {
     `;
 
     return summaryHtml;
+}
+
+// Spara draften innan vi lämnar vyn
+function saveDraftState() {
+    localStorage.setItem('temp_exercise_draft', JSON.stringify(temporarySelectedExercises));
+}
+
+// Återställ draften när vi kommer tillbaka
+function restoreDraftState() {
+    const saved = localStorage.getItem('temp_exercise_draft');
+    if (saved) {
+        temporarySelectedExercises = JSON.parse(saved);
+        // Rensa efter oss så att det inte ligger kvar nästa gång
+        localStorage.removeItem('temp_exercise_draft');
+        
+        // Uppdatera vyn (du behöver troligen anropa din render-funktion här)
+        updateExerciseSelectionView(); 
+    }
 }
 
 // UPPDATERAD FUNKTION: Uppdaterar nu varukorgslistan live istället för att bara gömma/visa en knapp
