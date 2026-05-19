@@ -757,7 +757,7 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
         html += `
             </div>
             
-           <button class="mode-btn premium-action-btn premium-free-btn" 
+          <button class="mode-btn premium-action-btn premium-free-btn" 
         onclick="closeModal(); startFreeWorkoutOnDate('${dateStr}')" 
         style="width: 100% !important; margin: 10px 0 0 0 !important; padding: 10px !important; touch-action: manipulation; -webkit-tap-highlight-color: transparent; cursor: pointer;">
     ➕ Starta Fritt Pass
