@@ -571,32 +571,33 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
             programData.routine.forEach(p => {
     const isSelected = planned && p.id === planned.id;
     
-    // 1. BESTÄM FÄRGTEMA BASERAT PÅ PASSNAMN
-    let btnColor = "var(--primary)"; // Standardblå om inget matchar
-    let btnBg = "rgba(59, 130, 246, 0.03)"; // Mycket svag blåton
-    
-    const nameLower = p.name.toLowerCase();
-    if (nameLower.includes("ben") || nameLower.includes("leg")) {
-        btnColor = "#ef4444"; // Röd för tunga benpass
-        btnBg = "rgba(239, 68, 68, 0.03)";
-    } else if (nameLower.includes("över") || nameLower.includes("bröst") || nameLower.includes("push")) {
-        btnColor = "#3b82f6"; // Klarblå för överkropp/push
-        btnBg = "rgba(59, 130, 246, 0.03)";
-    } else if (nameLower.includes("rygg") || nameLower.includes("pull")) {
-        btnColor = "#a855f7"; // Lila för rygg/pull
-        btnBg = "rgba(168, 85, 247, 0.03)";
-    } else if (nameLower.includes("kondition") || nameLower.includes("cardio") || nameLower.includes("pass a")) {
-        btnColor = "#10b981"; // Smaragdgrön för cardio eller Pass A
-        btnBg = "rgba(16, 185, 129, 0.03)";
+    // 1. SKAPA EN MATEMATISK "HASH" AV PASSNAMNET
+    let hash = 0;
+    const nameStr = p.name || "";
+    for (let i = 0; i < nameStr.length; i++) {
+        hash = nameStr.charCodeAt(i) + ((hash << 5) - hash);
     }
+    
+    // 2. EN PALETT MED FYRA ROLIGA, FRÄSCHA TRÄNINGSFÄRGER
+    const colors = [
+        { border: "#ef4444", bg: "rgba(239, 68, 68, 0.05)" },  // Röd/Rosa
+        { border: "#3b82f6", bg: "rgba(59, 130, 246, 0.05)" },  // Blå
+        { border: "#10b981", bg: "rgba(16, 185, 129, 0.05)" },  // Grön
+        { border: "#a855f7", bg: "rgba(168, 85, 247, 0.05)" }   // Lila
+    ];
+    
+    // Välj en av färgerna i paletten baserat på namnets unika hash-nummer
+    const colorIndex = Math.abs(hash) % colors.length;
+    const btnColor = colors[colorIndex].border;
+    const btnBg = colors[colorIndex].bg;
 
+    // (Resten av koden inuti loopen förblir exakt densamma som innan)
     const exList = p.exercises.map(e => `
         <div style="background: rgba(255,255,255,0.05); padding: 5px 8px; border-radius: 6px; margin-bottom: 4px; border-left: 2px solid ${btnColor}; font-size: 10px; color: #ddd; display: flex; align-items: center;">
             <span style="margin-right: 6px; opacity: 0.5;">•</span> ${e.name}
         </div>
     `).join('');
 
-    // 2. APPLICERA FÄRGERNA PÅ KNAPPEN
     html += `
     <div style="display: flex; flex-direction: column; gap: 5px;">
         <button class="mode-btn plan-override-btn ${isSelected ? 'active-choice' : ''}" 
