@@ -1577,12 +1577,22 @@ function confirmAndAddAllSelectedExercises() {
     const startIdx = activeDraft.workout.exercises.length;
 
     temporarySelectedExercises.forEach((exId, loopIdx) => {
-        const ex = masterExercises.find(e => e.id == exId);
+        // Försök hitta i masterExercises, om inte, leta i masterExercises (eller var du sparar nya)
+        let ex = masterExercises.find(e => e.id == exId);
+        
+        // --- HÄR ÄR FIXEN: Om den inte finns i masterExercises, leta i den lokala listan ---
+        // Antag att 'allExercises' eller liknande är den globala listan där nyskapade övningar hamnar
+        if (!ex) {
+            ex = allExercises.find(e => e.id == exId); 
+        }
+        
+        // Om den fortfarande inte hittas, avbryt
         if (!ex) return;
         
         const newExObj = { name: ex.name, target: ex.target };
         let newDataEntry;
         const history = getExerciseHistory(ex.name);
+        
         if (history) {
             newDataEntry = { sets_data: JSON.parse(JSON.stringify(history)), isCompleted: false };
         } else {
@@ -1601,6 +1611,9 @@ function confirmAndAddAllSelectedExercises() {
             }
         }
     });
+    
+    // Rensa listan efter att de lagts till
+    temporarySelectedExercises = []; 
     
     persistActiveWorkout();
     closeModal();
