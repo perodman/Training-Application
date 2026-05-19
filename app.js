@@ -568,23 +568,21 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
             
             <div class="plan-override-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; width: 100%;">`;
             
-            programData.routine.forEach(p => {
+            programData.routine.forEach((p, idx) => {
     const isSelected = planned && p.id === planned.id;
     
-    // 1. SKAPA EN MATEMATISK "HASH" AV PASSNAMNET
-    let hash = 0;
-    const nameStr = p.name || "";
-    for (let i = 0; i < nameStr.length; i++) {
-        hash = nameStr.charCodeAt(i) + ((hash << 5) - hash);
-    }
-    
-    // 2. EN PALETT MED FYRA ROLIGA, FRÄSCHA TRÄNINGSFÄRGER
+    // En palett med dina fyra färger
     const colors = [
-        { border: "#ef4444", bg: "rgba(239, 68, 68, 0.05)" },  // Röd/Rosa
-        { border: "#3b82f6", bg: "rgba(59, 130, 246, 0.05)" },  // Blå
-        { border: "#10b981", bg: "rgba(16, 185, 129, 0.05)" },  // Grön
-        { border: "#a855f7", bg: "rgba(168, 85, 247, 0.05)" }   // Lila
+        { border: "#ef4444", bg: "rgba(239, 68, 68, 0.05)" },  // 0: Röd
+        { border: "#3b82f6", bg: "rgba(59, 130, 246, 0.05)" },  // 1: Blå
+        { border: "#10b981", bg: "rgba(16, 185, 129, 0.05)" },  // 2: Grön
+        { border: "#a855f7", bg: "rgba(168, 85, 247, 0.05)" }   // 3: Lila
     ];
+    
+    // Räknar 0, 1, 2, 3, 0, 1, 2, 3... baserat på knappens plats i listan
+    const colorIndex = idx % colors.length;
+    const btnColor = colors[colorIndex].border;
+    const btnBg = colors[colorIndex].bg;
     
     // Välj en av färgerna i paletten baserat på namnets unika hash-nummer
     const colorIndex = Math.abs(hash) % colors.length;
