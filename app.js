@@ -484,16 +484,18 @@ function openProgramPreviewModal(idx) {
 let touchTimeout = null;
 let isLongPress = false;
 let touchStartY = 0;
+let hasScrolled = false;
 
 function startPress(idx, event) {
-    isLongPress = false;
-    
     // Om det är ett touch-event (mobil), spara startpositionen i Y-led
     if (event && event.touches && event.touches[0]) {
         touchStartY = event.touches[0].clientY;
     } else {
         touchStartY = 0;
     }
+    
+    isLongPress = false;
+    hasScrolled = false;
 
     // Starta timern på 500ms
     touchTimeout = setTimeout(() => {
@@ -503,22 +505,39 @@ function startPress(idx, event) {
 }
 
 function handleTouchMove(event) {
-    // Om användaren flyttar fingret mer än 6 pixlar under trycket, avbryt (eftersom de scrollar)
     if (event && event.touches && event.touches[0] && touchStartY > 0) {
         const currentY = event.touches[0].clientY;
         const moveDistance = Math.abs(currentY - touchStartY);
         
-        if (moveDistance > 6) { 
+        // Om användaren flyttar fingret mer än 8 pixlar, tolka det som scroll
+        if (moveDistance > 8) { 
+            hasScrolled = true;
             cancelPress();
         }
     }
 }
 
+function handleTouchEnd(idx, dateStr, programId, event) {
+    cancelPress();
+    
+    // Om det blev ett långtryck eller om användaren faktiskt scrollade, gör ingenting (avbryt valet)
+    if (isLongPress || hasScrolled) {
+        if (event && event.cancelable) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+        return false;
+    }
+    
+    // Annars var det ett snabbt klick – välj passet!
+    setOverrideSilent(dateStr, programId);
+}
+
 function cancelPress() {
     if (touchTimeout) {
         clearTimeout(touchTimeout);
+        touchTimeout = null;
     }
-    touchStartY = 0;
 }
 
 // FUNKTION: Öppnar en renodlad popup-ruta med övningarna (Med mjuk animation)
@@ -756,11 +775,11 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
                         id="btn-ovr-${p.id}" 
                         
                         onmousedown="startPress(${idx}, event)"
-                        onmouseup="cancelPress(); if(!isLongPress) setOverrideSilent('${dateStr}', '${p.id}');"
+                        onmouseup="if(!isLongPress && !hasScrolled) setOverrideSilent('${dateStr}', '${p.id}'); cancelPress();"
                         onmouseleave="cancelPress();"
                         
                         ontouchstart="startPress(${idx}, event)"
-                        ontouchend="cancelPress(); if(!isLongPress) setOverrideSilent('${dateStr}', '${p.id}');"
+                        ontouchend="handleTouchEnd(${idx}, '${dateStr}', '${p.id}', event)"
                         ontouchmove="handleTouchMove(event)"
                         
                         style="margin: 0; padding: 15px 12px; font-size: 13px; border-radius: 12px; font-weight: 600; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; width: 100%;
