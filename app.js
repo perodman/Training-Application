@@ -1362,9 +1362,6 @@ function actuallyStartWorkout() {
     if (typeof startTimer === "function") startTimer();
 }
 
-let restTimerSeconds = 0;
-let restTimerInterval = null;
-
 function startRestTimer() {
     restTimerSeconds = 0;
     if (restTimerInterval) clearInterval(restTimerInterval);
