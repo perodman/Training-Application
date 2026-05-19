@@ -5,8 +5,6 @@ let activeDraft = JSON.parse(localStorage.getItem("activeWorkoutDraft") || "null
 let calendarOverrides = JSON.parse(localStorage.getItem("calendarOverrides") || "{}");
 let currentViewDate = new Date();
 let currentExerciseCategory = "Ben";
-let restTimerSeconds = 0;
-let restTimerInterval = null;
 
 // Timer-variablerrf
 let timerInterval = null;
@@ -1151,9 +1149,13 @@ function renderActiveWorkout() {
     if (activeDraft && activeDraft.data) {
         activeDraft.data.forEach((exerciseData, i) => {
             if (!exerciseData.isCompleted && exerciseData.sets_data) {
+                const hasInputValues = exerciseData.sets_data.some(s => s.weight || s.reps);
                 const isBrandNewAndGhostChecked = exerciseData.sets_data.every(s => s.userConfirmed === true) && !activeDraft.ui_state?.openExercises?.includes(i);
+                
                 if (isBrandNewAndGhostChecked && exerciseData.sets_data.length > 0) {
-                    exerciseData.sets_data.forEach(set => { set.userConfirmed = false; });
+                    exerciseData.sets_data.forEach(set => {
+                        set.userConfirmed = false;
+                    });
                 }
             }
         });
@@ -1182,18 +1184,25 @@ function renderActiveWorkout() {
     pauseBtn.innerHTML = `Spara utkast 💾`;
     pauseBtn.className = "mode-btn save-draft-btn";
 
-    if (!activeDraft.ui_state) activeDraft.ui_state = {};
-    if (!activeDraft.ui_state.openExercises) activeDraft.ui_state.openExercises = [];
+    if (!activeDraft.ui_state) {
+        activeDraft.ui_state = {};
+    }
+    
+    if (!activeDraft.ui_state.openExercises) {
+        activeDraft.ui_state.openExercises = [];
+    }
 
+    // SPECIALHANTERING FÖR INITIALISERING AV VANLIGA PASS
     const isFrittPass = activeDraft.workout.name === "Fritt Pass";
-    if (!isFrittPass && !activeDraft.ui_state.hasOwnProperty('hasInitializedOpen')) {
-        activeDraft.ui_state.openExercises = [0];
-        activeDraft.ui_state.hasInitializedOpen = true;
-        if (typeof saveAll === "function") saveAll();
+    if (!isFrittPass) {
+        if (!activeDraft.ui_state.hasOwnProperty('hasInitializedOpen')) {
+            activeDraft.ui_state.openExercises = [0];
+            activeDraft.ui_state.hasInitializedOpen = true;
+            if (typeof saveAll === "function") saveAll();
+        }
     }
     
     const openExercises = activeDraft.ui_state.openExercises;
-    const timerDisplay = restTimerInterval ? `${Math.floor(restTimerSeconds/60)}:${(restTimerSeconds%60).toString().padStart(2, '0')}` : "⏱️";
 
     activeDraft.workout.exercises.forEach((ex, i) => {
         const exerciseData = activeDraft.data[i];
@@ -1207,14 +1216,13 @@ function renderActiveWorkout() {
         
         const completedSets = exerciseData.sets_data.filter(s => s.userConfirmed).length;
         const totalSets = exerciseData.sets_data.length;
-        
+
         let setsHtml = `<div style="margin-top:10px;">
-            <div style="display:grid; grid-template-columns: 40px 1fr 1fr 30px 40px; gap:8px; margin-bottom:5px; align-items:center;">
+            <div style="display:grid; grid-template-columns: 40px 1fr 1fr 30px; gap:8px; margin-bottom:5px; align-items:center;">
                 <small style="text-align:left; padding-left:5px; color:var(--text-light); font-size:9px; font-weight:700;">SET</small>
                 <small style="text-align:center; color:var(--text-light); font-size:9px;">KG</small>
                 <small style="text-align:center; color:var(--text-light); font-size:9px;">REPS</small>
                 <span></span>
-                <small style="text-align:center; color:var(--text-light); font-size:9px;">VILA</small>
             </div>`;
 
         exerciseData.sets_data.forEach((set, sIdx) => {
@@ -1232,7 +1240,7 @@ function renderActiveWorkout() {
             const statusContent = showSuccess ? '✅' : `#${sIdx + 1}`;
 
             setsHtml += `
-            <div style="display:grid; grid-template-columns: 40px 1fr 1fr 30px 40px; gap:8px; margin-bottom:8px; align-items:center;">
+            <div style="display:grid; grid-template-columns: 40px 1fr 1fr 30px; gap:8px; margin-bottom:8px; align-items:center;">
                 <div onclick="${isLocked && !isDone ? '' : `confirmSet(${i}, ${sIdx})`}" 
                      style="width:32px; height:32px; border-radius:50%; border:2px solid ${circleColor}; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:10px; font-weight:800; background: ${showSuccess ? 'rgba(34, 197, 94, 0.2)' : (isCurrent ? 'rgba(250, 204, 21, 0.15)' : 'rgba(245, 158, 11, 0.05)')}; color: ${circleColor}; opacity: 1;">
                     ${statusContent}
@@ -1240,7 +1248,6 @@ function renderActiveWorkout() {
                 <input type="text" inputmode="decimal" id="w-${i}-${sIdx}" class="log-input" style="margin:0; padding:12px; font-size:18px; opacity: ${isCurrent ? '1' : '0.3'};" value="${set.weight || ''}" ${isLocked ? 'readonly' : ''} oninput="updateSetDataOnly(${i}, ${sIdx})">
                 <input type="text" inputmode="decimal" id="r-${i}-${sIdx}" class="log-input" style="margin:0; padding:12px; font-size:18px; opacity: ${isCurrent ? '1' : '0.3'};" value="${set.reps || ''}" ${isLocked ? 'readonly' : ''} oninput="updateSetDataOnly(${i}, ${sIdx})">
                 <button onclick="removeSetFromExercise(${i}, ${sIdx})" style="background:none; border:none; color:var(--danger); font-size:16px; opacity: ${isLocked || showSuccess ? '0.1' : '0.8'};" ${isLocked ? 'disabled' : ''}>×</button>
-                <button onclick="event.stopPropagation(); startRestTimer()" style="background:none; border:none; font-size:11px; opacity:0.6; cursor:pointer;">${timerDisplay}</button>
             </div>`;
 
             if (isCurrent) {
@@ -1253,20 +1260,28 @@ function renderActiveWorkout() {
 
         div.innerHTML = `
         <div onclick="toggleExercise(${i})" style="padding: 12px 15px; display: flex; align-items: center; cursor: pointer; background: ${isOpen ? 'rgba(250, 204, 21, 0.05)' : 'transparent'}">
+            
             <div style="display: flex; gap: 4px; margin-right: 12px; flex-shrink: 0;">
                 <button class="reorder-btn" onclick="event.stopPropagation(); moveActiveExercise(${i}, -1)" ${isDone ? 'disabled' : ''} style="padding: 4px 6px; font-size: 10px;">▲</button>
                 <button class="reorder-btn" onclick="event.stopPropagation(); moveActiveExercise(${i}, 1)" ${isDone ? 'disabled' : ''} style="padding: 4px 6px; font-size: 10px;">▼</button>
             </div>
+
             <div style="display: flex; flex-direction: column; min-width:0; flex-grow:1;">
-                <strong style="font-size: 14px; color: ${isDone ? 'var(--text-light)' : 'var(--text)'}; text-decoration: ${isDone ? 'line-through' : 'none'}; white-space:nowrap; text-overflow:ellipsis; overflow:hidden;">${ex.name}</strong>
-                <small style="color: ${isDone ? '#22c55e' : 'var(--primary)'}; font-size: 10px;">${isDone ? 'KLAR ✅' : `${completedSets}/${totalSets} set`}</small>
+                <strong style="font-size: 14px; color: ${isDone ? 'var(--text-light)' : 'var(--text)'}; text-decoration: ${isDone ? 'line-through' : 'none'}; white-space:nowrap; text-overflow:ellipsis; overflow:hidden;">
+                    ${ex.name}
+                </strong>
+                <small style="color: ${isDone ? '#22c55e' : 'var(--primary)'}; font-size: 10px;">
+                    ${isDone ? 'KLAR ✅' : `${completedSets}/${totalSets} set`}
+                </small>
             </div>
+
             <div style="display: flex; align-items: center; gap: 8px; flex-shrink: 0; margin-left: 10px;">
                 <button onclick="event.stopPropagation(); openReplaceExerciseModal(${i})" style="background:none; border:none; font-size:14px; padding:5px; opacity: 0.7;" ${isDone ? 'disabled' : ''}>🔄</button>
                 <button onclick="event.stopPropagation(); removeActiveExercise(${i})" style="background:none; border:none; font-size:14px; padding:5px; opacity: 0.7;" ${isDone ? 'disabled' : ''}>✖</button>
                 <span style="font-size: 10px; color: var(--text-light); margin-left: 5px; transform: ${isOpen ? 'rotate(180deg)' : 'rotate(0)'}; transition: 0.3s;">▼</span>
             </div>
         </div>
+
         <div style="padding: 0 15px 15px 15px; display: ${isOpen ? 'block' : 'none'}; border-top: 1px solid rgba(255,255,255,0.05);">
             ${setsHtml}
             <button class="mode-border glass-border" style="padding:8px; font-size:11px; margin-top:10px; border-style:dashed; width:100%;" onclick="addSetToExercise(${i})" ${isDone ? 'disabled' : ''}>+ Lägg till set</button>
@@ -1274,6 +1289,7 @@ function renderActiveWorkout() {
                 ${isDone ? 'Ångra Klar ↩️' : 'Markera övning som klar ✅'}
             </button>
         </div>`;
+        
         list.appendChild(div);
     });
 
@@ -1360,25 +1376,6 @@ function actuallyStartWorkout() {
     persistActiveWorkout();
     renderActiveWorkout();
     if (typeof startTimer === "function") startTimer();
-}
-
-function startRestTimer() {
-    restTimerSeconds = 0;
-    if (restTimerInterval) clearInterval(restTimerInterval);
-    
-    // Uppdatera timer varje sekund
-    restTimerInterval = setInterval(() => {
-        restTimerSeconds++;
-        // Rendera om för att visa uppdaterad tid
-        if (typeof renderActiveWorkout === "function") renderActiveWorkout();
-    }, 1000);
-}
-
-function stopRestTimer() {
-    if (restTimerInterval) {
-        clearInterval(restTimerInterval);
-        restTimerInterval = null;
-    }
 }
 
 function openAddExerciseToWorkoutModal() {
@@ -1648,9 +1645,6 @@ function updateSetDataOnly(exIdx, setIdx) {
 }
 
 function confirmSet(exIdx, setIdx) {
-    // Stoppa vilan när man börjar logga/bekräfta ett set
-    stopRestTimer(); 
-    
     const scrollPos = window.scrollY;
     const currentState = activeDraft.data[exIdx].sets_data[setIdx].userConfirmed;
     activeDraft.data[exIdx].sets_data[setIdx].userConfirmed = !currentState;
