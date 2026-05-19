@@ -594,7 +594,7 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
                 `).join('');
 
                 html += `
-                <div style="display: flex; flex-direction: column; background: rgba(255, 255, 255, 0.02); border-radius: 12px; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.04);">
+                <div style="display: flex; flex-direction: column; background: rgba(255, 255, 255, 0.02); border-radius: 12px; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.06); box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
                     
                     <button class="mode-btn plan-override-btn ${isSelected ? 'active-choice' : ''}" 
                             id="btn-ovr-${p.id}" 
@@ -606,8 +606,8 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
                         ${p.name}
                     </button>
                     
-                    <details style="width: 100%; background: rgba(0, 0, 0, 0.12);">
-                        <summary style="list-style: none; font-size: 10px; color: var(--text-light); opacity: 0.7; cursor: pointer; padding: 8px 4px; text-align: center; border-top: 1px solid rgba(255,255,255,0.03); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; user-select: none;">
+                    <details style="width: 100%; background: rgba(0, 0, 0, 0.15); display: block;">
+                        <summary style="display: block !important; width: 100% !important; box-sizing: border-box; font-size: 10px; color: var(--text-light); opacity: 0.7; cursor: pointer; padding: 10px 6px; text-align: center; border-top: 1px solid rgba(255,255,255,0.04); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; user-select: none; background: rgba(255,255,255,0.01);">
                             Innehåll ▾
                         </summary>
                         <div style="text-align: left; padding: 10px; border-top: 1px solid rgba(0,0,0,0.2); max-height: 140px; overflow-y: auto; background: rgba(0,0,0,0.2);">
