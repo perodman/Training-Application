@@ -1110,9 +1110,6 @@ function startWorkout(workout, data = null, date = null, isImmediateStart = fals
 // Global array för att hålla koll på valda övningar i modalen innan de sparas
 let temporarySelectedExercises = [];
 
-// Global array för att hålla koll på valda övningar i modalen innan de sparas
-let temporarySelectedExercises = [];
-
 function renderActiveWorkout() {
     if (activeDraft && activeDraft.data) {
         activeDraft.data.forEach((exerciseData, i) => {
