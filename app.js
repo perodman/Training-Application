@@ -5,6 +5,8 @@ let activeDraft = JSON.parse(localStorage.getItem("activeWorkoutDraft") || "null
 let calendarOverrides = JSON.parse(localStorage.getItem("calendarOverrides") || "{}");
 let currentViewDate = new Date();
 let currentExerciseCategory = "Ben";
+let restTimerSeconds = 0;
+let restTimerInterval = null;
 
 // Timer-variablerrf
 let timerInterval = null;
@@ -1218,12 +1220,13 @@ function renderActiveWorkout() {
         const totalSets = exerciseData.sets_data.length;
 
         let setsHtml = `<div style="margin-top:10px;">
-            <div style="display:grid; grid-template-columns: 40px 1fr 1fr 30px; gap:8px; margin-bottom:5px; align-items:center;">
-                <small style="text-align:left; padding-left:5px; color:var(--text-light); font-size:9px; font-weight:700;">SET</small>
-                <small style="text-align:center; color:var(--text-light); font-size:9px;">KG</small>
-                <small style="text-align:center; color:var(--text-light); font-size:9px;">REPS</small>
-                <span></span>
-            </div>`;
+    <div style="display:grid; grid-template-columns: 40px 1fr 1fr 30px 40px; gap:8px; margin-bottom:5px; align-items:center;">
+        <small style="text-align:left; padding-left:5px; color:var(--text-light); font-size:9px; font-weight:700;">SET</small>
+        <small style="text-align:center; color:var(--text-light); font-size:9px;">KG</small>
+        <small style="text-align:center; color:var(--text-light); font-size:9px;">REPS</small>
+        <span></span>
+        <small style="text-align:center; color:var(--text-light); font-size:9px;">VILA</small>
+    </div>`;
 
         exerciseData.sets_data.forEach((set, sIdx) => {
             let isLocked = false;
@@ -1376,6 +1379,28 @@ function actuallyStartWorkout() {
     persistActiveWorkout();
     renderActiveWorkout();
     if (typeof startTimer === "function") startTimer();
+}
+
+let restTimerSeconds = 0;
+let restTimerInterval = null;
+
+function startRestTimer() {
+    restTimerSeconds = 0;
+    if (restTimerInterval) clearInterval(restTimerInterval);
+    
+    // Uppdatera timer varje sekund
+    restTimerInterval = setInterval(() => {
+        restTimerSeconds++;
+        // Rendera om för att visa uppdaterad tid
+        if (typeof renderActiveWorkout === "function") renderActiveWorkout();
+    }, 1000);
+}
+
+function stopRestTimer() {
+    if (restTimerInterval) {
+        clearInterval(restTimerInterval);
+        restTimerInterval = null;
+    }
 }
 
 function openAddExerciseToWorkoutModal() {
@@ -1645,6 +1670,9 @@ function updateSetDataOnly(exIdx, setIdx) {
 }
 
 function confirmSet(exIdx, setIdx) {
+    // Stoppa vilan när man börjar logga/bekräfta ett set
+    stopRestTimer(); 
+    
     const scrollPos = window.scrollY;
     const currentState = activeDraft.data[exIdx].sets_data[setIdx].userConfirmed;
     activeDraft.data[exIdx].sets_data[setIdx].userConfirmed = !currentState;
