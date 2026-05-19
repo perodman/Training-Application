@@ -1110,6 +1110,9 @@ function startWorkout(workout, data = null, date = null, isImmediateStart = fals
 // Global array för att hålla koll på valda övningar i modalen innan de sparas
 let temporarySelectedExercises = [];
 
+// Global array för att hålla koll på valda övningar i modalen innan de sparas
+let temporarySelectedExercises = [];
+
 function renderActiveWorkout() {
     if (activeDraft && activeDraft.data) {
         activeDraft.data.forEach((exerciseData, i) => {
@@ -1344,7 +1347,6 @@ function actuallyStartWorkout() {
 }
 
 function openAddExerciseToWorkoutModal() {
-    temporarySelectedExercises = []; 
     renderExercisePicker("Ben");
     openModal();
 }
@@ -1398,7 +1400,7 @@ function renderExercisePicker(category, replaceIndex = null) {
 
         html += `
         <div class="card glass" id="picker-ex-${ex.id}" style="padding:12px; margin:0; cursor:pointer; display:flex; justify-content:space-between; align-items:center; border-radius:12px; background: ${currentBg} !important; border: ${currentBorder} !important; transition: all 0.2s;" 
-             onclick="${replaceIndex !== null ? `confirmAddExerciseToActive(${ex.id}, ${replaceIndex})` : `toggleSelectExerciseInPicker(${ex.id}, '${category}')`}">
+             onclick="${replaceIndex !== null ? `confirmAddExerciseToActive(${ex.id}, ${replaceIndex})` : `toggleSelectExerciseInPicker(${ex.id}, '${category}')` || ''}">
             <span style="font-size:13px; font-weight:600;">${ex.name}</span>
             <span id="picker-icon-${ex.id}" style="color:${isSelectedInBatch ? '#22c55e' : 'var(--primary)'}; font-size:18px; font-weight:bold;">${currentIcon}</span>
         </div>`;
@@ -1504,8 +1506,31 @@ function confirmAndAddAllSelectedExercises() {
     renderActiveWorkout();
 }
 
+// UPPDATERAD FUNKTION: Hanterar fallet när en helt ny övning har skapats i systemet
 function handleInstantExerciseCreated(newEx, replaceIndex = null) {
-    confirmAddExerciseToActive(newEx.id, replaceIndex);
+    if (replaceIndex !== null) {
+        // Om vi höll på att Byt ut en enskild övning kör vi på som vanligt direkt
+        confirmAddExerciseToActive(newEx.id, replaceIndex);
+    } else {
+        // Om vi håller på att samla på oss övningar (Fritt pass):
+        // 1. Lägg till den nyskapade övningens ID i vår temporära varukorg direkt!
+        if (!temporarySelectedExercises.includes(newEx.id)) {
+            temporarySelectedExercises.push(newEx.id);
+        }
+        
+        // 2. Ta reda på vilken kategori den tillhör så vi kan öppna rätt flik igen
+        let categoryToOpen = "Ben"; // Standardfall
+        if (newEx.target) {
+            if (newEx.target === "Biceps" || newEx.target === "Triceps") {
+                categoryToOpen = "Armar";
+            } else {
+                categoryToOpen = newEx.target; // T.ex Bröst, Rygg, Axlar...
+            }
+        }
+        
+        // 3. Öppna och rita upp övningsväljaren igen med den nya övningen vald och markerad i listan!
+        renderExercisePicker(categoryToOpen, null);
+    }
 }
 
 function confirmAddExerciseToActive(exId, replaceIndex = null) {
