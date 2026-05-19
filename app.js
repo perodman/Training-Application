@@ -526,15 +526,14 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
         </div>`;
     }
     else {
-        // FIXAT HÄR: Tog bort den felaktiga backticken efter </p> så att strängen fortsätter oavbrutet nedåt
         html += `
         <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px; width: 100%; margin-top: 16px;">
             <div style="flex-grow: 1; height: 1px; background: rgba(255,255,255,0.08);"></div>
-           <span class="status-box-title" style="font-size: 12px !important; text-transform: uppercase; color: var(--text-light); font-weight: 700; letter-spacing: 1px; margin: 0 !important; white-space: nowrap;">Status</span>
+            <span class="status-box-title" style="font-size: 12px !important; text-transform: uppercase; color: var(--text-light); font-weight: 700; letter-spacing: 1px; margin: 0 !important; white-space: nowrap;">Status</span>
             <div style="flex-grow: 1; height: 1px; background: rgba(255,255,255,0.08);"></div>
         </div>
         
-       <div class="modern-status-card day-manager-status-box" style="padding: 30px 15px 30px 15px !important; align-items: stretch !important; margin-top: -10px !important;">
+        <div class="modern-status-card day-manager-status-box" style="padding: 30px 15px 30px 15px !important; align-items: stretch !important; margin-top: -10px !important;">
             
             <p id="current-planned-label" class="status-box-text" style="margin: 0 0 8px 0 !important; text-align: center !important; font-size: 16px; font-weight: 600; padding: 0 !important; line-height: 1.2 !important;">
                 ${planned ? `📋 <span class="status-highlight-text">${planned.name}</span>` : '🧘 Planerad Vila'}
@@ -569,55 +568,49 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
             <div class="plan-override-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; width: 100%;">`;
             
             programData.routine.forEach((p, idx) => {
-    const isSelected = planned && p.id === planned.id;
-    
-    // En palett med dina fyra färger
-    const colors = [
-        { border: "#ef4444", bg: "rgba(239, 68, 68, 0.05)" },  // 0: Röd
-        { border: "#3b82f6", bg: "rgba(59, 130, 246, 0.05)" },  // 1: Blå
-        { border: "#10b981", bg: "rgba(16, 185, 129, 0.05)" },  // 2: Grön
-        { border: "#a855f7", bg: "rgba(168, 85, 247, 0.05)" }   // 3: Lila
-    ];
-    
-    // Räknar 0, 1, 2, 3, 0, 1, 2, 3... baserat på knappens plats i listan
-    const colorIndex = idx % colors.length;
-    const btnColor = colors[colorIndex].border;
-    const btnBg = colors[colorIndex].bg;
-    
-    // Välj en av färgerna i paletten baserat på namnets unika hash-nummer
-    const colorIndex = Math.abs(hash) % colors.length;
-    const btnColor = colors[colorIndex].border;
-    const btnBg = colors[colorIndex].bg;
+                const isSelected = planned && p.id === planned.id;
+                
+                // En palett med dina fyra färger
+                const colors = [
+                    { border: "#ef4444", bg: "rgba(239, 68, 68, 0.05)" },  // 0: Röd
+                    { border: "#3b82f6", bg: "rgba(59, 130, 246, 0.05)" },  // 1: Blå
+                    { border: "#10b981", bg: "rgba(16, 185, 129, 0.05)" },  // 2: Grön
+                    { border: "#a855f7", bg: "rgba(168, 85, 247, 0.05)" }   // 3: Lila
+                ];
+                
+                // Beräknar ett index baserat på loopens varv (0, 1, 2, 3...)
+                const colorIndex = idx % colors.length;
+                const btnColor = colors[colorIndex].border;
+                const btnBg = colors[colorIndex].bg;
 
-    // (Resten av koden inuti loopen förblir exakt densamma som innan)
-    const exList = p.exercises.map(e => `
-        <div style="background: rgba(255,255,255,0.05); padding: 5px 8px; border-radius: 6px; margin-bottom: 4px; border-left: 2px solid ${btnColor}; font-size: 10px; color: #ddd; display: flex; align-items: center;">
-            <span style="margin-right: 6px; opacity: 0.5;">•</span> ${e.name}
-        </div>
-    `).join('');
+                const exList = p.exercises.map(e => `
+                    <div style="background: rgba(255,255,255,0.05); padding: 5px 8px; border-radius: 6px; margin-bottom: 4px; border-left: 2px solid ${btnColor}; font-size: 10px; color: #ddd; display: flex; align-items: center;">
+                        <span style="margin-right: 6px; opacity: 0.5;">•</span> ${e.name}
+                    </div>
+                `).join('');
 
-    html += `
-    <div style="display: flex; flex-direction: column; gap: 5px;">
-        <button class="mode-btn plan-override-btn ${isSelected ? 'active-choice' : ''}" 
-                id="btn-ovr-${p.id}" 
-                onclick="setOverrideSilent('${dateStr}', '${p.id}')"
-                style="margin: 0; padding: 12px; font-size: 13px; border-radius: 12px; font-weight: 600; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; width:100%;
-                       background: ${isSelected ? 'rgba(255,255,255,0.1)' : btnBg} !important;
-                       border-top: 2px solid ${btnColor} !important;
-                       color: ${isSelected ? '#ffffff' : 'var(--text-light)'} !important;">
-            ${p.name}
-        </button>
-        
-        <details style="width: 100%; text-align: center;">
-            <summary style="list-style: none; font-size: 10px; color: var(--text-light); opacity: 0.6; cursor: pointer; padding: 4px; border-radius: 8px;">
-                Innehåll ▾
-            </summary>
-            <div style="text-align: left; padding: 8px; border-radius: 10px; margin-top: 4px; max-height: 120px; overflow-y: auto; background: rgba(0,0,0,0.1);">
-                ${exList}
-            </div>
-        </details>
-    </div>`;
-});
+                html += `
+                <div style="display: flex; flex-direction: column; gap: 5px;">
+                    <button class="mode-btn plan-override-btn ${isSelected ? 'active-choice' : ''}" 
+                            id="btn-ovr-${p.id}" 
+                            onclick="setOverrideSilent('${dateStr}', '${p.id}')"
+                            style="margin: 0; padding: 12px; font-size: 13px; border-radius: 12px; font-weight: 600; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; width:100%;
+                                   background: ${isSelected ? 'rgba(255,255,255,0.1)' : btnBg} !important;
+                                   border-top: 2px solid ${btnColor} !important;
+                                   color: ${isSelected ? '#ffffff' : 'var(--text-light)'} !important;">
+                        ${p.name}
+                    </button>
+                    
+                    <details style="width: 100%; text-align: center;">
+                        <summary style="list-style: none; font-size: 10px; color: var(--text-light); opacity: 0.6; cursor: pointer; padding: 4px; border-radius: 8px;">
+                            Innehåll ▾
+                        </summary>
+                        <div style="text-align: left; padding: 8px; border-radius: 10px; margin-top: 4px; max-height: 120px; overflow-y: auto; background: rgba(0,0,0,0.1);">
+                            ${exList}
+                        </div>
+                    </details>
+                </div>`;
+            });
             
             const isRestSelected = !planned;
             html += `
