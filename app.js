@@ -480,7 +480,74 @@ function openProgramPreviewModal(idx) {
     previewModal.style.display = "flex";
 }
 
-// HUVUDFUNKTIONEN (Uppdaterad med snygga info-knappar istället för trånga detaljlistor)
+// GLOBALA VARIABLER FÖR ATT HÅLLA KOLL PÅ LÅNGTRYCKET
+let touchTimeout = null;
+let isLongPress = false;
+
+function startPress(idx) {
+    isLongPress = false;
+    // Starta en timer på 500ms (ett halvt sekund)
+    touchTimeout = setTimeout(() => {
+        isLongPress = true;
+        openProgramPreviewModal(idx);
+    }, 500);
+}
+
+function cancelPress() {
+    // Om användaren släpper eller flyttar fingret innan 500ms, avbryt timern
+    if (touchTimeout) {
+        clearTimeout(touchTimeout);
+    }
+}
+
+// NY FUNKTION: Öppnar en renodlad popup-ruta med övningarna
+function openProgramPreviewModal(idx) {
+    const pass = programData.routine[idx];
+    
+    let previewModal = document.getElementById("preview-modal");
+    if (!previewModal) {
+        previewModal = document.createElement("div");
+        previewModal.id = "preview-modal";
+        previewModal.style.position = "fixed";
+        previewModal.style.top = "0";
+        previewModal.style.left = "0";
+        previewModal.style.width = "100vw";
+        previewModal.style.height = "100vh";
+        previewModal.style.backgroundColor = "rgba(0, 0, 0, 0.75)";
+        previewModal.style.backdropFilter = "blur(8px)";
+        previewModal.style.display = "flex";
+        previewModal.style.justifyContent = "center";
+        previewModal.style.alignItems = "center";
+        previewModal.style.zIndex = "10000"; 
+        document.body.appendChild(previewModal);
+    }
+
+    previewModal.innerHTML = `
+        <div class="card glass" style="width: 90%; max-width: 400px; padding: 20px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); background: rgba(15, 23, 42, 0.95); animation: modalFadeIn 0.2s ease-out;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.08);">
+                <h3 style="margin: 0; font-size: 20px; color: #fff;">${pass.name}</h3>
+                <button onclick="document.getElementById('preview-modal').style.display='none'" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: var(--text-light); cursor: pointer; font-size: 14px; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">✖</button>
+            </div>
+            
+            <div style="max-height: 300px; overflow-y: auto; display: flex; flex-direction: column; gap: 2px;">
+                ${pass.exercises.map(e => `
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 4px; border-bottom: 1px solid rgba(255,255,255,0.03);">
+                        <span style="font-weight: 600; color: #ffffff; font-size: 14px;">${e.name}</span>
+                        <small style="color: var(--primary); font-weight: 800; text-transform: uppercase; font-size: 10px; background: rgba(59, 130, 246, 0.1); padding: 4px 8px; border-radius: 6px;">${e.target || 'Övning'}</small>
+                    </div>
+                `).join("")}
+            </div>
+            
+            <button onclick="document.getElementById('preview-modal').style.display='none'" style="width: 100%; margin-top: 20px; padding: 12px; background: var(--primary); color: #0f172a; border: none; border-radius: 12px; font-weight: 700; cursor: pointer;">
+                Stäng översikt
+            </button>
+        </div>
+    `;
+
+    previewModal.style.display = "flex";
+}
+
+// HUVUDFUNKTIONEN (Uppdaterad för att hantera Long-Press istället för klick-ikon)
 function openDayManager(dateStr, planned, completed, isOngoing) {
     if (typeof hideDefaultCloseButton === 'function') {
         hideDefaultCloseButton(false);
@@ -632,22 +699,24 @@ function openDayManager(dateStr, planned, completed, isOngoing) {
                 const btnBg = `rgba(${c.r}, ${c.g}, ${c.b}, 0.04)`;
 
                 html += `
-                <div style="display: flex; position: relative; background: ${isSelected ? 'rgba(255,255,255,0.1)' : btnBg}; border-radius: 12px; border-top: 2px solid ${borderColor}; box-shadow: 0 4px 6px rgba(0,0,0,0.1); overflow: hidden;">
-                    
-                    <button class="mode-btn plan-override-btn ${isSelected ? 'active-choice' : ''}" 
-                            id="btn-ovr-${p.id}" 
-                            onclick="setOverrideSilent('${dateStr}', '${p.id}')"
-                            style="margin: 0; padding: 15px 35px 15px 12px; font-size: 13px; font-weight: 600; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; width: 100%; border: none; background: transparent !important;
-                                   color: ${isSelected ? '#ffffff' : 'var(--text-light)'} !important; text-align: left;">
-                        ${p.name}
-                    </button>
-                    
-                    <div onclick="openProgramPreviewModal(${idx})" 
-                         style="position: absolute; right: 0; top: 0; bottom: 0; width: 35px; display: flex; align-items: center; justify-content: center; cursor: pointer; background: rgba(0,0,0,0.2); border-left: 1px solid rgba(255,255,255,0.05); font-size: 12px; user-select: none;"
-                         title="Visa övningar">
-                        ℹ️
-                    </div>
-                </div>`;
+                <button class="mode-btn plan-override-btn ${isSelected ? 'active-choice' : ''}" 
+                        id="btn-ovr-${p.id}" 
+                        
+                        onmousedown="startPress(${idx})"
+                        onmouseup="cancelPress(); if(!isLongPress) setOverrideSilent('${dateStr}', '${p.id}');"
+                        onmouseleave="cancelPress();"
+                        
+                        ontouchstart="startPress(${idx})"
+                        ontouchend="cancelPress(); if(!isLongPress) setOverrideSilent('${dateStr}', '${p.id}');"
+                        ontouchmove="cancelPress();"
+                        
+                        style="margin: 0; padding: 15px 12px; font-size: 13px; border-radius: 12px; font-weight: 600; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; width: 100%;
+                               background: ${isSelected ? 'rgba(255,255,255,0.1)' : btnBg} !important;
+                               border-top: 2px solid ${borderColor} !important;
+                               color: ${isSelected ? '#ffffff' : 'var(--text-light)'} !important;
+                               user-select: none !important; -webkit-user-select: none !important; -webkit-touch-callout: none !important;">
+                    ${p.name}
+                </button>`;
             });
             
             const isRestSelected = !planned;
