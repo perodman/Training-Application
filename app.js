@@ -77,18 +77,16 @@ function showView(id) {
 }
 
 function closeModal() {
-    const modal = document.getElementById("workout-modal");
-    if (modal) {
-        modal.classList.add("hidden");
-    }
-    
+    document.getElementById("workout-modal").classList.add("hidden");
     const video = document.querySelector("#modal-body video");
     if(video) video.pause();
     
+    // SÄKERHETSÅTGÄRD: Se till att den fasta stäng-knappen ALLTID visas igen
     if (typeof hideDefaultCloseButton === 'function') {
         hideDefaultCloseButton(false);
     }
 
+    // HÄR ÅTERSTÄLLER VI DIN DRAFT
     restoreDraftState();
 }
 
@@ -382,15 +380,6 @@ function renderCalendar(isFromStartBtn = false) {
     const label = document.getElementById("month-label");
     const infoBox = document.getElementById("calendar-info-box");
     
-    // SÄKERHETSKONTROLL: Om vi inte är på kalendervyn, avbryt eller visa vyn först
-    if (!grid || !label || !infoBox) {
-        console.warn("Kalender-element hittades inte. Försöker byta vy...");
-        showView("calendar-view");
-        // Använd setTimeout för att låta DOM hinna rendera innan vi kör logiken igen
-        setTimeout(() => renderCalendar(isFromStartBtn), 50);
-        return;
-    }
-    
     grid.innerHTML = "";
     infoBox.innerHTML = ""; 
     
@@ -409,19 +398,17 @@ function renderCalendar(isFromStartBtn = false) {
     const offset = firstDay === 0 ? 6 : firstDay - 1;
     const daysInMonth = new Date(year, month + 1, 0).getDate();
 
+    // Hämta dagens faktiska datum för att matcha mot loopen
     const now = new Date();
     const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
 
-    for (let i = 0; i < offset; i++) {
-        const emptyDiv = document.createElement("div");
-        grid.appendChild(emptyDiv);
-    }
-    
+    for (let i = 0; i < offset; i++) grid.innerHTML += `<div></div>`;
     for (let d = 1; d <= daysInMonth; d++) {
         const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
         const cell = document.createElement("div");
         cell.className = "calendar-cell";
         
+        // NYTT: Kontrollera om denna ruta är dagens datum – lägg i så fall till klassen "today"
         if (dateStr === todayStr) {
             cell.classList.add("today");
         }
@@ -432,20 +419,19 @@ function renderCalendar(isFromStartBtn = false) {
         const isAutoDay = [1, 3, 5].includes(dayOfWeek);
         const override = calendarOverrides[dateStr];
         let displayPass = null;
-        
         if (override && override !== "none") displayPass = programData.routine.find(p => p.id === override);
         else if (isAutoDay && override !== "none") displayPass = programData.routine[d % programData.routine.length];
         
         let info = "";
         if (hasWorkouts.length > 0) { cell.classList.add("cell-completed"); info = "✓"; }
-        else if (isOngoing) { cell.classList.add("cell-ongoing"); info = displayPass ? displayPass.name.split(" ").pop() : ""; }
+        else if (isOngoing) { cell.classList.add("cell-ongoing"); info = displayPass.name.split(" ").pop(); }
         else if (displayPass) { cell.classList.add("cell-planned"); info = displayPass.name.split(" ").pop(); }
         
+        // Punkt 3: Ändrad struktur för info-ikon för bättre centrering
         cell.innerHTML = `<span>${d}</span><div class="cell-info">${info}</div>`;
         cell.onclick = () => openDayManager(dateStr, displayPass, hasWorkouts, isOngoing);
         grid.appendChild(cell);
     }
-    
     showView("calendar-view");
 }
 
