@@ -77,16 +77,18 @@ function showView(id) {
 }
 
 function closeModal() {
-    document.getElementById("workout-modal").classList.add("hidden");
+    const modal = document.getElementById("workout-modal");
+    if (modal) {
+        modal.classList.add("hidden");
+    }
+    
     const video = document.querySelector("#modal-body video");
     if(video) video.pause();
     
-    // SÄKERHETSÅTGÄRD: Se till att den fasta stäng-knappen ALLTID visas igen
     if (typeof hideDefaultCloseButton === 'function') {
         hideDefaultCloseButton(false);
     }
 
-    // HÄR ÅTERSTÄLLER VI DIN DRAFT
     restoreDraftState();
 }
 
